@@ -36,6 +36,18 @@ public class GroupDAOImpl implements GroupDAO {
     @Value("${groups.delete}")
     private String delete;
 
+    @Value("${groups.getByCathedraId}")
+    private String getByCathedraId;
+
+    @Value("${groups.assignToCathedra}")
+    private String assignToCathedra;
+
+    @Value("${groups.updateAssignment}")
+    private String updateAssignment;
+
+    @Value("${groups.deleteAssignment}")
+    private String deleteAssignment;
+
     @Autowired
     public GroupDAOImpl(JdbcTemplate jdbcTemplate, SimpleJdbcInsert jdbcInsert, GroupMapper groupMapper) {
         this.jdbcTemplate = jdbcTemplate;
@@ -52,7 +64,7 @@ public class GroupDAOImpl implements GroupDAO {
     }
 
     @Override
-    public Group getByID(int id) {
+    public Group getById(int id) {
         return jdbcTemplate.queryForObject(getByID, groupMapper, id);
     }
 
@@ -69,5 +81,25 @@ public class GroupDAOImpl implements GroupDAO {
     @Override
     public void delete(int id) {
         jdbcTemplate.update(delete, id);
+    }
+
+    @Override
+    public List<Group> getByCathedraId(int cathedraId) {
+        return jdbcTemplate.query(getByCathedraId, groupMapper, cathedraId);
+    }
+
+    @Override
+    public void assignToCathedra(int cathedraId, int groupId) {
+        jdbcTemplate.update(assignToCathedra, cathedraId, groupId);
+    }
+
+    @Override
+    public void updateAssignment(int cathedraId, int groupId) {
+        jdbcTemplate.update(updateAssignment, cathedraId, groupId);
+    }
+
+    @Override
+    public void deleteAssignment(int groupId) {
+        jdbcTemplate.update(deleteAssignment, groupId);
     }
 }

@@ -63,3 +63,39 @@ INSERT INTO day_timetables
 VALUES (1, '08:00', '112', 'math', 1, 1);
 INSERT INTO day_timetables
 VALUES (2, '10:00', '312', 'physic', 2, 2);
+
+DELETE
+FROM groups_students
+WHERE TRUE;
+
+INSERT INTO groups_students
+VALUES (1, 1);
+INSERT INTO groups_students
+VALUES (1, 2);
+
+DELETE
+FROM cathedras_groups
+WHERE TRUE;
+
+INSERT INTO cathedras_groups
+VALUES (1, 1);
+INSERT INTO cathedras_groups
+VALUES (1, 2);
+
+DELETE
+FROM cathedras_teachers
+WHERE TRUE;
+
+INSERT INTO cathedras_teachers
+VALUES (1, 1);
+INSERT INTO cathedras_teachers
+VALUES (1, 2);
+
+DELETE
+FROM day_timetables_month_timetables
+WHERE TRUE;
+
+INSERT INTO day_timetables_month_timetables
+VALUES (1, 1);
+INSERT INTO day_timetables_month_timetables
+VALUES (1, 2);

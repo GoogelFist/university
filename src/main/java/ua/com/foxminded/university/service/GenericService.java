@@ -1,8 +1,8 @@
-package ua.com.foxminded.university.dao;
+package ua.com.foxminded.university.service;
 
 import java.util.List;
 
-public interface GenericDao<T> {
+public interface GenericService<T> {
     void create(T t);
 
     T getById(int id);

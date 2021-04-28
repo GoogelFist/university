@@ -1,10 +1,10 @@
-package ua.com.foxminded.university.dao;
+package ua.com.foxminded.university.service;
 
 import ua.com.foxminded.university.entities.Student;
 
 import java.util.List;
 
-public interface StudentDAO extends GenericDao<Student> {
+public interface StudentService extends GenericService<Student> {
     List<Student> getByGroupId(int groupId);
 
     void assignToGroup(int groupId, int studentId);

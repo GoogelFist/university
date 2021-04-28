@@ -40,6 +40,18 @@ public class TeacherDAOImpl implements TeacherDAO {
     @Value("${teachers.delete}")
     private String delete;
 
+    @Value("${teachers.getByCathedraId}")
+    private String getByCathedraId;
+
+    @Value("${teachers.assignToCathedra}")
+    private String assignToCathedra;
+
+    @Value("${teachers.updateAssignment}")
+    private String updateAssignment;
+
+    @Value("${teachers.deleteAssignment}")
+    private String deleteAssignment;
+
     @Autowired
     public TeacherDAOImpl(JdbcTemplate jdbcTemplate, SimpleJdbcInsert jdbcInsert, TeacherMapper teacherMapper) {
         this.jdbcTemplate = jdbcTemplate;
@@ -59,7 +71,7 @@ public class TeacherDAOImpl implements TeacherDAO {
     }
 
     @Override
-    public Teacher getByID(int id) {
+    public Teacher getById(int id) {
         return jdbcTemplate.queryForObject(getByID, teacherMapper, id);
     }
 
@@ -76,5 +88,25 @@ public class TeacherDAOImpl implements TeacherDAO {
     @Override
     public void delete(int id) {
         jdbcTemplate.update(delete, id);
+    }
+
+    @Override
+    public List<Teacher> getByCathedraId(int cathedraId) {
+        return jdbcTemplate.query(getByCathedraId, teacherMapper, cathedraId);
+    }
+
+    @Override
+    public void assignToCathedra(int cathedraId, int teacherId) {
+        jdbcTemplate.update(assignToCathedra, cathedraId, teacherId);
+    }
+
+    @Override
+    public void updateAssignment(int cathedraId, int teacherId) {
+        jdbcTemplate.update(updateAssignment, cathedraId, teacherId);
+    }
+
+    @Override
+    public void deleteAssignment(int teacherId) {
+        jdbcTemplate.update(deleteAssignment, teacherId);
     }
 }

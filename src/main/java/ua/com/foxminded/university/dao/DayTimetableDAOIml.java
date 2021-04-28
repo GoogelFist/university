@@ -41,6 +41,15 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     @Value("${day_timetables.delete}")
     private String delete;
 
+    @Value("${day_timetables.getByGroupId}")
+    private String getByGroupId;
+
+    @Value("${day_timetables.getByTeacherId}")
+    private String getByTeacherId;
+
+    @Value("${day_timetables.getByMonthTimetableId}")
+    private String getByMonthTimetableId;
+
     @Autowired
     public DayTimetableDAOIml(JdbcTemplate jdbcTemplate, SimpleJdbcInsert jdbcInsert, DayTimetableMapper dayTimetableMapper) {
         this.jdbcTemplate = jdbcTemplate;
@@ -61,7 +70,7 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     }
 
     @Override
-    public DayTimetable getByID(int id) {
+    public DayTimetable getById(int id) {
         return jdbcTemplate.queryForObject(getByID, dayTimetableMapper, id);
     }
 
@@ -79,5 +88,20 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     @Override
     public void delete(int id) {
         jdbcTemplate.update(delete, id);
+    }
+
+    @Override
+    public List<DayTimetable> getByGroupId(int groupId) {
+        return jdbcTemplate.query(getByGroupId, dayTimetableMapper, groupId);
+    }
+
+    @Override
+    public List<DayTimetable> getByTeacherId(int teacherId) {
+        return jdbcTemplate.query(getByTeacherId, dayTimetableMapper, teacherId);
+    }
+
+    @Override
+    public List<DayTimetable> getByMonthTimetableId(int id) {
+        return jdbcTemplate.query(getByMonthTimetableId, dayTimetableMapper, id);
     }
 }

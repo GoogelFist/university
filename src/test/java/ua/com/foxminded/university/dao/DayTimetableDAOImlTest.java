@@ -45,7 +45,7 @@ class DayTimetableDAOImlTest {
         teacher = new Teacher(2);
         expectedDayTimetable = new DayTimetable(3, LocalTime.of(12, 0), "223", "biology", group, teacher);
         dayTimetableDAO.create(expectedDayTimetable);
-        actualDayTimetable = dayTimetableDAO.getByID(3);
+        actualDayTimetable = dayTimetableDAO.getById(3);
 
         assertEquals(expectedDayTimetable, actualDayTimetable);
     }
@@ -56,7 +56,7 @@ class DayTimetableDAOImlTest {
         teacher = new Teacher(1);
         expectedDayTimetable = new DayTimetable(1, LocalTime.of(8, 0), "112", "math", group, teacher);
 
-        actualDayTimetable = dayTimetableDAO.getByID(1);
+        actualDayTimetable = dayTimetableDAO.getById(1);
 
         assertEquals(expectedDayTimetable, actualDayTimetable);
     }
@@ -84,7 +84,7 @@ class DayTimetableDAOImlTest {
         teacher = new Teacher(1);
         expectedDayTimetable = new DayTimetable(1, LocalTime.of(14, 0), "412", "arts", group, teacher);
         dayTimetableDAO.update(1, expectedDayTimetable);
-        actualDayTimetable = dayTimetableDAO.getByID(1);
+        actualDayTimetable = dayTimetableDAO.getById(1);
 
         assertEquals(expectedDayTimetable, actualDayTimetable);
     }
@@ -98,6 +98,45 @@ class DayTimetableDAOImlTest {
 
         dayTimetableDAO.delete(2);
         List<DayTimetable> actualDayTimetables = dayTimetableDAO.getAll();
+
+        assertEquals(expectedTimetables, actualDayTimetables);
+    }
+
+    @Test
+    void shouldGetDayTimetablesByGroupsId() {
+        List<DayTimetable> expectedTimetables = new ArrayList<>();
+        group = new Group(1);
+        teacher = new Teacher(1);
+        expectedTimetables.add(new DayTimetable(1, LocalTime.of(8, 0), "112", "math", group, teacher));
+
+        List<DayTimetable> actualDayTimetables = dayTimetableDAO.getByGroupId(1);
+
+        assertEquals(expectedTimetables, actualDayTimetables);
+    }
+
+    @Test
+    void shouldGetDayTimetablesByTeacherId() {
+        List<DayTimetable> expectedTimetables = new ArrayList<>();
+        group = new Group(1);
+        teacher = new Teacher(1);
+        expectedTimetables.add(new DayTimetable(1, LocalTime.of(8, 0), "112", "math", group, teacher));
+
+        List<DayTimetable> actualDayTimetables = dayTimetableDAO.getByTeacherId(1);
+
+        assertEquals(expectedTimetables, actualDayTimetables);
+    }
+
+    @Test
+    void shouldGetDayTimetableByMonthTimetableId() {
+        List<DayTimetable> expectedTimetables = new ArrayList<>();
+        group = new Group(1);
+        teacher = new Teacher(1);
+        Group group2 = new Group(2);
+        Teacher teacher2 = new Teacher(2);
+        expectedTimetables.add(new DayTimetable(1, LocalTime.of(8, 0), "112", "math", group, teacher));
+        expectedTimetables.add(new DayTimetable(2, LocalTime.of(10, 0), "312", "physic", group2, teacher2));
+
+        List<DayTimetable> actualDayTimetables = dayTimetableDAO.getByMonthTimetableId(1);
 
         assertEquals(expectedTimetables, actualDayTimetables);
     }

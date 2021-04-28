@@ -35,7 +35,7 @@ class CathedraDAOImplTest {
     void shouldCreateCathedras() {
         Cathedra expectedCathedra = new Cathedra(3, "maths");
         cathedraDAO.create(expectedCathedra);
-        Cathedra actualCathedra = cathedraDAO.getByID(3);
+        Cathedra actualCathedra = cathedraDAO.getById(3);
 
         assertEquals(expectedCathedra, actualCathedra);
     }
@@ -43,7 +43,7 @@ class CathedraDAOImplTest {
     @Test
     void shouldGetCathedraByID() {
         Cathedra expectedCathedra = new Cathedra(1, "physics");
-        Cathedra actualCathedra = cathedraDAO.getByID(1);
+        Cathedra actualCathedra = cathedraDAO.getById(1);
 
         assertEquals(expectedCathedra, actualCathedra);
     }
@@ -63,7 +63,7 @@ class CathedraDAOImplTest {
     void shouldUpdateCathedra() {
         Cathedra expectedCathedra = new Cathedra(1, "maths");
         cathedraDAO.update(1, expectedCathedra);
-        Cathedra actualCathedra = cathedraDAO.getByID(1);
+        Cathedra actualCathedra = cathedraDAO.getById(1);
 
         assertEquals(expectedCathedra, actualCathedra);
     }

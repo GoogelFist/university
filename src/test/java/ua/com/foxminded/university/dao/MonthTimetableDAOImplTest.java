@@ -36,7 +36,7 @@ class MonthTimetableDAOImplTest {
     void shouldCreateMonthTimetable() {
         MonthTimetable expectedMonthTimetable = new MonthTimetable(3, LocalDate.of(2021, 4, 25));
         monthTimetableDAO.create(expectedMonthTimetable);
-        MonthTimetable actualMonthTimetable = monthTimetableDAO.getByID(3);
+        MonthTimetable actualMonthTimetable = monthTimetableDAO.getById(3);
 
         assertEquals(expectedMonthTimetable, actualMonthTimetable);
     }
@@ -44,7 +44,7 @@ class MonthTimetableDAOImplTest {
     @Test
     void shouldGetMonthTimetableByID() {
         MonthTimetable expectedMonthTimetable = new MonthTimetable(1, LocalDate.of(2021, 4, 23));
-        MonthTimetable actualMonthTimetable = monthTimetableDAO.getByID(1);
+        MonthTimetable actualMonthTimetable = monthTimetableDAO.getById(1);
 
         assertEquals(expectedMonthTimetable, actualMonthTimetable);
     }
@@ -64,7 +64,7 @@ class MonthTimetableDAOImplTest {
     void shouldUpdateMonthTimetable() {
         MonthTimetable expectedMonthTimetable = new MonthTimetable(1, LocalDate.of(2000, 1, 1));
         monthTimetableDAO.update(1, expectedMonthTimetable);
-        MonthTimetable actualMonthTimetable = monthTimetableDAO.getByID(1);
+        MonthTimetable actualMonthTimetable = monthTimetableDAO.getById(1);
 
         assertEquals(expectedMonthTimetable, actualMonthTimetable);
     }

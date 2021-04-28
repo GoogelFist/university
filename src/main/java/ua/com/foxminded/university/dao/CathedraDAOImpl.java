@@ -52,7 +52,7 @@ public class CathedraDAOImpl implements CathedraDAO {
     }
 
     @Override
-    public Cathedra getByID(int id) {
+    public Cathedra getById(int id) {
         return jdbcTemplate.queryForObject(getByID, cathedraMapper, id);
     }
 

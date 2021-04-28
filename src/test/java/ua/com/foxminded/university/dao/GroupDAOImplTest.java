@@ -13,6 +13,7 @@ import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 @SpringJUnitConfig(DaoTestConfig.class)
@@ -35,7 +36,7 @@ class GroupDAOImplTest {
     void shouldCreateGroup() {
         Group expectedGroup = new Group(3, "CC-10");
         groupDAO.create(expectedGroup);
-        Group actualGroup = groupDAO.getByID(3);
+        Group actualGroup = groupDAO.getById(3);
 
         assertEquals(expectedGroup, actualGroup);
     }
@@ -43,7 +44,7 @@ class GroupDAOImplTest {
     @Test
     void shouldGetGroupByID() {
         Group expectedGroup = new Group(1, "AC-10");
-        Group actualGroup = groupDAO.getByID(1);
+        Group actualGroup = groupDAO.getById(1);
 
         assertEquals(expectedGroup, actualGroup);
     }
@@ -63,7 +64,7 @@ class GroupDAOImplTest {
     void shouldUpdateGroup() {
         Group expectedGroup = new Group(1, "ABC-123");
         groupDAO.update(1, expectedGroup);
-        Group actualGroup = groupDAO.getByID(1);
+        Group actualGroup = groupDAO.getById(1);
 
         assertEquals(expectedGroup, actualGroup);
     }
@@ -74,6 +75,51 @@ class GroupDAOImplTest {
         expectedGroups.add(new Group(1, "AC-10"));
         groupDAO.delete(2);
         List<Group> actualGroups = groupDAO.getAll();
+
+        assertEquals(expectedGroups, actualGroups);
+    }
+
+    @Test
+    void shouldGetGroupsByCathedraId() {
+        List<Group> expectedGroups = new ArrayList<>();
+        expectedGroups.add(new Group(1, "AC-10"));
+        expectedGroups.add(new Group(2, "BC-20"));
+        List<Group> actualGroups = groupDAO.getByCathedraId(1);
+
+        assertEquals(expectedGroups, actualGroups);
+    }
+
+    @Test
+    void shouldAssignGroupToCathedra() {
+        List<Group> expectedGroups = new ArrayList<>();
+        expectedGroups.add(new Group(1, "AC-10"));
+        expectedGroups.add(new Group(2, "BC-20"));
+        expectedGroups.add(new Group(3, "CC-30"));
+
+        groupDAO.create(new Group(3, "CC-30"));
+        groupDAO.assignToCathedra(1, 3);
+        List<Group> actualGroups = groupDAO.getByCathedraId(1);
+
+        assertEquals(expectedGroups, actualGroups);
+    }
+
+    @Test
+    void shouldUpdateAssignmentGroupToCathedra() {
+        List<Group> expectedGroups = new ArrayList<>();
+        expectedGroups.add(new Group(1, "AC-10"));
+
+        groupDAO.updateAssignment(2, 1);
+        List<Group> actualGroups = groupDAO.getByCathedraId(2);
+
+        assertEquals(expectedGroups, actualGroups);
+    }
+
+    @Test
+    void shouldDeleteAssignmentGroupToCathedra() {
+        List<Group> expectedGroups = emptyList();
+        groupDAO.deleteAssignment(1);
+        groupDAO.deleteAssignment(2);
+        List<Group> actualGroups = groupDAO.getByCathedraId(1);
 
         assertEquals(expectedGroups, actualGroups);
     }

@@ -7,13 +7,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.dao.mappers.StudentMapper;
 import ua.com.foxminded.university.entities.Student;
 
 import java.util.List;
 
-@Component
+@Repository
 @PropertySource("classpath:queries.properties")
 public class StudentDAOImpl implements StudentDAO {
 
@@ -39,6 +39,18 @@ public class StudentDAOImpl implements StudentDAO {
     @Value("${students.delete}")
     private String delete;
 
+    @Value("${students.getByGroupId}")
+    private String getByGroupId;
+
+    @Value("${students.assignToGroup}")
+    private String assignToGroup;
+
+    @Value("${students.updateAssignment}")
+    private String updateAssignment;
+
+    @Value("${students.deleteAssignment}")
+    private String deleteAssignment;
+
     @Autowired
     public StudentDAOImpl(JdbcTemplate jdbcTemplate, SimpleJdbcInsert jdbcInsert, StudentMapper studentMapper) {
         this.jdbcTemplate = jdbcTemplate;
@@ -57,7 +69,7 @@ public class StudentDAOImpl implements StudentDAO {
     }
 
     @Override
-    public Student getByID(int id) {
+    public Student getById(int id) {
         return jdbcTemplate.queryForObject(getByID, studentMapper, id);
     }
 
@@ -74,5 +86,25 @@ public class StudentDAOImpl implements StudentDAO {
     @Override
     public void delete(int id) {
         jdbcTemplate.update(delete, id);
+    }
+
+    @Override
+    public List<Student> getByGroupId(int groupId) {
+        return jdbcTemplate.query(getByGroupId, studentMapper, groupId);
+    }
+
+    @Override
+    public void assignToGroup(int groupId, int studentId) {
+        jdbcTemplate.update(assignToGroup, groupId, studentId);
+    }
+
+    @Override
+    public void updateAssignment(int groupId, int studentId) {
+        jdbcTemplate.update(updateAssignment, groupId, studentId);
+    }
+
+    @Override
+    public void deleteAssignment(int studentId) {
+        jdbcTemplate.update(deleteAssignment, studentId);
     }
 }

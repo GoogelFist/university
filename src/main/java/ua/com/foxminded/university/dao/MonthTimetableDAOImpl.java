@@ -50,7 +50,7 @@ public class MonthTimetableDAOImpl implements MonthTimetableDAO {
     }
 
     @Override
-    public MonthTimetable getByID(int id) {
+    public MonthTimetable getById(int id) {
         return jdbcTemplate.queryForObject(getByID, monthTimetableMapper, id);
     }
 

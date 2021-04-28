@@ -39,8 +39,8 @@ CREATE TABLE cathedras
     name VARCHAR(50) NOT NULL
 );
 
-DROP TABLE IF EXISTS cathedra_groups CASCADE;
-CREATE TABLE cathedra_groups
+DROP TABLE IF EXISTS cathedras_groups CASCADE;
+CREATE TABLE cathedras_groups
 (
     cathedra_id INT REFERENCES cathedras (id) ON UPDATE CASCADE ON DELETE CASCADE,
     group_id    INT REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE,
@@ -48,8 +48,8 @@ CREATE TABLE cathedra_groups
 
 );
 
-DROP TABLE IF EXISTS cathedra_teachers CASCADE;
-CREATE TABLE cathedra_teachers
+DROP TABLE IF EXISTS cathedras_teachers CASCADE;
+CREATE TABLE cathedras_teachers
 (
     cathedra_id INT REFERENCES cathedras (id) ON UPDATE CASCADE ON DELETE CASCADE,
     teacher_id  INT REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE,
