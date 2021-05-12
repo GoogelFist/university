@@ -7,18 +7,24 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import ua.com.foxminded.university.dao.exceptions.DaoException;
 import ua.com.foxminded.university.entities.Student;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ua.com.foxminded.university.dao.exceptions.ExceptionsMessageConstants.ENTITY_NOT_FOUND;
 
 
 @SpringJUnitConfig(DaoTestConfig.class)
 class StudentDAOImpTest {
+
+    private static final String STUDENT = "student";
 
     @Autowired
     private StudentDAO studentDAO;
@@ -33,8 +39,9 @@ class StudentDAOImpTest {
     }
 
     @Test
-    void shouldCreateStudent() {
+    void shouldCreateStudent() throws DaoException {
         Student expectedStudent = new Student(3, "John", "Manson", "777");
+
         studentDAO.create(expectedStudent);
         Student actualStudent = studentDAO.getById(3);
 
@@ -42,26 +49,39 @@ class StudentDAOImpTest {
     }
 
     @Test
-    void shouldGetStudentByID() {
+    void shouldGetStudentByID() throws DaoException {
         Student expectedStudent = new Student(1, "James", "Gosling", "12345");
+
         Student actualStudent = studentDAO.getById(1);
 
         assertEquals(expectedStudent, actualStudent);
     }
 
     @Test
-    void shouldGetAllStudents() {
+    void shouldThrowEntityNotFoundExceptionExceptionWhenCantGetStudentById() {
+        int id = 5;
+        Exception exception = assertThrows(DaoException.class, () -> studentDAO.getById(id));
+        String actual = exception.getMessage();
+        String expected = format(ENTITY_NOT_FOUND, STUDENT, id);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGetAllStudents() throws DaoException {
         List<Student> expectedStudents = new ArrayList<>();
         expectedStudents.add(new Student(1, "James", "Gosling", "12345"));
         expectedStudents.add(new Student(2, "Mikhail", "Denver", "54321"));
+
         List<Student> actualStudents = studentDAO.getAll();
 
         assertEquals(expectedStudents, actualStudents);
     }
 
     @Test
-    void shouldUpdateStudent() {
+    void shouldUpdateStudent() throws DaoException {
         Student expectedStudent = new Student(1, "Donald", "Gosling", "12345");
+
         studentDAO.update(1, expectedStudent);
         Student actualStudent = studentDAO.getById(1);
 
@@ -69,9 +89,10 @@ class StudentDAOImpTest {
     }
 
     @Test
-    void shouldDeleteStudent() {
+    void shouldDeleteStudent() throws DaoException {
         List<Student> expectedStudents = new ArrayList<>();
         expectedStudents.add(new Student(1, "James", "Gosling", "12345"));
+
         studentDAO.delete(2);
         List<Student> actualStudents = studentDAO.getAll();
 
@@ -79,17 +100,18 @@ class StudentDAOImpTest {
     }
 
     @Test
-    void shouldGetStudentsByGroupId() {
+    void shouldGetStudentsByGroupId() throws DaoException {
         List<Student> expectedStudents = new ArrayList<>();
         expectedStudents.add(new Student(1, "James", "Gosling", "12345"));
         expectedStudents.add(new Student(2, "Mikhail", "Denver", "54321"));
+
         List<Student> actualStudent = studentDAO.getByGroupId(1);
 
         assertEquals(expectedStudents, actualStudent);
     }
 
     @Test
-    void shouldAssignStudentsToGroup() {
+    void shouldAssignStudentsToGroup() throws DaoException {
         List<Student> expectedStudents = new ArrayList<>();
         expectedStudents.add(new Student(1, "James", "Gosling", "12345"));
         expectedStudents.add(new Student(2, "Mikhail", "Denver", "54321"));
@@ -103,7 +125,7 @@ class StudentDAOImpTest {
     }
 
     @Test
-    void shouldUpdateAssignmentStudentToGroup() {
+    void shouldUpdateAssignmentStudentToGroup() throws DaoException {
         List<Student> expectedStudents = new ArrayList<>();
         expectedStudents.add(new Student(1, "James", "Gosling", "12345"));
 
@@ -114,8 +136,9 @@ class StudentDAOImpTest {
     }
 
     @Test
-    void shouldDeleteAssignmentStudentToGroup() {
+    void shouldDeleteAssignmentStudentToGroup() throws DaoException {
         List<Student> expectedStudents = emptyList();
+
         studentDAO.deleteAssignment(1);
         studentDAO.deleteAssignment(2);
         List<Student> actualStudents = studentDAO.getByGroupId(1);

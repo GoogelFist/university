@@ -7,6 +7,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import ua.com.foxminded.university.dao.exceptions.DaoException;
 import ua.com.foxminded.university.entities.DayTimetable;
 import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.Teacher;
@@ -16,11 +17,15 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static ua.com.foxminded.university.dao.exceptions.ExceptionsMessageConstants.ENTITY_NOT_FOUND;
 
 @SpringJUnitConfig(DaoTestConfig.class)
 class DayTimetableDAOImlTest {
 
+    private static final String DAY_TIMETABLE = "day_timetable";
     @Autowired
     private DayTimetableDAO dayTimetableDAO;
 
@@ -40,7 +45,7 @@ class DayTimetableDAOImlTest {
     }
 
     @Test
-    void shouldCreateDayTimetable() {
+    void shouldCreateDayTimetable() throws DaoException {
         group = new Group(1);
         teacher = new Teacher(2);
         expectedDayTimetable = new DayTimetable(3, LocalTime.of(12, 0), "223", "biology", group, teacher);
@@ -51,7 +56,7 @@ class DayTimetableDAOImlTest {
     }
 
     @Test
-    void shouldGetDayTimetableByID() {
+    void shouldGetDayTimetableByID() throws DaoException {
         group = new Group(1);
         teacher = new Teacher(1);
         expectedDayTimetable = new DayTimetable(1, LocalTime.of(8, 0), "112", "math", group, teacher);
@@ -62,7 +67,17 @@ class DayTimetableDAOImlTest {
     }
 
     @Test
-    void shouldGetAllDayTimetables() {
+    void shouldThrowEntityNotFoundExceptionExceptionWhenCantGetDayTimetableById() {
+        int id = 5;
+        Exception exception = assertThrows(DaoException.class, () -> dayTimetableDAO.getById(id));
+        String actual = exception.getMessage();
+        String expected = format(ENTITY_NOT_FOUND, DAY_TIMETABLE, id);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void shouldGetAllDayTimetables() throws DaoException {
         List<DayTimetable> expectedTimetables = new ArrayList<>();
         group = new Group(1);
         teacher = new Teacher(1);
@@ -79,7 +94,7 @@ class DayTimetableDAOImlTest {
 
 
     @Test
-    void shouldUpdateDayTimeTable() {
+    void shouldUpdateDayTimeTable() throws DaoException {
         group = new Group(1);
         teacher = new Teacher(1);
         expectedDayTimetable = new DayTimetable(1, LocalTime.of(14, 0), "412", "arts", group, teacher);
@@ -90,7 +105,7 @@ class DayTimetableDAOImlTest {
     }
 
     @Test
-    void shouldDeleteDAyTimetable() {
+    void shouldDeleteDAyTimetable() throws DaoException {
         group = new Group(1);
         teacher = new Teacher(1);
         List<DayTimetable> expectedTimetables = new ArrayList<>();
@@ -103,7 +118,7 @@ class DayTimetableDAOImlTest {
     }
 
     @Test
-    void shouldGetDayTimetablesByGroupsId() {
+    void shouldGetDayTimetablesByGroupsId() throws DaoException {
         List<DayTimetable> expectedTimetables = new ArrayList<>();
         group = new Group(1);
         teacher = new Teacher(1);
@@ -115,7 +130,7 @@ class DayTimetableDAOImlTest {
     }
 
     @Test
-    void shouldGetDayTimetablesByTeacherId() {
+    void shouldGetDayTimetablesByTeacherId() throws DaoException {
         List<DayTimetable> expectedTimetables = new ArrayList<>();
         group = new Group(1);
         teacher = new Teacher(1);
@@ -127,7 +142,7 @@ class DayTimetableDAOImlTest {
     }
 
     @Test
-    void shouldGetDayTimetableByMonthTimetableId() {
+    void shouldGetDayTimetableByMonthTimetableId() throws DaoException {
         List<DayTimetable> expectedTimetables = new ArrayList<>();
         group = new Group(1);
         teacher = new Teacher(1);
