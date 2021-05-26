@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Day timetables fragments')"></head>
+<body>
+
+<div th:fragment="menu-site-for-day-timetables">
+    <nav aria-label="Site menu" class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">University</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/students">Students</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/groups">Groups</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/teachers">Teachers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cathedras">Cathedras</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/month-timetables">Timetables</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
+<div th:fragment="by-group">
+    <table aria-label="day timetable" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Start time</th>
+            <th scope="col">Lecture hall</th>
+            <th scope="col">Subject</th>
+            <th scope="col">Teacher</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="timetable: ${dayTimetablesByGroup}">
+            <td th:text="${timetable.getMonthTimetable().getDate()}"></td>
+            <td th:text="${timetable.getStartTime()}"></td>
+            <td th:text="${timetable.getLectureHall()}"></td>
+            <td th:text="${timetable.getSubject()}"></td>
+            <td th:text="| ${timetable.getTeacher().getFirstName()} ${timetable.getTeacher().getLastName()} |"></td>
+            <td>
+                <a th:href="@{/day-timetables/{id}(id = ${timetable.getId()})}"
+                   class="btn btn-outline-primary"
+                   role="button">Edit</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:fragment="by-month-timetable">
+    <table aria-label="day timetable" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Start time</th>
+            <th scope="col">Lecture Hall</th>
+            <th scope="col">Subject</th>
+            <th scope="col">Group</th>
+            <th scope="col">Teacher</th>
+            <th scope="col">
+                <a th:href="@{/day-timetables/{id}/new(id=${monthTimetableId})}"
+                   type="button"
+                   class="btn btn-outline-primary">New timetable
+                </a>
+            </th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="timetable: ${dayTimetablesByMonthTimetable}">
+            <td th:text="${timetable.getStartTime()}"></td>
+            <td th:text="${timetable.getLectureHall()}"></td>
+            <td th:text="${timetable.getSubject()}"></td>
+            <td th:text="${timetable.getGroup().getName()}"></td>
+            <td th:text="| ${timetable.getTeacher().getFirstName()} ${timetable.getTeacher().getLastName()} |"></td>
+            <td class="d-flex flex-row text-nowrap bd-highlight">
+                <a th:href="@{/day-timetables/{id}(id = ${timetable.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Info</a>
+                <a th:href="@{/day-timetables/{id}/edit(id = ${timetable.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Edit</a>
+                <form th:method="DELETE" th:action="@{/day-timetables/{id}(id=${timetable.getId()})}"
+                      class="input-group ms-1">
+                    <input type="submit" class="btn btn-outline-primary" value="Delete"/>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:fragment="by-teacher">
+    <table aria-label="day timetable" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Start time</th>
+            <th scope="col">Lecture Hall</th>
+            <th scope="col">Subject</th>
+            <th scope="col">Group</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="timetable: ${dayTimetablesByTeacher}">
+            <td th:text="${timetable.getMonthTimetable().getDate()}"></td>
+            <td th:text="${timetable.getStartTime()}"></td>
+            <td th:text="${timetable.getLectureHall()}"></td>
+            <td th:text="${timetable.getSubject()}"></td>
+            <td th:text="${timetable.getGroup().getName()}"></td>
+            <td>
+                <a th:href="@{/day-timetables/{id}(id = ${timetable.getId()})}"
+                   class="btn btn-outline-primary"
+                   role="button">Edit</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:fragment="new-day-timetable">
+    <form th:method="POST" th:action="@{/day-timetables}" th:object="${dayTimetable}" class="row mb-1 m-lg-2">
+        <div>
+            <input type="hidden" class="form-control" th:field="*{monthTimetable.id}" th:value="${dayTimetable.monthTimetable.id}">
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="startTime" class="form-label">Start time</label>
+                <input th:field="*{startTime}" id="startTime"
+                       type="time" class="form-control"
+                       placeholder="Enter start time">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="lectureHall" class="form-label">Lecture hall</label>
+                <input th:field="*{lectureHall}" id="lectureHall" type="text" class="form-control"
+                       placeholder="Enter lecture hall">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input th:field="*{subject}" id="subject" type="text" class="form-control"
+                       placeholder="Enter subject">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputGroup" class="form-label">Group</label>
+                <select th:field="*{group.id}" id="inputGroup" class="form-select"/>
+                <option selected="selected" th:value="${String}">Select</option>
+                <option th:each="group : ${groups}"
+                        th:value="${group.id}"
+                        th:text="${group.getName()}">
+                </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputTeacher" class="form-label">Teacher</label>
+                <select th:field="*{teacher.id}" id="inputTeacher" class="form-select"/>
+                <option selected="selected" th:value="${String}">Select</option>
+                <option th:each="teacher : ${teachers}"
+                        th:value="${teacher.id}"
+                        th:text="| ${teacher.getFirstName()} ${teacher.getLastName()} |">
+                </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div th:fragment="day-timetable-update">
+    <form th:method="PATCH" th:action="@{/day-timetables/{id}(id=${dayTimetable.getId()})}" th:object="${dayTimetable}" class="row mb-1 m-lg-2">
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="startTime" class="form-label">Start time</label>
+                <input th:field="*{startTime}" id="startTime"
+                       type="time" class="form-control"
+                       placeholder="Enter start time">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="lectureHall" class="form-label">Lecture hall</label>
+                <input th:field="*{lectureHall}" id="lectureHall" type="text" class="form-control"
+                       placeholder="Enter lecture hall">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input th:field="*{subject}" id="subject" type="text" class="form-control"
+                       placeholder="Enter subject">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputGroup" class="form-label">Group</label>
+                <select th:field="*{group.id}" id="inputGroup" class="form-select"/>
+                <option selected="selected" th:value="${String}">Select</option>
+                <option th:each="group : ${groups}"
+                        th:value="${group.id}"
+                        th:text="${group.getName()}">
+                </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputTeacher" class="form-label">Teacher</label>
+                <select th:field="*{teacher.id}" id="inputTeacher" class="form-select"/>
+                <option selected="selected" th:value="${String}">Select</option>
+                <option th:each="teacher : ${teachers}"
+                        th:value="${teacher.id}"
+                        th:text="| ${teacher.getFirstName()} ${teacher.getLastName()} |">
+                </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div th:fragment="day-timetables-by-group-pagination">
+    <nav aria-label="Page navigation example">
+        <ul th:if="${dayTimetablesByGroup.totalPages > 1}" class="pagination">
+            <li th:if="${dayTimetablesByGroup.isFirst()}" class="page-item disabled"><a class="page-link" href="">Previous</a>
+            </li>
+            <li th:unless="${dayTimetablesByGroup.isFirst()}" class="page-item">
+                <a th:href="@{/day_timetables/by_group/{groupId}(groupId=${groupId}, size=${dayTimetablesByGroup.size}, page=${dayTimetablesByGroup.previousPageable().getPageNumber()})}"
+                   class="page-link">Previous</a>
+            </li>
+            <div th:each="pageNumber : ${pageNumbers}" class="page-item">
+                <li th:if="${pageNumber - 1 == dayTimetablesByGroup.number}" class="page-item active"
+                    aria-current="page">
+                    <a th:href="@{/day_timetables/by_group/{groupId}(groupId=${groupId}, size=${dayTimetablesByGroup.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+                <li th:unless="${pageNumber - 1 == dayTimetablesByGroup.number}" class="page-item">
+                    <a th:href="@{/day_timetables/by_group/{groupId}(groupId=${groupId}, size=${dayTimetablesByGroup.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+            </div>
+            <li th:if="${dayTimetablesByGroup.isLast()}" class="page-item disabled"><a class="page-link"
+                                                                                       href="#">Next</a></li>
+            <li th:unless="${dayTimetablesByGroup.isLast()}" class="page-item">
+                <a th:href="@{/day_timetables/by_group/{groupId}(groupId=${groupId}, size=${dayTimetablesByGroup.size}, page=${dayTimetablesByGroup.nextPageable().getPageNumber()})}"
+                   class="page-link">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div th:fragment="day-timetables-by-month-timetable-pagination">
+    <nav aria-label="Page navigation example">
+        <ul th:if="${dayTimetablesByMonthTimetable.totalPages > 1}" class="pagination">
+            <li th:if="${dayTimetablesByMonthTimetable.isFirst()}" class="page-item disabled"><a class="page-link"
+                                                                                                 href="">Previous</a>
+            </li>
+            <li th:unless="${dayTimetablesByMonthTimetable.isFirst()}" class="page-item">
+                <a th:href="@{/day_timetables/by_month_timetable/{id}(id=${id}, size=${dayTimetablesByMonthTimetable.size}, page=${dayTimetablesByMonthTimetable.previousPageable().getPageNumber()})}"
+                   class="page-link">Previous</a>
+            </li>
+            <div th:each="pageNumber : ${pageNumbers}" class="page-item">
+                <li th:if="${pageNumber - 1 == dayTimetablesByMonthTimetable.number}" class="page-item active"
+                    aria-current="page">
+                    <a th:href="@{/day_timetables/by_month_timetable/{id}(id=${id}, size=${dayTimetablesByMonthTimetable.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+                <li th:unless="${pageNumber - 1 == dayTimetablesByMonthTimetable.number}" class="page-item">
+                    <a th:href="@{/day_timetables/by_month_timetable/{id}(id=${id}, size=${dayTimetablesByMonthTimetable.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+            </div>
+            <li th:if="${dayTimetablesByMonthTimetable.isLast()}" class="page-item disabled"><a class="page-link"
+                                                                                                href="#">Next</a></li>
+            <li th:unless="${dayTimetablesByMonthTimetable.isLast()}" class="page-item">
+                <a th:href="@{/day_timetables/by_month_timetable/{id}(id=${id}, size=${dayTimetablesByMonthTimetable.size}, page=${dayTimetablesByMonthTimetable.nextPageable().getPageNumber()})}"
+                   class="page-link">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div th:fragment="day-timetables-by-teacher-pagination">
+    <nav aria-label="Page navigation example">
+        <ul th:if="${dayTimetablesByTeacher.totalPages > 1}" class="pagination">
+            <li th:if="${dayTimetablesByTeacher.isFirst()}" class="page-item disabled"><a class="page-link" href="">Previous</a>
+            </li>
+            <li th:unless="${dayTimetablesByTeacher.isFirst()}" class="page-item">
+                <a th:href="@{/day_timetables/by_teacher/{teacherId}(teacherId=${teacherId}, size=${dayTimetablesByTeacher.size}, page=${dayTimetablesByTeacher.previousPageable().getPageNumber()})}"
+                   class="page-link">Previous</a>
+            </li>
+            <div th:each="pageNumber : ${pageNumbers}" class="page-item">
+                <li th:if="${pageNumber - 1 == dayTimetablesByTeacher.number}" class="page-item active"
+                    aria-current="page">
+                    <a th:href="@{/day_timetables/by_teacher/{teacherId}(teacherId=${teacherId}, size=${dayTimetablesByTeacher.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+                <li th:unless="${pageNumber - 1 == dayTimetablesByTeacher.number}" class="page-item">
+                    <a th:href="@{/day_timetables/by_teacher/{teacherId}(teacherId=${teacherId}, size=${dayTimetablesByTeacher.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+            </div>
+            <li th:if="${dayTimetablesByTeacher.isLast()}" class="page-item disabled"><a class="page-link"
+                                                                                         href="#">Next</a></li>
+            <li th:unless="${dayTimetablesByTeacher.isLast()}" class="page-item">
+                <a th:href="@{/day_timetables/by_teacher/{teacherId}(teacherId=${teacherId}, size=${dayTimetablesByTeacher.size}, page=${dayTimetablesByTeacher.nextPageable().getPageNumber()})}"
+                   class="page-link">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+</body>
+</html>

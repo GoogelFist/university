@@ -8,13 +8,15 @@ public class Teacher {
     private String lastName;
     private String phone;
     private String qualification;
+    private Cathedra cathedra;
 
-    public Teacher(int id, String firstName, String lastName, String phone, String qualification) {
+    public Teacher(int id, String firstName, String lastName, String phone, String qualification, Cathedra cathedra) {
         this.id = id;
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
         this.qualification = qualification;
+        this.cathedra = cathedra;
     }
 
     public Teacher() {
@@ -64,17 +66,25 @@ public class Teacher {
         this.qualification = qualification;
     }
 
+    public Cathedra getCathedra() {
+        return cathedra;
+    }
+
+    public void setCathedra(Cathedra cathedra) {
+        this.cathedra = cathedra;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Teacher teacher = (Teacher) o;
-        return id == teacher.id && Objects.equals(firstName, teacher.firstName) && Objects.equals(lastName, teacher.lastName) && Objects.equals(phone, teacher.phone) && Objects.equals(qualification, teacher.qualification);
+        return id == teacher.id && Objects.equals(firstName, teacher.firstName) && Objects.equals(lastName, teacher.lastName) && Objects.equals(phone, teacher.phone) && Objects.equals(qualification, teacher.qualification) && Objects.equals(cathedra, teacher.cathedra);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, firstName, lastName, phone, qualification);
+        return Objects.hash(id, firstName, lastName, phone, qualification, cathedra);
     }
 
     @Override
@@ -85,6 +95,7 @@ public class Teacher {
             ", lastName='" + lastName + '\'' +
             ", phone='" + phone + '\'' +
             ", qualification='" + qualification + '\'' +
+            ", cathedra=" + cathedra +
             '}';
     }
 }

@@ -5,27 +5,35 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import ua.com.foxminded.university.dao.DayTimetableDAO;
+import ua.com.foxminded.university.dao.MonthTimetableDAO;
 import ua.com.foxminded.university.dao.exceptions.DaoException;
 import ua.com.foxminded.university.entities.DayTimetable;
 import ua.com.foxminded.university.entities.Group;
+import ua.com.foxminded.university.entities.MonthTimetable;
 import ua.com.foxminded.university.entities.Teacher;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
-import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static ua.com.foxminded.university.utils.Constants.*;
 
 @ExtendWith(MockitoExtension.class)
 @SpringJUnitConfig(ServiceTestConfig.class)
 class DayTimetableServiceImplTest {
     @Mock
-    private DayTimetableDAO mockDayTimetable;
+    private DayTimetableDAO mockDayTimetableDAO;
 
     @Mock
     private GroupService mockGroupService;
@@ -33,14 +41,17 @@ class DayTimetableServiceImplTest {
     @Mock
     private TeacherService mockTeacherService;
 
+    @Mock
+    private MonthTimetableDAO mockMonthTimetableDao;
+
     private DayTimeTableService dayTimeTableService;
     private DayTimetable dayTimetable;
     private List<DayTimetable> dayTimetables;
 
     @BeforeEach
     void setUp() {
-        dayTimeTableService = new DayTimetableServiceImpl(mockDayTimetable, mockGroupService, mockTeacherService);
-        dayTimetable = new DayTimetable(1, LocalTime.of(8, 0), "112", "math", new Group(1), new Teacher(1));
+        dayTimeTableService = new DayTimetableServiceImpl(mockDayTimetableDAO, mockGroupService, mockTeacherService, mockMonthTimetableDao);
+        dayTimetable = new DayTimetable(ID_1_VALUE, DAY_TIMETABLE_1_TIME_VALUE, LECTURE_HALL_1_VALUE, SUBJECT_1_VALUE, new Group(ID_1_VALUE), new Teacher(ID_1_VALUE), new MonthTimetable(ID_1_VALUE));
         dayTimetables = singletonList(dayTimetable);
     }
 
@@ -48,161 +59,217 @@ class DayTimetableServiceImplTest {
     void shouldCallCreateDayTimetable() throws DaoException {
         dayTimeTableService.create(dayTimetable);
 
-        verify(mockDayTimetable, times(1)).create(dayTimetable);
+        verify(mockDayTimetableDAO, times(ID_1_VALUE)).create(dayTimetable);
     }
 
     @Test
     void shouldCallGetDayTimetableByID() throws DaoException {
-        when(mockDayTimetable.getById(1)).thenReturn(dayTimetable);
-        DayTimetable actualTimetable = dayTimeTableService.getById(1);
+        when(mockDayTimetableDAO.getById(ID_1_VALUE)).thenReturn(dayTimetable);
+        DayTimetable actualTimetable = dayTimeTableService.getById(ID_1_VALUE);
 
-        verify(mockDayTimetable, times(1)).getById(1);
-        verify(mockGroupService, times(1)).getById(1);
-        verify(mockTeacherService, times(1)).getById(1);
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
+        verify(mockGroupService, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
+        verify(mockTeacherService, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
         assertEquals(dayTimetable, actualTimetable);
     }
 
     @Test
     void shouldCallGetAllTimetables() throws DaoException {
-        when(mockDayTimetable.getAll()).thenReturn(dayTimetables);
+        when(mockDayTimetableDAO.getAll()).thenReturn(dayTimetables);
         List<DayTimetable> actualTimetables = dayTimeTableService.getAll();
 
-        verify(mockDayTimetable, times(1)).getAll();
-        verify(mockGroupService, times(1)).getById(1);
-        verify(mockTeacherService, times(1)).getById(1);
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getAll();
+        verify(mockGroupService, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
+        verify(mockTeacherService, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
         assertEquals(dayTimetables, actualTimetables);
     }
 
     @Test
-    void shouldCallUpdateTimetable() throws DaoException {
-        dayTimeTableService.update(1, dayTimetable);
+    void shouldCallGetAllDayTimetablesPageable() throws DaoException {
+        Pageable pageable = PageRequest.of(PAGE, SIZE);
+        dayTimetables = new ArrayList<>();
+        dayTimetables.add(new DayTimetable(ID_1_VALUE, DAY_TIMETABLE_1_TIME_VALUE, LECTURE_HALL_1_VALUE, SUBJECT_1_VALUE, new Group(ID_1_VALUE), new Teacher(ID_1_VALUE), new MonthTimetable(ID_1_VALUE)));
+        when(mockDayTimetableDAO.getAll()).thenReturn(dayTimetables);
 
-        verify(mockDayTimetable, times(1)).update(1, dayTimetable);
+        Page<DayTimetable> expectedPageDayTimetable = new PageImpl<>(dayTimetables, pageable, dayTimetables.size());
+        Page<DayTimetable> actualPageDayTimetable = dayTimeTableService.getAll(pageable);
+
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getAll();
+        assertEquals(expectedPageDayTimetable, actualPageDayTimetable);
+    }
+
+    @Test
+    void shouldCallUpdateTimetable() throws DaoException {
+        dayTimeTableService.update(ID_1_VALUE, dayTimetable);
+
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).update(ID_1_VALUE, dayTimetable);
     }
 
     @Test
     void shouldCallDeleteTimetable() throws DaoException {
-        dayTimeTableService.delete(1);
+        dayTimeTableService.delete(ID_1_VALUE);
 
-        verify(mockDayTimetable, times(1)).delete(1);
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).delete(ID_1_VALUE);
     }
 
     @Test
     void shouldCallGetDayTimetableByGroupId() throws DaoException {
-        when(mockDayTimetable.getByGroupId(1)).thenReturn(dayTimetables);
-        List<DayTimetable> actualDayTimetables = dayTimeTableService.getByGroupId(1);
+        when(mockDayTimetableDAO.getByGroupId(ID_1_VALUE)).thenReturn(dayTimetables);
+        List<DayTimetable> actualDayTimetables = dayTimeTableService.getByGroupId(ID_1_VALUE);
 
-        verify(mockDayTimetable, times(1)).getByGroupId(1);
-        verify(mockTeacherService, times(1)).getById(1);
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByGroupId(ID_1_VALUE);
+        verify(mockTeacherService, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
         assertEquals(dayTimetables, actualDayTimetables);
+    }
+
+    @Test
+    void shouldCallGetDayTimetablesByGroupIdPageable() throws DaoException {
+        Pageable pageable = PageRequest.of(PAGE, SIZE);
+        dayTimetables = new ArrayList<>();
+        dayTimetables.add(new DayTimetable(ID_1_VALUE, DAY_TIMETABLE_1_TIME_VALUE, LECTURE_HALL_1_VALUE, SUBJECT_1_VALUE, new Group(ID_1_VALUE), new Teacher(ID_1_VALUE), new MonthTimetable(ID_1_VALUE)));
+        when(mockDayTimetableDAO.getByGroupId(ID_1_VALUE)).thenReturn(dayTimetables);
+
+        Page<DayTimetable> expectedPageDayTimetable = new PageImpl<>(dayTimetables, pageable, dayTimetables.size());
+        Page<DayTimetable> actualPageDayTimetable = dayTimeTableService.getByGroupId(ID_1_VALUE, pageable);
+
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByGroupId(ID_1_VALUE);
+        assertEquals(expectedPageDayTimetable, actualPageDayTimetable);
     }
 
     @Test
     void shouldCallGetDayTimetableByTeacherId() throws DaoException {
-        when(mockDayTimetable.getByTeacherId(1)).thenReturn(dayTimetables);
-        List<DayTimetable> actualDayTimetables = dayTimeTableService.getByTeacherId(1);
+        when(mockDayTimetableDAO.getByTeacherId(ID_1_VALUE)).thenReturn(dayTimetables);
+        List<DayTimetable> actualDayTimetables = dayTimeTableService.getByTeacherId(ID_1_VALUE);
 
-        verify(mockDayTimetable, times(1)).getByTeacherId(1);
-        verify(mockGroupService, times(1)).getById(1);
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByTeacherId(ID_1_VALUE);
+        verify(mockGroupService, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
         assertEquals(dayTimetables, actualDayTimetables);
+    }
+
+    @Test
+    void shouldCallGetDayTimetablesByTeacherIdPageable() throws DaoException {
+        Pageable pageable = PageRequest.of(PAGE, SIZE);
+        dayTimetables = new ArrayList<>();
+        dayTimetables.add(new DayTimetable(ID_1_VALUE, DAY_TIMETABLE_1_TIME_VALUE, LECTURE_HALL_1_VALUE, SUBJECT_1_VALUE, new Group(ID_1_VALUE), new Teacher(ID_1_VALUE), new MonthTimetable(ID_1_VALUE)));
+        when(mockDayTimetableDAO.getByTeacherId(ID_1_VALUE)).thenReturn(dayTimetables);
+
+        Page<DayTimetable> expectedPageDayTimetable = new PageImpl<>(dayTimetables, pageable, dayTimetables.size());
+        Page<DayTimetable> actualPageDayTimetable = dayTimeTableService.getByTeacherId(ID_1_VALUE, pageable);
+
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByTeacherId(ID_1_VALUE);
+        assertEquals(expectedPageDayTimetable, actualPageDayTimetable);
     }
 
     @Test
     void shouldCallGetDayTimetableByMonthTimetableId() throws DaoException {
-        when(mockDayTimetable.getByMonthTimetableId(1)).thenReturn(dayTimetables);
-        List<DayTimetable> actualDayTimetables = dayTimeTableService.getByMonthTimetableId(1);
+        when(mockDayTimetableDAO.getByMonthTimetableId(ID_1_VALUE)).thenReturn(dayTimetables);
+        List<DayTimetable> actualDayTimetables = dayTimeTableService.getByMonthTimetableId(ID_1_VALUE);
 
-        verify(mockDayTimetable, times(1)).getByMonthTimetableId(1);
-        verify(mockGroupService, times(1)).getById(1);
-        verify(mockTeacherService, times(1)).getById(1);
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByMonthTimetableId(ID_1_VALUE);
+        verify(mockGroupService, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
+        verify(mockTeacherService, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
         assertEquals(dayTimetables, actualDayTimetables);
     }
 
     @Test
+    void shouldCallGetDayTimetablesByMonthTimetableIdPageable() throws DaoException {
+        Pageable pageable = PageRequest.of(PAGE, SIZE);
+        dayTimetables = new ArrayList<>();
+        dayTimetables.add(new DayTimetable(ID_1_VALUE, DAY_TIMETABLE_1_TIME_VALUE, LECTURE_HALL_1_VALUE, SUBJECT_1_VALUE, new Group(ID_1_VALUE), new Teacher(ID_1_VALUE), new MonthTimetable(ID_1_VALUE)));
+        when(mockDayTimetableDAO.getByMonthTimetableId(ID_1_VALUE)).thenReturn(dayTimetables);
+
+        Page<DayTimetable> expectedPageDayTimetable = new PageImpl<>(dayTimetables, pageable, dayTimetables.size());
+        Page<DayTimetable> actualPageDayTimetable = dayTimeTableService.getByMonthTimetableId(ID_1_VALUE, pageable);
+
+        verify(mockDayTimetableDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByMonthTimetableId(ID_1_VALUE);
+        assertEquals(expectedPageDayTimetable, actualPageDayTimetable);
+    }
+
+    @Test
     void shouldThrowServiceExceptionWhenCantCreateDayTimetable() throws DaoException {
-        doThrow(new ServiceException("Unable to create dayTimetable")).when(mockDayTimetable).create(dayTimetable);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_CREATE, DAY_TIMETABLE);
+        doThrow(new ServiceException(message)).when(mockDayTimetableDAO).create(dayTimetable);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetable.create(dayTimetable));
+        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetableDAO.create(dayTimetable));
         String actual = exception.getMessage();
-        String expected = "Unable to create dayTimetable";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantGetDayTimetableById() throws DaoException {
-        doThrow(new ServiceException("Unable to get dayTimetable with ID 5")).when(mockDayTimetable).getById(5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ID, GET, DAY_TIMETABLE, ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockDayTimetableDAO).getById(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetable.getById(5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetableDAO.getById(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable to get dayTimetable with ID 5";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantGetAllDayTimetables() throws DaoException {
-        doThrow(new ServiceException("Unable to get all dayTimetables")).when(mockDayTimetable).getAll();
+        String message = format(SERVICE_EXCEPTION_MESSAGE_GET_ALL, DAY_TIMETABLE);
+        doThrow(new ServiceException(message)).when(mockDayTimetableDAO).getAll();
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetable.getAll());
+        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetableDAO.getAll());
         String actual = exception.getMessage();
-        String expected = "Unable to get all dayTimetables";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantUpdateDayTimetable() throws DaoException {
-        doThrow(new ServiceException("Unable to update dayTimetable with ID 5")).when(mockDayTimetable).update(5, dayTimetable);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ID, UPDATE, DAY_TIMETABLE, ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockDayTimetableDAO).update(ID_5_VALUE, dayTimetable);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetable.update(5, dayTimetable));
+        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetableDAO.update(ID_5_VALUE, dayTimetable));
         String actual = exception.getMessage();
-        String expected = "Unable to update dayTimetable with ID 5";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantDeleteDayTimetable() throws DaoException {
-        doThrow(new ServiceException("Unable to delete dayTimetable with ID 5")).when(mockDayTimetable).delete(5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ID, DELETE, DAY_TIMETABLE, ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockDayTimetableDAO).delete(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetable.delete(5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetableDAO.delete(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable to delete dayTimetable with ID 5";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantGetDayTimetableByGroupId() throws DaoException {
-        doThrow(new ServiceException("Unable to get dayTimetable by groupId 5")).when(mockDayTimetable).getByGroupId(5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ENTITY_ID, GET, DAY_TIMETABLE, GROUP, ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockDayTimetableDAO).getByGroupId(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetable.getByGroupId(5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetableDAO.getByGroupId(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable to get dayTimetable by groupId 5";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantGetDayTimetableByTeacherId() throws DaoException {
-        doThrow(new ServiceException("Unable to get dayTimetable by teacherId 5")).when(mockDayTimetable).getByTeacherId(5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ENTITY_ID, GET, DAY_TIMETABLE, TEACHER, ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockDayTimetableDAO).getByTeacherId(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetable.getByTeacherId(5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetableDAO.getByTeacherId(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable to get dayTimetable by teacherId 5";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantGetDayTimetableByMonthTimetableId() throws DaoException {
-        doThrow(new ServiceException("Unable to get dayTimetable by monthTimetableId 5")).when(mockDayTimetable).getByMonthTimetableId(5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ENTITY_ID, GET, DAY_TIMETABLE, MONTH_TIMETABLE, ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockDayTimetableDAO).getByMonthTimetableId(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetable.getByMonthTimetableId(5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockDayTimetableDAO.getByMonthTimetableId(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable to get dayTimetable by monthTimetableId 5";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import ua.com.foxminded.university.dao.exceptions.DaoException;
+import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.entities.Group;
 
 import javax.sql.DataSource;
@@ -19,11 +20,10 @@ import static java.util.Collections.emptyList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static ua.com.foxminded.university.dao.exceptions.ExceptionsMessageConstants.ENTITY_NOT_FOUND;
+import static ua.com.foxminded.university.utils.Constants.*;
 
 @SpringJUnitConfig(DaoTestConfig.class)
 class GroupDAOImplTest {
-
-    private static final String GROUP = "group";
     @Autowired
     private GroupDAO groupDAO;
 
@@ -33,33 +33,32 @@ class GroupDAOImplTest {
     @BeforeEach
     void setUp() {
         ResourceDatabasePopulator tables = new ResourceDatabasePopulator();
-        tables.addScript(new ClassPathResource("/testData.sql"));
+        tables.addScript(new ClassPathResource(TEST_DATA_SQL_PATH));
         DatabasePopulatorUtils.execute(tables, dataSource);
     }
 
     @Test
     void shouldCreateGroup() throws DaoException {
-        Group expectedGroup = new Group(3, "CC-10");
+        Group expectedGroup = new Group(ID_3_VALUE, GROUP_3_NAME_VALUE, new Cathedra(ID_1_VALUE));
         groupDAO.create(expectedGroup);
-        Group actualGroup = groupDAO.getById(3);
+        Group actualGroup = groupDAO.getById(ID_3_VALUE);
 
         assertEquals(expectedGroup, actualGroup);
     }
 
     @Test
     void shouldGetGroupByID() throws DaoException {
-        Group expectedGroup = new Group(1, "AC-10");
-        Group actualGroup = groupDAO.getById(1);
+        Group expectedGroup = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_1_VALUE));
+        Group actualGroup = groupDAO.getById(ID_1_VALUE);
 
         assertEquals(expectedGroup, actualGroup);
     }
 
     @Test
     void shouldThrowEntityNotFoundExceptionExceptionWhenCantGetGroupById() {
-        int id = 5;
-        Exception exception = assertThrows(DaoException.class, () -> groupDAO.getById(id));
+        Exception exception = assertThrows(DaoException.class, () -> groupDAO.getById(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = format(ENTITY_NOT_FOUND, GROUP, id);
+        String expected = format(ENTITY_NOT_FOUND, GROUP, ID_5_VALUE);
 
         assertEquals(expected, actual);
     }
@@ -67,8 +66,8 @@ class GroupDAOImplTest {
     @Test
     void shouldGetAllGroups() throws DaoException {
         List<Group> expectedGroups = new ArrayList<>();
-        expectedGroups.add(new Group(1, "AC-10"));
-        expectedGroups.add(new Group(2, "BC-20"));
+        expectedGroups.add(new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_1_VALUE)));
+        expectedGroups.add(new Group(ID_2_VALUE, GROUP_2_NAME_VALUE, new Cathedra(ID_2_VALUE)));
 
         List<Group> actualGroup = groupDAO.getAll();
 
@@ -77,9 +76,9 @@ class GroupDAOImplTest {
 
     @Test
     void shouldUpdateGroup() throws DaoException {
-        Group expectedGroup = new Group(1, "ABC-123");
+        Group expectedGroup = new Group(ID_1_VALUE, GROUP_3_NAME_VALUE, new Cathedra(ID_1_VALUE));
         groupDAO.update(1, expectedGroup);
-        Group actualGroup = groupDAO.getById(1);
+        Group actualGroup = groupDAO.getById(ID_1_VALUE);
 
         assertEquals(expectedGroup, actualGroup);
     }
@@ -87,7 +86,7 @@ class GroupDAOImplTest {
     @Test
     void shouldDeleteGroup() throws DaoException {
         List<Group> expectedGroups = new ArrayList<>();
-        expectedGroups.add(new Group(1, "AC-10"));
+        expectedGroups.add(new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_1_VALUE)));
         groupDAO.delete(2);
         List<Group> actualGroups = groupDAO.getAll();
 
@@ -97,9 +96,8 @@ class GroupDAOImplTest {
     @Test
     void shouldGetGroupsByCathedraId() throws DaoException {
         List<Group> expectedGroups = new ArrayList<>();
-        expectedGroups.add(new Group(1, "AC-10"));
-        expectedGroups.add(new Group(2, "BC-20"));
-        List<Group> actualGroups = groupDAO.getByCathedraId(1);
+        expectedGroups.add(new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_1_VALUE)));
+        List<Group> actualGroups = groupDAO.getByCathedraId(ID_1_VALUE);
 
         assertEquals(expectedGroups, actualGroups);
     }
@@ -107,13 +105,12 @@ class GroupDAOImplTest {
     @Test
     void shouldAssignGroupToCathedra() throws DaoException {
         List<Group> expectedGroups = new ArrayList<>();
-        expectedGroups.add(new Group(1, "AC-10"));
-        expectedGroups.add(new Group(2, "BC-20"));
-        expectedGroups.add(new Group(3, "CC-30"));
+        expectedGroups.add(new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_1_VALUE)));
+        expectedGroups.add(new Group(ID_3_VALUE, GROUP_3_NAME_VALUE, new Cathedra(ID_1_VALUE)));
 
-        groupDAO.create(new Group(3, "CC-30"));
-        groupDAO.assignToCathedra(1, 3);
-        List<Group> actualGroups = groupDAO.getByCathedraId(1);
+        groupDAO.create(new Group(ID_3_VALUE, GROUP_3_NAME_VALUE, new Cathedra(ID_2_VALUE)));
+        groupDAO.assignToCathedra(ID_1_VALUE, ID_3_VALUE);
+        List<Group> actualGroups = groupDAO.getByCathedraId(ID_1_VALUE);
 
         assertEquals(expectedGroups, actualGroups);
     }
@@ -121,10 +118,11 @@ class GroupDAOImplTest {
     @Test
     void shouldUpdateAssignmentGroupToCathedra() throws DaoException {
         List<Group> expectedGroups = new ArrayList<>();
-        expectedGroups.add(new Group(1, "AC-10"));
+        expectedGroups.add(new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_2_VALUE)));
+        expectedGroups.add(new Group(ID_2_VALUE, GROUP_2_NAME_VALUE, new Cathedra(ID_2_VALUE)));
 
-        groupDAO.updateAssignment(2, 1);
-        List<Group> actualGroups = groupDAO.getByCathedraId(2);
+        groupDAO.updateAssignment(ID_2_VALUE, ID_1_VALUE);
+        List<Group> actualGroups = groupDAO.getByCathedraId(ID_2_VALUE);
 
         assertEquals(expectedGroups, actualGroups);
     }
@@ -132,9 +130,9 @@ class GroupDAOImplTest {
     @Test
     void shouldDeleteAssignmentGroupToCathedra() throws DaoException {
         List<Group> expectedGroups = emptyList();
-        groupDAO.deleteAssignment(1);
-        groupDAO.deleteAssignment(2);
-        List<Group> actualGroups = groupDAO.getByCathedraId(1);
+        groupDAO.deleteAssignment(ID_1_VALUE);
+        groupDAO.deleteAssignment(ID_2_VALUE);
+        List<Group> actualGroups = groupDAO.getByCathedraId(ID_1_VALUE);
 
         assertEquals(expectedGroups, actualGroups);
     }

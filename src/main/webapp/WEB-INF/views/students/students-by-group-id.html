@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Students by group')"></head>
+<body>
+
+<div th:replace="fragments/students-fragments :: menu-site-for-students"></div>
+
+<table aria-label="Students table" class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Group</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="student: ${studentsByGroupId}">
+        <td th:text="${student.getFirstName()}"></td>
+        <td th:text="${student.getLastName()}"></td>
+        <td th:text="${student.getGroup().getName()}"></td>
+        <td>
+            <a class="btn btn-outline-primary"
+               th:href="@{/students/{id}(id = ${student.getId()})}"
+               role="button">Info</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:replace="fragments/students-fragments :: students-by-group-pagination"></div>
+
+</body>
+</html>

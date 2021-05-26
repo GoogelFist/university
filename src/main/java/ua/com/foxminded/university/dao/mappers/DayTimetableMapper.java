@@ -4,6 +4,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Component;
 import ua.com.foxminded.university.entities.DayTimetable;
 import ua.com.foxminded.university.entities.Group;
+import ua.com.foxminded.university.entities.MonthTimetable;
 import ua.com.foxminded.university.entities.Teacher;
 
 import java.sql.ResultSet;
@@ -18,6 +19,7 @@ public class DayTimetableMapper implements RowMapper<DayTimetable> {
     private static final String SUBJECT = "subject";
     private static final String GROUP_ID = "group_id";
     private static final String TEACHER_ID = "teacher_id";
+    private static final String MONTH_TIMETABLE_ID = "month_timetable_id";
 
     @Override
     public DayTimetable mapRow(ResultSet resultSet, int i) throws SQLException {
@@ -29,6 +31,7 @@ public class DayTimetableMapper implements RowMapper<DayTimetable> {
         dayTimetable.setSubject(resultSet.getString(SUBJECT));
         dayTimetable.setGroup(new Group(resultSet.getInt(GROUP_ID)));
         dayTimetable.setTeacher(new Teacher(resultSet.getInt(TEACHER_ID)));
+        dayTimetable.setMonthTimetable(new MonthTimetable(resultSet.getInt(MONTH_TIMETABLE_ID)));
 
         return dayTimetable;
     }

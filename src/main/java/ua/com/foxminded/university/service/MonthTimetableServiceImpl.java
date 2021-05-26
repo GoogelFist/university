@@ -3,6 +3,10 @@ package ua.com.foxminded.university.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.MonthTimetableDAO;
 import ua.com.foxminded.university.dao.exceptions.DaoException;
@@ -10,6 +14,8 @@ import ua.com.foxminded.university.entities.DayTimetable;
 import ua.com.foxminded.university.entities.MonthTimetable;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -59,6 +65,29 @@ public class MonthTimetableServiceImpl implements MonthTimetableService {
         }
         monthTimetables.forEach(this::setDayTimetablesInMonthTimetable);
         return monthTimetables;
+    }
+
+    @Override
+    public Page<MonthTimetable> getAll(Pageable pageable) {
+        logger.debug("TeacherService calls teacherDAO.getAll({})", pageable);
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<MonthTimetable> monthTimetables;
+        List<MonthTimetable> list;
+        try {
+            monthTimetables = monthTimetableDAO.getAll();
+            monthTimetables.sort(Comparator.comparing(MonthTimetable::getDate));
+        } catch (DaoException e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
+        if (monthTimetables.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, monthTimetables.size());
+            list = monthTimetables.subList(startItem, toIndex);
+        }
+        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), monthTimetables.size());
     }
 
     @Override

@@ -31,6 +31,7 @@ public class StudentDAOImpl implements StudentDAO {
     private static final String PHONE = "phone";
     private static final String STUDENTS = "students";
     private static final String STUDENT = "student";
+    private static final String GROUP_ID = "group_id";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -76,7 +77,8 @@ public class StudentDAOImpl implements StudentDAO {
             SqlParameterSource parameterSource = new MapSqlParameterSource()
                 .addValue(FIRST_NAME, student.getFirstName())
                 .addValue(LAST_NAME, student.getLastName())
-                .addValue(PHONE, student.getPhone());
+                .addValue(PHONE, student.getPhone())
+                .addValue(GROUP_ID, student.getGroup().getId());
             Number generatedId = jdbcInsert.executeAndReturnKey(parameterSource);
             student.setId(generatedId.intValue());
         } catch (DataAccessException e) {

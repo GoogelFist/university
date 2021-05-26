@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Students')"></head>
+<body>
+
+<div th:replace="fragments/students-fragments :: menu-site-for-students"></div>
+
+<div th:replace="fragments/students-fragments :: all-students"></div>
+
+<div th:replace="fragments/students-fragments :: student-pagination"></div>
+
+</body>
+</html>

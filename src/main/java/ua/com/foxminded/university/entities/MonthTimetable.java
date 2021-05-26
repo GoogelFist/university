@@ -1,11 +1,14 @@
 package ua.com.foxminded.university.entities;
 
+import org.springframework.format.annotation.DateTimeFormat;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
 public class MonthTimetable {
     private int id;
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;
     private List<DayTimetable> dayTimetables;
 
@@ -14,7 +17,21 @@ public class MonthTimetable {
         this.date = date;
     }
 
+    public MonthTimetable(int id, LocalDate date, List<DayTimetable> dayTimetables) {
+        this.id = id;
+        this.date = date;
+        this.dayTimetables = dayTimetables;
+    }
+
+    public MonthTimetable(LocalDate date) {
+        this.date = date;
+    }
+
     public MonthTimetable() {
+    }
+
+    public MonthTimetable(int id) {
+        this.id = id;
     }
 
     public int getId() {

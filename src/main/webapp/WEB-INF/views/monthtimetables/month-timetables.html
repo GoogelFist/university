@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Timetables')"></head>
+<body>
+
+<div th:replace="fragments/month-timetables-fragments :: menu-site-month-timetables"></div>
+
+<div th:replace="fragments/month-timetables-fragments :: all-month-timetables"></div>
+
+<div th:replace="fragments/month-timetables-fragments :: month-timetables-pagination"></div>
+
+</body>
+</html>

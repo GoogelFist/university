@@ -10,6 +10,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import ua.com.foxminded.university.dao.DaoTestConfig;
 import ua.com.foxminded.university.entities.DayTimetable;
 import ua.com.foxminded.university.entities.Group;
+import ua.com.foxminded.university.entities.MonthTimetable;
 import ua.com.foxminded.university.entities.Teacher;
 
 import java.sql.ResultSet;
@@ -18,27 +19,27 @@ import java.time.LocalTime;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static ua.com.foxminded.university.utils.Constants.*;
 
 @ExtendWith(MockitoExtension.class)
 @SpringJUnitConfig(DaoTestConfig.class)
 class DayTimetableMapperTest {
+    private final DayTimetable expectedDayTimetable = new DayTimetable(ID_1_VALUE, DAY_TIMETABLE_1_TIME_VALUE, LECTURE_HALL_1_VALUE, SUBJECT_1_VALUE, new Group(ID_1_VALUE), new Teacher(ID_2_VALUE), new MonthTimetable(ID_1_VALUE));
     @Mock
     private ResultSet resultSet;
-
     @InjectMocks
     @Autowired
     private DayTimetableMapper dayTimetableMapper;
 
-    private final DayTimetable expectedDayTimetable = new DayTimetable(1, LocalTime.of(8, 0), "12", "math", new Group(1), new Teacher(2));
-
     @Test
     void shouldReturnDayTimetableWithCorrectSettings() throws SQLException {
-        when(resultSet.getInt("id")).thenReturn(1);
-        when(resultSet.getObject("start_time", LocalTime.class)).thenReturn(LocalTime.of(8, 0));
-        when(resultSet.getString("lecture_hall")).thenReturn("12");
-        when(resultSet.getString("subject")).thenReturn("math");
-        when(resultSet.getInt("group_id")).thenReturn(1);
-        when(resultSet.getInt("teacher_id")).thenReturn(2);
+        when(resultSet.getInt(COLUMN_LABEL_ID)).thenReturn(ID_1_VALUE);
+        when(resultSet.getObject(COLUMN_START_TIME, LocalTime.class)).thenReturn(DAY_TIMETABLE_1_TIME_VALUE);
+        when(resultSet.getString(COLUMN_LABEL_LECTURE_HALL)).thenReturn(LECTURE_HALL_1_VALUE);
+        when(resultSet.getString(COLUMN_LABEL_SUBJECT)).thenReturn(SUBJECT_1_VALUE);
+        when(resultSet.getInt(COLUMN_LABEL_GROUP_ID)).thenReturn(ID_1_VALUE);
+        when(resultSet.getInt(COLUMN_LABEL_TEACHER_ID)).thenReturn(ID_2_VALUE);
+        when(resultSet.getInt(COLUMN_LABEL_MONT_TIMETABLE_ID)).thenReturn(ID_1_VALUE);
 
         DayTimetable actualDayTimetable = dayTimetableMapper.mapRow(resultSet, 1);
 

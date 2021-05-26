@@ -34,6 +34,7 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     private static final String TEACHER_ID = "teacher_id";
     private static final String DAY_TIMETABLE = "day_timetable";
     private static final String FOUND_DAY_TIMETABLES = "Found {} {}";
+    private static final String MONTH_TIMETABLE_ID = "month_timetable_id";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -78,7 +79,8 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
                 .addValue(LECTURE_HALL, dayTimetable.getLectureHall())
                 .addValue(SUBJECT, dayTimetable.getSubject())
                 .addValue(GROUP_ID, dayTimetable.getGroup().getId())
-                .addValue(TEACHER_ID, dayTimetable.getTeacher().getId());
+                .addValue(TEACHER_ID, dayTimetable.getTeacher().getId())
+                .addValue(MONTH_TIMETABLE_ID, dayTimetable.getMonthTimetable().getId());
             Number generatedID = jdbcInsert.executeAndReturnKey(parameterSource);
             dayTimetable.setId(generatedID.intValue());
         } catch (DataAccessException e) {

@@ -11,6 +11,8 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import javax.sql.DataSource;
 
+import static ua.com.foxminded.university.utils.Constants.CREATE_TABLES_SQL_PATH;
+
 @Configuration
 @ComponentScan("ua.com.foxminded.university.dao")
 public class DaoTestConfig {
@@ -19,7 +21,7 @@ public class DaoTestConfig {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
             .setType(EmbeddedDatabaseType.H2)
-            .addScript("classpath:createTestTable.sql")
+            .addScript(CREATE_TABLES_SQL_PATH)
             .build();
     }
 

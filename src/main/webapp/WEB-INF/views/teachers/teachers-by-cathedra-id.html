@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Teachers by cathedra')"></head>
+<body>
+
+<head th:replace="fragments/teachers-fragments :: menu-site-for-teachers"></head>
+
+<table aria-label="Teachers table" class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">First Name</th>
+        <th scope="col">Last Name</th>
+        <th scope="col">Phone</th>
+        <th scope="col">Qualification</th>
+        <th scope="col">Cathedra</th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="teacher: ${teachersByCathedraId}">
+        <td th:text="${teacher.getFirstName()}"></td>
+        <td th:text="${teacher.getLastName()}"></td>
+        <td th:text="${teacher.getPhone()}"></td>
+        <td th:text="${teacher.getQualification()}"></td>
+        <td th:text="${teacher.getCathedra().getName()}"></td>
+        <td>
+            <a class="btn btn-outline-primary"
+               th:href="@{/teachers/{id}(id = ${teacher.getId()})}"
+               role="button">Info</a>
+        </td>
+    </tr>
+    </tbody>
+</table>
+
+<div th:replace="fragments/teachers-fragments :: teacher-by-cathedra-pagination"></div>
+
+</body>
+</html>

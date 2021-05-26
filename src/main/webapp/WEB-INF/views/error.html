@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Error')"></head>
+<body>
+
+<div th:replace="fragments/fragments :: menu-site"></div>
+
+<div class="container-lg">
+    <div>
+        <div class="alert alert-warning" role="alert">
+            <p class="text-center mb-0" th:text="${exception.getMessage()}">ERROR MESSAGE</p>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

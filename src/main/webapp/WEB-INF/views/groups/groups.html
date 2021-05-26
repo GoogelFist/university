@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Groups')"></head>
+<body>
+
+<div th:replace="fragments/groups-fragments :: menu-site-for-groups"></div>
+
+<div th:replace="fragments/groups-fragments :: all-groups"></div>
+
+<div th:replace="fragments/groups-fragments :: groups-pagination"></div>
+
+</body>
+</html>

@@ -18,11 +18,10 @@ import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static ua.com.foxminded.university.dao.exceptions.ExceptionsMessageConstants.ENTITY_NOT_FOUND;
+import static ua.com.foxminded.university.utils.Constants.*;
 
 @SpringJUnitConfig(DaoTestConfig.class)
 class CathedraDAOImplTest {
-
-    private static final String CATHEDRA = "cathedra";
     @Autowired
     private CathedraDAO cathedraDAO;
 
@@ -32,33 +31,32 @@ class CathedraDAOImplTest {
     @BeforeEach
     void setUp() {
         ResourceDatabasePopulator tables = new ResourceDatabasePopulator();
-        tables.addScript(new ClassPathResource("/testData.sql"));
+        tables.addScript(new ClassPathResource(TEST_DATA_SQL_PATH));
         DatabasePopulatorUtils.execute(tables, dataSource);
     }
 
     @Test
     void shouldCreateCathedras() throws DaoException {
-        Cathedra expectedCathedra = new Cathedra(3, "maths");
+        Cathedra expectedCathedra = new Cathedra(ID_3_VALUE, CATHEDRA_3_NAME_VALUE);
         cathedraDAO.create(expectedCathedra);
-        Cathedra actualCathedra = cathedraDAO.getById(3);
+        Cathedra actualCathedra = cathedraDAO.getById(ID_3_VALUE);
 
         assertEquals(expectedCathedra, actualCathedra);
     }
 
     @Test
     void shouldGetCathedraByID() throws DaoException {
-        Cathedra expectedCathedra = new Cathedra(1, "physics");
-        Cathedra actualCathedra = cathedraDAO.getById(1);
+        Cathedra expectedCathedra = new Cathedra(ID_1_VALUE, CATHEDRA_1_NAME_VALUE);
+        Cathedra actualCathedra = cathedraDAO.getById(ID_1_VALUE);
 
         assertEquals(expectedCathedra, actualCathedra);
     }
 
     @Test
     void shouldThrowDaoExceptionExceptionWhenCantGetCathedraById() {
-        int id = 5;
-        Exception exception = assertThrows(DaoException.class, () -> cathedraDAO.getById(id));
+        Exception exception = assertThrows(DaoException.class, () -> cathedraDAO.getById(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = format(ENTITY_NOT_FOUND, CATHEDRA, id);
+        String expected = format(ENTITY_NOT_FOUND, CATHEDRA, ID_5_VALUE);
 
         assertEquals(expected, actual);
     }
@@ -66,8 +64,8 @@ class CathedraDAOImplTest {
     @Test
     void shouldGetAllCathedras() throws DaoException {
         List<Cathedra> expectedCathedras = new ArrayList<>();
-        expectedCathedras.add(new Cathedra(1, "physics"));
-        expectedCathedras.add(new Cathedra(2, "medicals"));
+        expectedCathedras.add(new Cathedra(ID_1_VALUE, CATHEDRA_1_NAME_VALUE));
+        expectedCathedras.add(new Cathedra(ID_2_VALUE, CATHEDRA_2_NAME_VALUE));
 
         List<Cathedra> actualCAthedras = cathedraDAO.getAll();
 
@@ -76,9 +74,9 @@ class CathedraDAOImplTest {
 
     @Test
     void shouldUpdateCathedra() throws DaoException {
-        Cathedra expectedCathedra = new Cathedra(1, "maths");
-        cathedraDAO.update(1, expectedCathedra);
-        Cathedra actualCathedra = cathedraDAO.getById(1);
+        Cathedra expectedCathedra = new Cathedra(ID_1_VALUE, CATHEDRA_3_NAME_VALUE);
+        cathedraDAO.update(ID_1_VALUE, expectedCathedra);
+        Cathedra actualCathedra = cathedraDAO.getById(ID_1_VALUE);
 
         assertEquals(expectedCathedra, actualCathedra);
     }
@@ -86,8 +84,8 @@ class CathedraDAOImplTest {
     @Test
     void shouldDeleteCathedra() throws DaoException {
         List<Cathedra> expectedCathedras = new ArrayList<>();
-        expectedCathedras.add(new Cathedra(1, "physics"));
-        cathedraDAO.delete(2);
+        expectedCathedras.add(new Cathedra(ID_1_VALUE, CATHEDRA_1_NAME_VALUE));
+        cathedraDAO.delete(ID_2_VALUE);
         List<Cathedra> actualCathedras = cathedraDAO.getAll();
 
         assertEquals(expectedCathedras, actualCathedras);

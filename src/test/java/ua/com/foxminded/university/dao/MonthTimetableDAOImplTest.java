@@ -11,7 +11,6 @@ import ua.com.foxminded.university.dao.exceptions.DaoException;
 import ua.com.foxminded.university.entities.MonthTimetable;
 
 import javax.sql.DataSource;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,6 +18,7 @@ import static java.lang.String.format;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static ua.com.foxminded.university.dao.exceptions.ExceptionsMessageConstants.ENTITY_NOT_FOUND;
+import static ua.com.foxminded.university.utils.Constants.*;
 
 @SpringJUnitConfig(DaoTestConfig.class)
 class MonthTimetableDAOImplTest {
@@ -34,33 +34,32 @@ class MonthTimetableDAOImplTest {
     @BeforeEach
     void setUp() {
         ResourceDatabasePopulator tables = new ResourceDatabasePopulator();
-        tables.addScript(new ClassPathResource("/testData.sql"));
+        tables.addScript(new ClassPathResource(TEST_DATA_SQL_PATH));
         DatabasePopulatorUtils.execute(tables, dataSource);
     }
 
     @Test
     void shouldCreateMonthTimetable() throws DaoException {
-        MonthTimetable expectedMonthTimetable = new MonthTimetable(3, LocalDate.of(2021, 4, 25));
+        MonthTimetable expectedMonthTimetable = new MonthTimetable(ID_3_VALUE, MONTH_TIMETABLE_DATE_VALUE_3);
         monthTimetableDAO.create(expectedMonthTimetable);
-        MonthTimetable actualMonthTimetable = monthTimetableDAO.getById(3);
+        MonthTimetable actualMonthTimetable = monthTimetableDAO.getById(ID_3_VALUE);
 
         assertEquals(expectedMonthTimetable, actualMonthTimetable);
     }
 
     @Test
     void shouldGetMonthTimetableByID() throws DaoException {
-        MonthTimetable expectedMonthTimetable = new MonthTimetable(1, LocalDate.of(2021, 4, 23));
-        MonthTimetable actualMonthTimetable = monthTimetableDAO.getById(1);
+        MonthTimetable expectedMonthTimetable = new MonthTimetable(ID_1_VALUE, MONTH_TIMETABLE_DATE_VALUE_1);
+        MonthTimetable actualMonthTimetable = monthTimetableDAO.getById(ID_1_VALUE);
 
         assertEquals(expectedMonthTimetable, actualMonthTimetable);
     }
 
     @Test
     void shouldThrowEntityNotFoundExceptionExceptionWhenCantGetMonthTimetableById() {
-        int id = 5;
-        Exception exception = assertThrows(DaoException.class, () -> monthTimetableDAO.getById(id));
+        Exception exception = assertThrows(DaoException.class, () -> monthTimetableDAO.getById(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = format(ENTITY_NOT_FOUND, MONTH_TIMETABLE, id);
+        String expected = format(ENTITY_NOT_FOUND, MONTH_TIMETABLE, ID_5_VALUE);
 
         assertEquals(expected, actual);
     }
@@ -68,8 +67,8 @@ class MonthTimetableDAOImplTest {
     @Test
     void shouldGetAllMonthTimetables() throws DaoException {
         List<MonthTimetable> expectedMonthTimetables = new ArrayList<>();
-        expectedMonthTimetables.add(new MonthTimetable(1, LocalDate.of(2021, 4, 23)));
-        expectedMonthTimetables.add(new MonthTimetable(2, LocalDate.of(2021, 4, 24)));
+        expectedMonthTimetables.add(new MonthTimetable(ID_1_VALUE, MONTH_TIMETABLE_DATE_VALUE_1));
+        expectedMonthTimetables.add(new MonthTimetable(ID_2_VALUE, MONTH_TIMETABLE_DATE_VALUE_2));
 
         List<MonthTimetable> actualMonthTimetables = monthTimetableDAO.getAll();
 
@@ -78,8 +77,8 @@ class MonthTimetableDAOImplTest {
 
     @Test
     void shouldUpdateMonthTimetable() throws DaoException {
-        MonthTimetable expectedMonthTimetable = new MonthTimetable(1, LocalDate.of(2000, 1, 1));
-        monthTimetableDAO.update(1, expectedMonthTimetable);
+        MonthTimetable expectedMonthTimetable = new MonthTimetable(ID_1_VALUE, MONTH_TIMETABLE_DATE_VALUE_3);
+        monthTimetableDAO.update(ID_1_VALUE, expectedMonthTimetable);
         MonthTimetable actualMonthTimetable = monthTimetableDAO.getById(1);
 
         assertEquals(expectedMonthTimetable, actualMonthTimetable);
@@ -88,9 +87,9 @@ class MonthTimetableDAOImplTest {
     @Test
     void shouldDeleteMonthTimetable() throws DaoException {
         List<MonthTimetable> expectedMonthTimetables = new ArrayList<>();
-        expectedMonthTimetables.add(new MonthTimetable(1, LocalDate.of(2021, 4, 23)));
+        expectedMonthTimetables.add(new MonthTimetable(ID_1_VALUE, MONTH_TIMETABLE_DATE_VALUE_1));
 
-        monthTimetableDAO.delete(2);
+        monthTimetableDAO.delete(ID_2_VALUE);
         List<MonthTimetable> actualMonthTimetables = monthTimetableDAO.getAll();
 
         assertEquals(expectedMonthTimetables, actualMonthTimetables);

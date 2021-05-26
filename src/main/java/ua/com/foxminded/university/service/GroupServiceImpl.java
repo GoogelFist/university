@@ -3,14 +3,21 @@ package ua.com.foxminded.university.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.CathedraDAO;
 import ua.com.foxminded.university.dao.GroupDAO;
 import ua.com.foxminded.university.dao.exceptions.DaoException;
+import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.Student;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -48,6 +55,7 @@ public class GroupServiceImpl implements GroupService {
             throw new ServiceException(e.getMessage(), e);
         }
         setStudentsInGroup(group);
+        setCathedraToGroup(group);
         return group;
     }
 
@@ -62,6 +70,30 @@ public class GroupServiceImpl implements GroupService {
         }
         groups.forEach(this::setStudentsInGroup);
         return groups;
+    }
+
+    @Override
+    public Page<Group> getAll(Pageable pageable) {
+        logger.debug("GroupService calls groupDao.getAll()");
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Group> groups;
+        List<Group> list;
+        try {
+            groups = groupDAO.getAll();
+            groups.sort(Comparator.comparing(Group::getId));
+        } catch (DaoException e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
+        if (groups.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, groups.size());
+            list = groups.subList(startItem, toIndex);
+            list.forEach(this::setCathedraToGroup);
+        }
+        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), groups.size());
     }
 
     @Override
@@ -86,6 +118,8 @@ public class GroupServiceImpl implements GroupService {
 
     @Override
     public List<Group> getByCathedraId(int cathedraId) {
+        checkingCathedraInDao(cathedraId);
+
         logger.debug("GroupService calls groupDao.getByCathedraId(id {})", cathedraId);
         List<Group> groupsByCathedraId;
         try {
@@ -98,7 +132,35 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
+    public Page<Group> getByCathedraId(int cathedraId, Pageable pageable) {
+        checkingCathedraInDao(cathedraId);
+
+        logger.debug("GroupService calls groupDao.getByCathedraId({}, {})", cathedraId, pageable);
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Group> groups;
+        List<Group> list;
+        try {
+            groups = groupDAO.getByCathedraId(cathedraId);
+            groups.sort(Comparator.comparing(Group::getId));
+        } catch (DaoException e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
+        if (groups.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, groups.size());
+            list = groups.subList(startItem, toIndex);
+            list.forEach(this::setCathedraToGroup);
+        }
+        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), groups.size());
+    }
+
+    @Override
     public void assignToCathedra(int cathedraId, int groupId) {
+        checkingCathedraInDao(cathedraId);
+
         logger.debug("GroupService calls groupDao.assignToCathedra(cathedraId {}, groupId {})", cathedraId, groupId);
         try {
             groupDAO.assignToCathedra(cathedraId, groupId);
@@ -110,7 +172,6 @@ public class GroupServiceImpl implements GroupService {
     @Override
     public void updateAssignment(int cathedraId, int groupId) {
         checkingCathedraInDao(cathedraId);
-        checkingGroupInDao(groupId);
 
         logger.debug("GroupService calls groupDao.updateAssignment(cathedraId {}, groupId {})", cathedraId, groupId);
         try {
@@ -141,6 +202,22 @@ public class GroupServiceImpl implements GroupService {
         group.setStudents(studentsByGroupId);
     }
 
+    private void setCathedraToGroup(Group group) {
+        logger.debug("Call group.getId()");
+        int cathedraId = group.getCathedra().getId();
+
+        logger.debug("Call cathedraDAO.getById({})", cathedraId);
+        Cathedra cathedra;
+        try {
+            cathedra = cathedraDAO.getById(cathedraId);
+        } catch (DaoException e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
+
+        logger.debug("Set {} to the {}", cathedra, group);
+        group.setCathedra(cathedra);
+    }
+
     private void checkingCathedraInDao(int cathedraId) {
         logger.debug("Checking the presence of a cathedra");
         try {
@@ -149,15 +226,5 @@ public class GroupServiceImpl implements GroupService {
             throw new ServiceException(e.getMessage(), e);
         }
         logger.trace("Cathedra is present");
-    }
-
-    private void checkingGroupInDao(int groupId) {
-        logger.debug("Checking the presence of a group");
-        try {
-            groupDAO.getById(groupId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-        logger.debug("Group is present");
     }
 }

@@ -32,6 +32,7 @@ public class TeacherDAOImpl implements TeacherDAO {
     private static final String PHONE = "phone";
     private static final String QUALIFICATION = "qualification";
     private static final String TEACHER = "teacher";
+    private static final String CATHEDRA_ID = "cathedra_id";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -78,7 +79,8 @@ public class TeacherDAOImpl implements TeacherDAO {
                 .addValue(FIRST_NAME, teacher.getFirstName())
                 .addValue(LAST_NAME, teacher.getLastName())
                 .addValue(PHONE, teacher.getPhone())
-                .addValue(QUALIFICATION, teacher.getQualification());
+                .addValue(QUALIFICATION, teacher.getQualification())
+                .addValue(CATHEDRA_ID, teacher.getCathedra().getId());
             Number generatedID = jdbcInsert.executeAndReturnKey(parameterSource);
             teacher.setId(generatedID.intValue());
         } catch (DataAccessException e) {

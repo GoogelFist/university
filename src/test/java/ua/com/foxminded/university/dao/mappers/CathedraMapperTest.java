@@ -15,6 +15,7 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static ua.com.foxminded.university.utils.Constants.*;
 
 @ExtendWith(MockitoExtension.class)
 @SpringJUnitConfig(DaoTestConfig.class)
@@ -27,12 +28,12 @@ class CathedraMapperTest {
     @Autowired
     private CathedraMapper cathedraMapper;
 
-    private final Cathedra expectedCathedra = new Cathedra(1, "physics");
+    private final Cathedra expectedCathedra = new Cathedra(ID_1_VALUE, PHYSICS);
 
     @Test
     void shouldReturnCathedraWithCorrectSettings() throws SQLException {
-        when(resultSet.getInt("id")).thenReturn(1);
-        when(resultSet.getString("name")).thenReturn("physics");
+        when(resultSet.getInt(ID)).thenReturn(ID_1_VALUE);
+        when(resultSet.getString(NAME)).thenReturn(PHYSICS);
 
         Cathedra actualCathedra = cathedraMapper.mapRow(resultSet, 1);
 

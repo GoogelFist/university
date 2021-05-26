@@ -29,6 +29,7 @@ public class GroupDAOImpl implements GroupDAO {
     private static final String NAME = "name";
     private static final String GROUPS = "groups";
     private static final String GROUP = "group";
+    private static final String CATHEDRA_ID = "cathedra_id";
 
     private final JdbcTemplate jdbcTemplate;
     private final SimpleJdbcInsert jdbcInsert;
@@ -72,7 +73,8 @@ public class GroupDAOImpl implements GroupDAO {
         logger.debug("create({})", group);
         try {
             SqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue(NAME, group.getName());
+                .addValue(NAME, group.getName())
+                .addValue(CATHEDRA_ID, group.getCathedra().getId());
             Number generatedID = jdbcInsert.executeAndReturnKey(parameterSource);
             group.setId(generatedID.intValue());
         } catch (DataAccessException e) {

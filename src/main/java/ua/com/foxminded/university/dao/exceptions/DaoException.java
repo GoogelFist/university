@@ -1,6 +1,6 @@
 package ua.com.foxminded.university.dao.exceptions;
 
-public class DaoException extends Exception{
+public class DaoException extends Exception {
     public DaoException() {
     }
 

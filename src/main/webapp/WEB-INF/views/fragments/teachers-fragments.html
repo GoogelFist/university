@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Teachers fragments')"></head>
+<body>
+
+<div th:fragment="menu-site-for-teachers">
+    <nav aria-label="Site menu" class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/">University</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavDropdown">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/students">Students</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/groups">Groups</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link active" href="/teachers">Teachers</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/cathedras">Cathedras</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/month-timetables">Timetables</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+</div>
+
+<div th:fragment="all-teachers">
+    <table aria-label="Teachers table" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Qualification</th>
+            <th scope="col">Cathedra</th>
+            <th scope="col">
+                <a th:href="@{/teachers/new}"
+                   type="button"
+                   class="btn btn-outline-primary">New teacher
+                </a>
+            </th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="teacher: ${teachers}">
+            <td th:text="${teacher.getFirstName()}"></td>
+            <td th:text="${teacher.getLastName()}"></td>
+            <td th:text="${teacher.getPhone()}"></td>
+            <td th:text="${teacher.getQualification()}"></td>
+            <td th:text="${teacher.getCathedra().getName()}"></td>
+            <td></td>
+            <td class="d-flex flex-row text-nowrap bd-highlight">
+                <a th:href="@{/day_timetables/by_teacher/{teacherId}(teacherId=${teacher.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Timetable</a>
+                <a class="btn btn-outline-primary ms-3"
+                   th:href="@{/teachers/{id}(id = ${teacher.getId()})}"
+                   role="button">Info</a>
+                <a th:href="@{/teachers/{id}/edit(id = ${teacher.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Edit</a>
+                <form th:method="DELETE" th:action="@{/teachers/{id}(id=${teacher.getId()})}" class="input-group ms-1">
+                    <input type="submit" class="btn btn-outline-primary" value="Delete"/>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div th:fragment="new-teacher">
+    <form th:method="POST" th:action="@{/teachers}" th:object="${teacher}" class="row mb-1 m-lg-2">
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="firstName" class="form-label">First Name</label>
+                <input th:field="*{firstName}" id="firstName" type="text" class="form-control"
+                       placeholder="Enter first name of teacher">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input th:field="*{lastName}" id="lastName" type="text" class="form-control"
+                       placeholder="Enter last name of teacher">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="phone" class="form-label">Phone</label>
+                <input th:field="*{phone}" id="phone" type="text" class="form-control"
+                       placeholder="Enter phone of teacher">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="qualification" class="form-label">Qualification</label>
+                <input th:field="*{qualification}" id="qualification" type="text" class="form-control"
+                       placeholder="Enter qualification of teacher">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputState" class="form-label">Cathedra</label>
+                <select th:field="*{cathedra.id}" id="inputState" class="form-select"/>
+                <option selected="selected" th:value="${String}">Select</option>
+                <option th:each="cathedra : ${cathedras}"
+                        th:value="${cathedra.id}"
+                        th:text="${cathedra.getName()}">
+                </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Create</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div th:fragment="update-teacher">
+    <form th:method="PATCH" th:action="@{/teachers/{id}(id=${teacher.getId()})}" th:object="${teacher}" class="row mb-1 m-lg-2">
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="firstName" class="form-label">First Name</label>
+                <input th:field="*{firstName}" id="firstName" type="text" class="form-control"
+                       placeholder="Enter the first name of teacher">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input th:field="*{lastName}" id="lastName" type="text" class="form-control"
+                       placeholder="Enter the last name of teacher">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="phone" class="form-label">Phone</label>
+                <input th:field="*{phone}" id="phone" type="text" class="form-control"
+                       placeholder="Enter the phone of teacher">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="qualification" class="form-label">Qualification</label>
+                <input th:field="*{qualification}" id="qualification" type="text" class="form-control"
+                       placeholder="Enter the qualification of teacher">
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-sm">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div th:fragment="teachers-pagination">
+    <nav aria-label="Page navigation example">
+        <ul th:if="${teachers.totalPages > 1}" class="pagination">
+            <li th:if="${teachers.isFirst()}" class="page-item disabled"><a class="page-link" href="">Previous</a></li>
+            <li th:unless="${teachers.isFirst()}" class="page-item">
+                <a th:href="@{/teachers(size=${teachers.size}, page=${teachers.previousPageable().getPageNumber()})}"
+                   class="page-link">Previous</a>
+            </li>
+            <div th:each="pageNumber : ${pageNumbers}" class="page-item">
+                <li th:if="${pageNumber - 1 == teachers.number}" class="page-item active" aria-current="page">
+                    <a th:href="@{/teachers(size=${teachers.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+                <li th:unless="${pageNumber - 1 == teachers.number}" class="page-item">
+                    <a th:href="@{/teachers(size=${teachers.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+            </div>
+            <li th:if="${teachers.isLast()}" class="page-item disabled"><a class="page-link" href="#">Next</a></li>
+            <li th:unless="${teachers.isLast()}" class="page-item">
+                <a th:href="@{/teachers(size=${teachers.size}, page=${teachers.nextPageable().getPageNumber()})}"
+                   class="page-link">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+<div th:fragment="teacher-by-cathedra-pagination">
+    <nav aria-label="Page navigation example">
+        <ul th:if="${teachersByCathedraId.totalPages > 1}" class="pagination">
+            <li th:if="${teachersByCathedraId.isFirst()}" class="page-item disabled"><a class="page-link" href="">Previous</a>
+            </li>
+            <li th:unless="${teachersByCathedraId.isFirst()}" class="page-item">
+                <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachersByCathedraId.size}, page=${teachersByCathedraId.previousPageable().getPageNumber()})}"
+                   class="page-link">Previous</a>
+            </li>
+            <div th:each="pageNumber : ${pageNumbers}" class="page-item">
+                <li th:if="${pageNumber - 1 == teachersByCathedraId.number}" class="page-item active"
+                    aria-current="page">
+                    <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachersByCathedraId.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+                <li th:unless="${pageNumber - 1 == teachersByCathedraId.number}" class="page-item">
+                    <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachersByCathedraId.size}, page=${pageNumber - 1})}"
+                       th:text="${pageNumber}" class="page-link">1</a>
+                </li>
+            </div>
+            <li th:if="${teachersByCathedraId.isLast()}" class="page-item disabled"><a class="page-link"
+                                                                                       href="#">Next</a></li>
+            <li th:unless="${teachersByCathedraId.isLast()}" class="page-item">
+                <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachersByCathedraId.size}, page=${teachersByCathedraId.nextPageable().getPageNumber()})}"
+                   class="page-link">Next</a>
+            </li>
+        </ul>
+    </nav>
+</div>
+
+</body>
+</html>

@@ -5,19 +5,27 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import ua.com.foxminded.university.dao.GroupDAO;
 import ua.com.foxminded.university.dao.StudentDAO;
 import ua.com.foxminded.university.dao.exceptions.DaoException;
+import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.Student;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.String.format;
 import static java.util.Collections.singletonList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
+import static ua.com.foxminded.university.utils.Constants.*;
 
 @ExtendWith(MockitoExtension.class)
 @SpringJUnitConfig(ServiceTestConfig.class)
@@ -35,7 +43,7 @@ class StudentServiceImplTest {
     @BeforeEach
     void setUp() {
         studentService = new StudentServiceImpl(mockStudentDAO, mockGroupDAO);
-        student = new Student(1, "James", "White", "12345");
+        student = new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE, new Group(ID_1_VALUE));
         students = singletonList(student);
     }
 
@@ -43,15 +51,15 @@ class StudentServiceImplTest {
     void shouldCallCreateStudent() throws DaoException {
         studentService.create(student);
 
-        verify(mockStudentDAO, times(1)).create(student);
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).create(student);
     }
 
     @Test
     void shouldCallGetStudentByID() throws DaoException {
         when(mockStudentDAO.getById(1)).thenReturn(student);
-        Student actualStudent = studentService.getById(1);
+        Student actualStudent = studentService.getById(ID_1_VALUE);
 
-        verify(mockStudentDAO, times(1)).getById(1);
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
         assertEquals(student, actualStudent);
     }
 
@@ -60,141 +68,168 @@ class StudentServiceImplTest {
         when(mockStudentDAO.getAll()).thenReturn(students);
         List<Student> actualStudents = studentService.getAll();
 
-        verify(mockStudentDAO, times(1)).getAll();
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getAll();
         assertEquals(students, actualStudents);
+    }
+
+    @Test
+    void shouldCallGetAllStudentsPageable() throws DaoException {
+        Pageable pageable = PageRequest.of(PAGE, SIZE);
+        students = new ArrayList<>();
+        students.add(new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE, new Group(ID_1_VALUE)));
+        when(mockStudentDAO.getAll()).thenReturn(students);
+
+        Page<Student> expectedPageStudents = new PageImpl<>(students, pageable, students.size());
+        Page<Student> actualPageStudents = studentService.getAll(pageable);
+
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getAll();
+        assertEquals(expectedPageStudents, actualPageStudents);
     }
 
     @Test
     void shouldCallUpdateStudent() throws DaoException {
-        studentService.update(1, student);
+        studentService.update(ID_1_VALUE, student);
 
-        verify(mockStudentDAO, times(1)).update(1, student);
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).update(ID_1_VALUE, student);
     }
 
     @Test
     void shouldCallDeleteStudent() throws DaoException {
-        studentService.delete(1);
+        studentService.delete(ID_1_VALUE);
 
-        verify(mockStudentDAO, times(1)).delete(1);
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).delete(ID_1_VALUE);
     }
 
     @Test
     void shouldCallGetStudentsByGroupId() throws DaoException {
-        when(mockStudentDAO.getByGroupId(1)).thenReturn(students);
-        List<Student> actualStudents = studentService.getByGroupId(1);
+        when(mockStudentDAO.getByGroupId(ID_1_VALUE)).thenReturn(students);
+        List<Student> actualStudents = studentService.getByGroupId(ID_1_VALUE);
 
-        verify(mockStudentDAO, times(1)).getByGroupId(1);
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByGroupId(ID_1_VALUE);
         assertEquals(students, actualStudents);
     }
 
     @Test
-    void shouldCallAssignStudentToGroup() throws DaoException {
-        studentService.assignToGroup(1, 1);
+    void shouldCallGetStudentsByGroupIdPageable() throws DaoException {
+        Pageable pageable = PageRequest.of(PAGE, SIZE);
+        students = new ArrayList<>();
+        students.add(new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE, new Group(ID_1_VALUE)));
+        when(mockStudentDAO.getByGroupId(ID_1_VALUE)).thenReturn(students);
 
-        verify(mockStudentDAO, times(1)).assignToGroup(1, 1);
+        Page<Student> expectedPageStudents = new PageImpl<>(students, pageable, students.size());
+        Page<Student> actualPageStudents = studentService.getByGroupId(ID_1_VALUE, pageable);
+
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByGroupId(ID_1_VALUE);
+        assertEquals(expectedPageStudents, actualPageStudents);
+    }
+
+    @Test
+    void shouldCallAssignStudentToGroup() throws DaoException {
+        studentService.assignToGroup(ID_1_VALUE, ID_1_VALUE);
+
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).assignToGroup(ID_1_VALUE, ID_1_VALUE);
     }
 
     @Test
     void shouldCallUpdateAssignmentStudentToGroup() throws DaoException {
-        studentService.updateAssignment(1, 1);
+        studentService.updateAssignment(ID_1_VALUE, ID_1_VALUE);
 
-        verify(mockGroupDAO, times(1)).getById(anyInt());
-        verify(mockStudentDAO, times(1)).getById(anyInt());
-        verify(mockStudentDAO, times(1)).updateAssignment(1, 1);
+        verify(mockGroupDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).updateAssignment(ID_1_VALUE, ID_1_VALUE);
     }
 
     @Test
     void shouldCallDeleteAssignmentStudentToGroup() throws DaoException {
-        studentService.deleteAssignment(1);
+        studentService.deleteAssignment(ID_1_VALUE);
 
-        verify(mockStudentDAO, times(1)).deleteAssignment(1);
+        verify(mockStudentDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).deleteAssignment(ID_1_VALUE);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantCreateStudent() throws DaoException {
-        doThrow(new ServiceException("Unable to create student")).when(mockStudentDAO).create(student);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_CREATE, STUDENT);
+        doThrow(new ServiceException(message)).when(mockStudentDAO).create(student);
 
         Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.create(student));
         String actual = exception.getMessage();
-        String expected = "Unable to create student";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantGetByStudentId() throws DaoException {
-        doThrow(new ServiceException("Unable to get student with ID 5")).when(mockStudentDAO).getById(5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ID, GET, STUDENT, ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockStudentDAO).getById(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.getById(5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.getById(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable to get student with ID 5";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantGetAllStudents() throws DaoException {
-        doThrow(new ServiceException("Unable to get all students")).when(mockStudentDAO).getAll();
+        String message = format(SERVICE_EXCEPTION_MESSAGE_GET_ALL, STUDENTS);
+        doThrow(new ServiceException(message)).when(mockStudentDAO).getAll();
 
         Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.getAll());
         String actual = exception.getMessage();
-        String expected = "Unable to get all students";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantUpdateStudent() throws DaoException {
-        doThrow(new ServiceException("Unable to update student with ID 5")).when(mockStudentDAO).update(5, student);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ID, UPDATE, STUDENT, ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockStudentDAO).update(ID_5_VALUE, student);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.update(5, student));
+        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.update(ID_5_VALUE, student));
         String actual = exception.getMessage();
-        String expected = "Unable to update student with ID 5";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantDeleteStudent() throws DaoException {
-        doThrow(new ServiceException("Unable to delete student with ID 5")).when(mockStudentDAO).delete(5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ID, DELETE, STUDENT, ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockStudentDAO).delete(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.delete(5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.delete(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable to delete student with ID 5";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantAssignToGroup() throws DaoException {
-        doThrow(new ServiceException("Unable assign student with id 5 to group with id 3")).when(mockStudentDAO).assignToGroup(3, 5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_ASSIGN, ASSIGN, STUDENT, ID_5_VALUE, GROUP, ID_3_VALUE);
+        doThrow(new ServiceException(message)).when(mockStudentDAO).assignToGroup(ID_3_VALUE, ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.assignToGroup(3, 5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.assignToGroup(ID_3_VALUE, ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable assign student with id 5 to group with id 3";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantUpdateAssignment() throws DaoException {
-        doThrow(new ServiceException("Unable to update assignment student id 5 to group with id 3")).when(mockStudentDAO).updateAssignment(3, 5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_ASSIGNMENT, UPDATE, STUDENT, ID_5_VALUE, GROUP, ID_3_VALUE);
+        doThrow(new ServiceException(message)).when(mockStudentDAO).updateAssignment(ID_3_VALUE, ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.updateAssignment(3, 5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.updateAssignment(ID_3_VALUE, ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable to update assignment student id 5 to group with id 3";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantDeleteAssignment() throws DaoException {
-        doThrow(new ServiceException("Unable to delete assignment student id 5 from group")).when(mockStudentDAO).deleteAssignment(5);
+        String message = format(SERVICE_EXCEPTION_MESSAGE_ASSIGNMENT, DELETE, STUDENT, ID_5_VALUE, GROUP, ID_3_VALUE);
+        doThrow(new ServiceException(message)).when(mockStudentDAO).deleteAssignment(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.deleteAssignment(5));
+        Exception exception = assertThrows(ServiceException.class, () -> mockStudentDAO.deleteAssignment(ID_5_VALUE));
         String actual = exception.getMessage();
-        String expected = "Unable to delete assignment student id 5 from group";
 
-        assertEquals(expected, actual);
+        assertEquals(message, actual);
     }
 }

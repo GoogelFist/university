@@ -3,6 +3,10 @@ package ua.com.foxminded.university.service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import ua.com.foxminded.university.dao.CathedraDAO;
 import ua.com.foxminded.university.dao.exceptions.DaoException;
@@ -11,6 +15,8 @@ import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.Teacher;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -47,8 +53,6 @@ public class CathedraServiceImpl implements CathedraService {
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
         }
-        setGroupsInCathedra(cathedraById);
-        setTeachersInCathedra(cathedraById);
         return cathedraById;
     }
 
@@ -61,11 +65,30 @@ public class CathedraServiceImpl implements CathedraService {
         } catch (DaoException e) {
             throw new ServiceException(e.getMessage(), e);
         }
-        cathedras.forEach(cathedra -> {
-            setGroupsInCathedra(cathedra);
-            setTeachersInCathedra(cathedra);
-        });
         return cathedras;
+    }
+
+    @Override
+    public Page<Cathedra> getAll(Pageable pageable) {
+        logger.debug("StudentService calls cathedraService.getAll({})", pageable);
+        int pageSize = pageable.getPageSize();
+        int currentPage = pageable.getPageNumber();
+        int startItem = currentPage * pageSize;
+        List<Cathedra> cathedras;
+        List<Cathedra> list;
+        try {
+            cathedras = cathedraDAO.getAll();
+            cathedras.sort(Comparator.comparing(Cathedra::getId));
+        } catch (DaoException e) {
+            throw new ServiceException(e.getMessage(), e);
+        }
+        if (cathedras.size() < startItem) {
+            list = Collections.emptyList();
+        } else {
+            int toIndex = Math.min(startItem + pageSize, cathedras.size());
+            list = cathedras.subList(startItem, toIndex);
+        }
+        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), cathedras.size());
     }
 
     @Override

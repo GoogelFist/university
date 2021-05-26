@@ -8,6 +8,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import ua.com.foxminded.university.dao.DaoTestConfig;
+import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.entities.Teacher;
 
 import java.sql.ResultSet;
@@ -15,6 +16,7 @@ import java.sql.SQLException;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.when;
+import static ua.com.foxminded.university.utils.Constants.*;
 
 @ExtendWith(MockitoExtension.class)
 @SpringJUnitConfig(DaoTestConfig.class)
@@ -28,13 +30,14 @@ class TeacherMapperTest {
 
     @Test
     void shouldReturnTeacherWithCorrectSettings() throws SQLException {
-        Teacher expectedTeacher = new Teacher(1, "Jonathan", "Bride", "612345", "1");
+        Teacher expectedTeacher = new Teacher(ID_1_VALUE, TEACHER_1_FIRST_NAME_VALUE, TEACHER_1_LAST_NAME_VALUE, TEACHER_1_PHONE_VALUE, QUALIFICATION_1_VALUE, new Cathedra(ID_1_VALUE));
 
-        when(resultSet.getInt("id")).thenReturn(1);
-        when(resultSet.getString("first_name")).thenReturn("Jonathan");
-        when(resultSet.getString("last_name")).thenReturn("Bride");
-        when(resultSet.getString("phone")).thenReturn("612345");
-        when(resultSet.getString("qualification")).thenReturn("1");
+        when(resultSet.getInt(COLUMN_LABEL_ID)).thenReturn(ID_1_VALUE);
+        when(resultSet.getString(COLUMN_LABEL_FIRST_NAME)).thenReturn(TEACHER_1_FIRST_NAME_VALUE);
+        when(resultSet.getString(COLUMN_LABEL_LAST_NAME)).thenReturn(TEACHER_1_LAST_NAME_VALUE);
+        when(resultSet.getString(COLUMN_LABEL_PHONE)).thenReturn(TEACHER_1_PHONE_VALUE);
+        when(resultSet.getString(COLUMN_LABEL_QUALIFICATION)).thenReturn(QUALIFICATION_1_VALUE);
+        when(resultSet.getInt(COLUMN_LABEL_CATHEDRA_ID)).thenReturn(ID_1_VALUE);
 
         Teacher actualTeacher = teacherMapper.mapRow(resultSet, 1);
 

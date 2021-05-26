@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Student info')"></head>
+<body>
+
+<div th:replace="fragments/students-fragments :: menu-site-for-students"></div>
+
+<div class="card" style="width: 18rem;">
+    <img src="" class="card-img-top" alt="...">
+    <div class="card-body">
+        <h5 th:text="|${student.getFirstName()} ${student.getLastName()}|" class="card-title">Card title</h5>
+        <p th:text="| ID: ${student.getId()} |" class="card-text">VALUE</p>
+        <p th:text="| First Name: ${student.getFirstName()} |" class="card-text">VALUE</p>
+        <p th:text="| Last Name: ${student.getLastName()} |" class="card-text">VALUE</p>
+        <p th:text="| Phone: ${student.getPhone()} |" class="card-text">VALUE</p>
+        <p th:text="| Group: ${student.getGroup().getName()} |" class="card-text">VALUE</p>
+        <a th:href="@{/students/{id}/edit(id=${student.getId()})}" class="btn btn-primary">Edit</a>
+        <a class="btn btn-secondary" onclick="history.back()">Go back</a>
+    </div>
+</div>
+
+</body>
+</html>
