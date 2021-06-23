@@ -1,43 +1,25 @@
 package ua.com.foxminded.university.config;
 
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.Scope;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.jdbc.datasource.DriverManagerDataSource;
+import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 
 import javax.sql.DataSource;
 
 @Configuration
-@PropertySource("classpath:database.properties")
 public class SpringConfig {
 
-    @Value("${datasource.driver}")
-    private String getDriver;
-
-    @Value("${datasource.url}")
-    private String getUrl;
-
-    @Value("${datasource.user}")
-    private String getUser;
-
-    @Value("${datasource.password}")
-    private String getPassword;
+    private static final String DATA_SOURCE_NAME = "jdbc/University";
 
     @Bean
     public DataSource dataSource() {
-        DriverManagerDataSource dataSource = new DriverManagerDataSource();
-
-        dataSource.setDriverClassName(getDriver);
-        dataSource.setUrl(getUrl);
-        dataSource.setUsername(getUser);
-        dataSource.setPassword(getPassword);
-
-        return dataSource;
+        JndiDataSourceLookup dataSource = new JndiDataSourceLookup();
+        dataSource.setResourceRef(true);
+        return dataSource.getDataSource(DATA_SOURCE_NAME);
     }
 
     @Bean

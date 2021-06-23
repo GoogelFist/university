@@ -21,6 +21,8 @@ import org.thymeleaf.templatemode.TemplateMode;
 @EnableSpringDataWebSupport
 public class WebConfig implements WebMvcConfigurer {
 
+    private static final String PREFIX = "WEB-INF/views/";
+    private static final String SUFFIX = ".html";
     private final ApplicationContext applicationContext;
 
     @Autowired
@@ -32,8 +34,8 @@ public class WebConfig implements WebMvcConfigurer {
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
         templateResolver.setApplicationContext(applicationContext);
-        templateResolver.setPrefix("WEB-INF/views/");
-        templateResolver.setSuffix(".html");
+        templateResolver.setPrefix(PREFIX);
+        templateResolver.setSuffix(SUFFIX);
         templateResolver.setTemplateMode(TemplateMode.HTML);
         return templateResolver;
     }
