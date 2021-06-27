@@ -3,7 +3,6 @@ package ua.com.foxminded.university.controllers.handlers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
@@ -18,13 +17,13 @@ import ua.com.foxminded.university.controllers.WebTestConfig;
 
 import javax.sql.DataSource;
 
+import static java.lang.String.format;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {WebTestConfig.class})
 @WebAppConfiguration
@@ -32,6 +31,10 @@ class GlobalExceptionHandlerTest {
     private static final String ERROR_URL_TEMPLATE = "/students/101";
     private static final String ERROR_ATTRIBUTE = "exception";
     private static final String ERROR_VIEW_NAME = "error";
+
+    private static final String ERROR_MESSAGE = "Entity %s with id %s not found";
+    private static final String STUDENT_ID = "101";
+
 
     public MockMvc mockMvc;
 
@@ -69,6 +72,6 @@ class GlobalExceptionHandlerTest {
     void shouldReturnCorrectedExceptionAttributesWhenGetIncorrectStudentPage() throws Exception {
         mockMvc.perform(get(ERROR_URL_TEMPLATE))
             .andExpect(status().is2xxSuccessful())
-            .andExpect(model().attribute(ERROR_ATTRIBUTE, hasProperty(MESSAGE_PROPERTY_NAME, is(MESSAGE_PROPERTY_VALUE))));
+            .andExpect(model().attribute(ERROR_ATTRIBUTE, hasProperty(MESSAGE_PROPERTY_NAME, is(format(ERROR_MESSAGE, STUDENT, STUDENT_ID)))));
     }
 }

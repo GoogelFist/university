@@ -73,7 +73,6 @@ public class StudentController {
     @GetMapping("/{id}")
     public String showStudentById(@PathVariable(ID) int id, Model model) {
         Student studentById = studentService.getById(id);
-
         model.addAttribute(STUDENT, studentById);
         return GET_BY_ID_VIEW_NAME;
     }
@@ -93,14 +92,16 @@ public class StudentController {
 
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable(ID) int id, Model model) {
+        List<Group> groups = groupService.getAll();
+        model.addAttribute(GROUPS, groups);
         Student studentById = studentService.getById(id);
         model.addAttribute(STUDENT, studentById);
         return GET_EDIT_STUDENT_VIEW_NAME;
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(STUDENT) Student student, @PathVariable(ID) int id) {
-        studentService.update(id, student);
+    public String update(@ModelAttribute(STUDENT) Student student) {
+        studentService.update(student);
         return format(REDIRECT, STUDENTS);
     }
 

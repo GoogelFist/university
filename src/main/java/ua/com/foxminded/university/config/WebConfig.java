@@ -23,6 +23,9 @@ public class WebConfig implements WebMvcConfigurer {
 
     private static final String PREFIX = "WEB-INF/views/";
     private static final String SUFFIX = ".html";
+    private static final Integer PAGE = 0;
+    private static final Integer SIZE = 10;
+
     private final ApplicationContext applicationContext;
 
     @Autowired
@@ -58,6 +61,6 @@ public class WebConfig implements WebMvcConfigurer {
 
     @Bean
     public PageableHandlerMethodArgumentResolverCustomizer sortCustomizer() {
-        return p -> p.setFallbackPageable(PageRequest.of(0, 10));
+        return p -> p.setFallbackPageable(PageRequest.of(PAGE, SIZE));
     }
 }

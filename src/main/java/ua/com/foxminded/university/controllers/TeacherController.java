@@ -95,14 +95,16 @@ public class TeacherController {
 
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable(ID) int id, Model model) {
+        List<Cathedra> cathedras = cathedraService.getAll();
+        model.addAttribute(CATHEDRAS, cathedras);
         Teacher teacherById = teacherService.getById(id);
         model.addAttribute(TEACHER, teacherById);
         return GET_EDIT_TEACHER_VIEW_NAME;
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(TEACHER) Teacher teacher, @PathVariable(ID) int id) {
-        teacherService.update(id, teacher);
+    public String update(@ModelAttribute(TEACHER) Teacher teacher) {
+        teacherService.update(teacher);
         return format(REDIRECT, TEACHERS);
     }
 

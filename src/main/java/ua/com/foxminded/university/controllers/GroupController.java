@@ -48,7 +48,6 @@ public class GroupController {
     @GetMapping()
     public String showAllGroups(Model model, Pageable pageable) {
         Page<Group> groupPage = groupService.getAll(pageable);
-
         model.addAttribute(GROUPS, groupPage);
 
         int totalPages = groupPage.getTotalPages();
@@ -75,7 +74,6 @@ public class GroupController {
     @GetMapping("/{id}")
     public String showGroupById(@PathVariable(ID) int id, Model model) {
         Group groupById = groupService.getById(id);
-
         model.addAttribute(GROUP, groupById);
         return GET_BY_ID_VIEW_NAME;
     }
@@ -95,14 +93,16 @@ public class GroupController {
 
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable(ID) int id, Model model) {
+        List<Cathedra> cathedras = cathedraService.getAll();
+        model.addAttribute(CATHEDRAS, cathedras);
         Group groupById = groupService.getById(id);
         model.addAttribute(GROUP, groupById);
         return GET_EDIT_GROUP_VIEW_NAME;
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(GROUP) Group group, @PathVariable(ID) int id) {
-        groupService.update(id, group);
+    public String update(@ModelAttribute(GROUP) Group group) {
+        groupService.update(group);
         return format(REDIRECT, GROUPS);
     }
 

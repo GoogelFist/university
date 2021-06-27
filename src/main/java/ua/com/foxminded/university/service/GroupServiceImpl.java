@@ -1,230 +1,132 @@
 package ua.com.foxminded.university.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ua.com.foxminded.university.dao.CathedraDAO;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.GroupDAO;
-import ua.com.foxminded.university.dao.exceptions.DaoException;
-import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.entities.Group;
-import ua.com.foxminded.university.entities.Student;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
+import static java.lang.String.format;
+
+@Slf4j
 @Service
+@Transactional
 public class GroupServiceImpl implements GroupService {
-    private final GroupDAO groupDAO;
-    private final StudentService studentService;
-    private final CathedraDAO cathedraDAO;
+    private static final String LOG_MESSAGE = "GroupService calls groupDAO.%s";
+    private static final String CREATE = "create({})";
+    private static final String GET_BY_ID = "getById({})";
+    private static final String GET_ALL = "getAll()";
+    private static final String GET_ALL_PAGEABLE = "getAll({})";
+    private static final String UPDATE = "update({})";
+    private static final String DELETE = "delete(Id {})";
+    private static final String GET_BY_CATHEDRA_ID = "getByCathedraId({})";
+    private static final String GET_BY_CATHEDRA_ID_PAGEABLE = "getByCathedraId({}, {})";
 
-    private static final Logger logger = LoggerFactory.getLogger(GroupServiceImpl.class);
+    private static final String ERROR_MESSAGE = "Entity %s with id %s not found";
+    private static final Object GROUP = "group";
+
+
+    private final GroupDAO groupDAO;
 
     @Autowired
-    public GroupServiceImpl(GroupDAO groupDAO, StudentService studentService, CathedraDAO cathedraDAO) {
+    public GroupServiceImpl(GroupDAO groupDAO) {
         this.groupDAO = groupDAO;
-        this.studentService = studentService;
-        this.cathedraDAO = cathedraDAO;
     }
 
     @Override
     public void create(Group group) {
-        logger.debug("GroupService calls groupDao.create({})", group);
-        try {
-            groupDAO.create(group);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+        log.debug(format(LOG_MESSAGE, CREATE), group);
+
+        groupDAO.create(group);
     }
 
     @Override
     public Group getById(int id) {
-        logger.debug("GroupService calls groupDao.getById(id {})", id);
-        Group group;
-        try {
-            group = groupDAO.getById(id);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
+        log.debug(format(LOG_MESSAGE, GET_BY_ID), id);
+
+        Group group = groupDAO.getById(id);
+        if (Objects.isNull(group)) {
+            String message = String.format(ERROR_MESSAGE, GROUP, id);
+            throw new ServiceException(message);
         }
-        setStudentsInGroup(group);
-        setCathedraToGroup(group);
         return group;
     }
 
     @Override
     public List<Group> getAll() {
-        logger.debug("GroupService calls groupDao.getAll()");
-        List<Group> groups;
-        try {
-            groups = groupDAO.getAll();
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-        groups.forEach(this::setStudentsInGroup);
-        return groups;
+        log.debug(format(LOG_MESSAGE, GET_ALL));
+
+        return groupDAO.getAll();
     }
 
     @Override
     public Page<Group> getAll(Pageable pageable) {
-        logger.debug("GroupService calls groupDao.getAll()");
+        log.debug(format(LOG_MESSAGE, GET_ALL_PAGEABLE), pageable);
+
         int pageSize = pageable.getPageSize();
         int currentPage = pageable.getPageNumber();
         int startItem = currentPage * pageSize;
-        List<Group> groups;
         List<Group> list;
-        try {
-            groups = groupDAO.getAll();
-            groups.sort(Comparator.comparing(Group::getId));
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+
+        List<Group> groups = groupDAO.getAll();
+
         if (groups.size() < startItem) {
             list = Collections.emptyList();
         } else {
             int toIndex = Math.min(startItem + pageSize, groups.size());
             list = groups.subList(startItem, toIndex);
-            list.forEach(this::setCathedraToGroup);
         }
         return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), groups.size());
     }
 
     @Override
-    public void update(int id, Group group) {
-        logger.debug("GroupService calls groupDao.update(id {}, {})", id, group);
-        try {
-            groupDAO.update(id, group);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+    public void update(Group group) {
+        log.debug(format(LOG_MESSAGE, UPDATE), group);
+
+        groupDAO.update(group);
     }
 
     @Override
     public void delete(int id) {
-        logger.debug("GroupService calls groupDao.delete(id {})", id);
-        try {
-            groupDAO.delete(id);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+        log.debug(format(LOG_MESSAGE, DELETE), id);
+
+        groupDAO.delete(id);
     }
 
     @Override
     public List<Group> getByCathedraId(int cathedraId) {
-        checkingCathedraInDao(cathedraId);
+        log.debug(format(LOG_MESSAGE, GET_BY_CATHEDRA_ID), cathedraId);
 
-        logger.debug("GroupService calls groupDao.getByCathedraId(id {})", cathedraId);
-        List<Group> groupsByCathedraId;
-        try {
-            groupsByCathedraId = groupDAO.getByCathedraId(cathedraId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-        groupsByCathedraId.forEach(this::setStudentsInGroup);
-        return groupsByCathedraId;
+        return groupDAO.getByCathedraId(cathedraId);
     }
 
     @Override
     public Page<Group> getByCathedraId(int cathedraId, Pageable pageable) {
-        checkingCathedraInDao(cathedraId);
+        log.debug(format(LOG_MESSAGE, GET_BY_CATHEDRA_ID_PAGEABLE), cathedraId, pageable);
 
-        logger.debug("GroupService calls groupDao.getByCathedraId({}, {})", cathedraId, pageable);
         int pageSize = pageable.getPageSize();
         int currentPage = pageable.getPageNumber();
         int startItem = currentPage * pageSize;
-        List<Group> groups;
         List<Group> list;
-        try {
-            groups = groupDAO.getByCathedraId(cathedraId);
-            groups.sort(Comparator.comparing(Group::getId));
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+
+        List<Group> groups = groupDAO.getByCathedraId(cathedraId);
+
         if (groups.size() < startItem) {
             list = Collections.emptyList();
         } else {
             int toIndex = Math.min(startItem + pageSize, groups.size());
             list = groups.subList(startItem, toIndex);
-            list.forEach(this::setCathedraToGroup);
         }
         return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), groups.size());
-    }
-
-    @Override
-    public void assignToCathedra(int cathedraId, int groupId) {
-        checkingCathedraInDao(cathedraId);
-
-        logger.debug("GroupService calls groupDao.assignToCathedra(cathedraId {}, groupId {})", cathedraId, groupId);
-        try {
-            groupDAO.assignToCathedra(cathedraId, groupId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void updateAssignment(int cathedraId, int groupId) {
-        checkingCathedraInDao(cathedraId);
-
-        logger.debug("GroupService calls groupDao.updateAssignment(cathedraId {}, groupId {})", cathedraId, groupId);
-        try {
-            groupDAO.updateAssignment(cathedraId, groupId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void deleteAssignment(int cathedraId) {
-        logger.debug("GroupService calls groupDao.deleteAssignment(cathedraId {})", cathedraId);
-        try {
-            groupDAO.deleteAssignment(cathedraId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-    }
-
-    private void setStudentsInGroup(Group group) {
-        logger.debug("Call group.getId()");
-        int id = group.getId();
-
-        logger.debug("Call studentService.getByGroupId(id {})", id);
-        List<Student> studentsByGroupId = studentService.getByGroupId(id);
-
-        logger.debug("Set {} to the {}", studentsByGroupId, group);
-        group.setStudents(studentsByGroupId);
-    }
-
-    private void setCathedraToGroup(Group group) {
-        logger.debug("Call group.getId()");
-        int cathedraId = group.getCathedra().getId();
-
-        logger.debug("Call cathedraDAO.getById({})", cathedraId);
-        Cathedra cathedra;
-        try {
-            cathedra = cathedraDAO.getById(cathedraId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-
-        logger.debug("Set {} to the {}", cathedra, group);
-        group.setCathedra(cathedra);
-    }
-
-    private void checkingCathedraInDao(int cathedraId) {
-        logger.debug("Checking the presence of a cathedra");
-        try {
-            cathedraDAO.getById(cathedraId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-        logger.trace("Cathedra is present");
     }
 }

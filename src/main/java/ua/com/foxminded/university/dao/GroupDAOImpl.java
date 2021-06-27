@@ -1,201 +1,103 @@
 package ua.com.foxminded.university.dao;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
-import org.springframework.stereotype.Component;
-import ua.com.foxminded.university.dao.exceptions.DaoException;
-import ua.com.foxminded.university.dao.mappers.GroupMapper;
+import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.entities.Group;
 
 import java.util.List;
 
-import static java.lang.String.format;
-import static ua.com.foxminded.university.dao.exceptions.ExceptionsMessageConstants.*;
-
-@Component
-@PropertySource("classpath:queries.properties")
+@Slf4j
+@Repository
 public class GroupDAOImpl implements GroupDAO {
-
-    private static final String ID = "id";
-    private static final String NAME = "name";
     private static final String GROUPS = "groups";
-    private static final String GROUP = "group";
-    private static final String CATHEDRA_ID = "cathedra_id";
+    private static final String CATHEDRA_ID = "cathedraId";
+    private static final String QUERY_GET_ALL = "from Group order by id";
+    private static final String QUERY_GET_BY_GROUP_ID = "from Group group where group.cathedra.id = :cathedraId order by id";
 
-    private final JdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert jdbcInsert;
-    private final GroupMapper groupMapper;
+    private static final String CREATE = "create({})";
+    private static final String CREATED = "{} created";
+    private static final String GET_BY_ID = "getById({})";
+    private static final String FOUND_BY_ID = "Found {}";
+    private static final String GET_ALL = "getAll()";
+    private static final String FOUND_ALL = "Found {} {}";
+    private static final String UPDATE = "update({})";
+    private static final String UPDATED = "{} was updated";
+    private static final String DELETE = "delete(Id {})";
+    private static final String DELETED = "{} was deleted";
+    private static final String GET_BY_CATHEDRA_ID = "getByCathedraId {}";
+    private static final String FOUND_BY_CATHEDRA_ID = "Found {} {}";
 
-    private static final Logger logger = LoggerFactory.getLogger(GroupDAOImpl.class);
 
-    @Value("${groups.getByID}")
-    private String getByID;
-
-    @Value("${groups.getAll}")
-    private String getAll;
-
-    @Value("${groups.update}")
-    private String update;
-
-    @Value("${groups.delete}")
-    private String delete;
-
-    @Value("${groups.getByCathedraId}")
-    private String getByCathedraId;
-
-    @Value("${groups.assignToCathedra}")
-    private String assignToCathedra;
-
-    @Value("${groups.updateAssignment}")
-    private String updateAssignment;
-
-    @Value("${groups.deleteAssignment}")
-    private String deleteAssignment;
+    private final SessionFactory sessionFactory;
 
     @Autowired
-    public GroupDAOImpl(JdbcTemplate jdbcTemplate, SimpleJdbcInsert jdbcInsert, GroupMapper groupMapper) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.jdbcInsert = jdbcInsert.withTableName(GROUPS).usingGeneratedKeyColumns(ID);
-        this.groupMapper = groupMapper;
+    public GroupDAOImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
     }
 
     @Override
-    public void create(Group group) throws DaoException {
-        logger.debug("create({})", group);
-        try {
-            SqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue(NAME, group.getName())
-                .addValue(CATHEDRA_ID, group.getCathedra().getId());
-            Number generatedID = jdbcInsert.executeAndReturnKey(parameterSource);
-            group.setId(generatedID.intValue());
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_CREATE, group);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("{} created.", group);
+    public void create(Group group) {
+        log.debug(CREATE, group);
+
+        sessionFactory.getCurrentSession().saveOrUpdate(group);
+
+        log.debug(CREATED, group);
     }
 
     @Override
-    public Group getById(int id) throws DaoException {
-        logger.debug("getById {}", id);
-        Group group;
-        try {
-            group = jdbcTemplate.queryForObject(getByID, groupMapper, id);
-        } catch (EmptyResultDataAccessException e) {
-            String message = format(ENTITY_NOT_FOUND, GROUP, id);
-            logger.warn(message);
-            throw new DaoException(message, e);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_GET_BY_ID, GROUP, id);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Found {}", group);
+    public Group getById(int id) {
+        log.debug(GET_BY_ID, id);
+
+        Group group = sessionFactory.getCurrentSession().get(Group.class, id);
+
+        log.debug(FOUND_BY_ID, group);
         return group;
     }
 
     @Override
-    public List<Group> getAll() throws DaoException {
-        logger.debug("getAll {]");
-        List<Group> groups;
-        try {
-            groups = jdbcTemplate.query(getAll, groupMapper);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_GET_ALL, GROUPS);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Found {} {}", groups.size(), GROUPS);
+    public List<Group> getAll() {
+        log.debug(GET_ALL);
+
+        @SuppressWarnings("unchecked")
+        List<Group> groups = sessionFactory.getCurrentSession().createQuery(QUERY_GET_ALL).list();
+
+        log.debug(FOUND_ALL, groups.size(), GROUPS);
         return groups;
     }
 
     @Override
-    public void update(int id, Group group) throws DaoException {
-        logger.debug("update id {}, {}", id, group);
-        try {
-            jdbcTemplate.update(update, group.getName(), id);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_UPDATE, GROUP, id);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("{} for id {} was updated", group, id);
+    public void update(Group group) {
+        log.debug(UPDATE, group);
+
+        sessionFactory.getCurrentSession().update(group);
+
+        log.debug(UPDATED, group);
     }
 
     @Override
-    public void delete(int id) throws DaoException {
-        logger.debug("delete Id {}", id);
-        try {
-            jdbcTemplate.update(delete, id);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_DELETE, GROUP, id);
-            logger.error(message);
-            throw new DaoException(message, e);
+    public void delete(int id) {
+        log.debug(DELETE, id);
+
+        Session session = sessionFactory.getCurrentSession();
+        Group group = session.get(Group.class, id);
+
+        if (group != null) {
+            session.delete(group);
+            log.debug(DELETED, group);
         }
-        logger.debug("{} with {} was deleted", GROUP, id);
     }
 
     @Override
-    public List<Group> getByCathedraId(int cathedraId) throws DaoException {
-        logger.debug("getByCathedraId {}", cathedraId);
-        List<Group> groups;
-        try {
-            groups = jdbcTemplate.query(getByCathedraId, groupMapper, cathedraId);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_GET_BY_CATHEDRA_ID, GROUPS, cathedraId);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Found {} {}", groups.size(), GROUPS);
+    public List<Group> getByCathedraId(int cathedraId) {
+        log.debug(GET_BY_CATHEDRA_ID, cathedraId);
+
+        @SuppressWarnings("unchecked")
+        List<Group> groups = sessionFactory.getCurrentSession().createQuery(QUERY_GET_BY_GROUP_ID).setParameter(CATHEDRA_ID, cathedraId).list();
+
+        log.debug(FOUND_BY_CATHEDRA_ID, groups.size(), GROUPS);
         return groups;
-    }
-
-    @Override
-    public void assignToCathedra(int cathedraId, int groupId) throws DaoException {
-        logger.debug("assignToCathedra(cathedraId {}, groupId {})", cathedraId, groupId);
-        try {
-            jdbcTemplate.update(assignToCathedra, cathedraId, groupId);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_ASSIGN_GROUP_TO_CATHEDRA, groupId, cathedraId);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Group with id {} was assigned to cathedra with cathedraId {}", groupId, cathedraId);
-    }
-
-    @Override
-    public void updateAssignment(int cathedraId, int groupId) throws DaoException {
-        logger.debug("updateAssignment(cathedraId {}, groupId {})", cathedraId, groupId);
-        try {
-            jdbcTemplate.update(updateAssignment, cathedraId, groupId);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_UPDATE_ASSIGNMENT_GROUP_TO_CATHEDRA, groupId, cathedraId);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Assignment group with id {} to cathedra with id {} was updated", groupId, cathedraId);
-    }
-
-    @Override
-    public void deleteAssignment(int groupId) throws DaoException {
-        logger.debug("deleteAssignment(groupId {})", groupId);
-        try {
-            jdbcTemplate.update(deleteAssignment, groupId);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_DELETE_ASSIGNMENT_GROUP, groupId);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Group with id {} was deleted from cathedra", groupId);
     }
 }

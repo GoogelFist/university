@@ -1,205 +1,103 @@
 package ua.com.foxminded.university.dao;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
+import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.dao.DataAccessException;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
-import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Repository;
-import ua.com.foxminded.university.dao.exceptions.DaoException;
-import ua.com.foxminded.university.dao.mappers.StudentMapper;
 import ua.com.foxminded.university.entities.Student;
 
 import java.util.List;
 
-import static java.lang.String.format;
-import static ua.com.foxminded.university.dao.exceptions.ExceptionsMessageConstants.*;
 
+@Slf4j
 @Repository
-@PropertySource("classpath:queries.properties")
 public class StudentDAOImpl implements StudentDAO {
-
-    private static final String ID = "id";
-    private static final String FIRST_NAME = "first_name";
-    private static final String LAST_NAME = "last_name";
-    private static final String PHONE = "phone";
     private static final String STUDENTS = "students";
-    private static final String STUDENT = "student";
-    private static final String GROUP_ID = "group_id";
+    private static final String QUERY_GET_BY_GROUP_ID = "from Student student where student.group.id = :groupId order by id";
+    private static final String GROUP_ID = "groupId";
+    private static final String QUERY_GET_ALL = "from Student order by id";
 
-    private final JdbcTemplate jdbcTemplate;
-    private final SimpleJdbcInsert jdbcInsert;
-    private final StudentMapper studentMapper;
+    private static final String CREATE = "create({})";
+    private static final String CREATED = "{} created";
+    private static final String GET_BY_ID = "getById({})";
+    private static final String FOUND_BY_ID = "Found {}";
+    private static final String GET_ALL = "getAll()";
+    private static final String FOUND_ALL = "Found {} {}";
+    private static final String UPDATE = "update({})";
+    private static final String UPDATED = "{} was updated";
+    private static final String DELETE = "delete(Id {})";
+    private static final String DELETED = "{} was deleted";
+    private static final String GET_BY_GROUP_ID = "getByGroupId {}";
+    private static final String FOUND_BY_GROUP_ID = "Found {} {}";
 
-    private static final Logger logger = LoggerFactory.getLogger(StudentDAOImpl.class);
 
-    @Value("${students.getByID}")
-    private String getByID;
-
-    @Value("${students.getAll}")
-    private String getAll;
-
-    @Value("${students.update}")
-    private String update;
-
-    @Value("${students.delete}")
-    private String delete;
-
-    @Value("${students.getByGroupId}")
-    private String getByGroupId;
-
-    @Value("${students.assignToGroup}")
-    private String assignToGroup;
-
-    @Value("${students.updateAssignment}")
-    private String updateAssignment;
-
-    @Value("${students.deleteAssignment}")
-    private String deleteAssignment;
+    private final SessionFactory sessionFactory;
 
     @Autowired
-    public StudentDAOImpl(JdbcTemplate jdbcTemplate, SimpleJdbcInsert jdbcInsert, StudentMapper studentMapper) {
-        this.jdbcTemplate = jdbcTemplate;
-        this.jdbcInsert = jdbcInsert.withTableName(STUDENTS).usingGeneratedKeyColumns(ID);
-        this.studentMapper = studentMapper;
+    public StudentDAOImpl(SessionFactory sessionFactory) {
+        this.sessionFactory = sessionFactory;
+    }
+
+    public void create(Student student) {
+        log.debug(CREATE, student);
+
+        sessionFactory.getCurrentSession().saveOrUpdate(student);
+
+        log.debug(CREATED, student);
     }
 
     @Override
-    public void create(Student student) throws DaoException {
-        logger.debug("create({})", student);
-        try {
-            SqlParameterSource parameterSource = new MapSqlParameterSource()
-                .addValue(FIRST_NAME, student.getFirstName())
-                .addValue(LAST_NAME, student.getLastName())
-                .addValue(PHONE, student.getPhone())
-                .addValue(GROUP_ID, student.getGroup().getId());
-            Number generatedId = jdbcInsert.executeAndReturnKey(parameterSource);
-            student.setId(generatedId.intValue());
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_CREATE, student);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("{} created.", student);
-    }
+    public Student getById(int id) {
+        log.debug(GET_BY_ID, id);
 
-    @Override
-    public Student getById(int id) throws DaoException {
-        logger.debug("getById {}", id);
-        Student student;
-        try {
-            student = jdbcTemplate.queryForObject(getByID, studentMapper, id);
-        } catch (EmptyResultDataAccessException e) {
-            String message = format(ENTITY_NOT_FOUND, STUDENT, id);
-            logger.warn(message);
-            throw new DaoException(message, e);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_GET_BY_ID, STUDENT, id);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Found {}", student);
+        Student student = sessionFactory.getCurrentSession().get(Student.class, id);
+
+        log.debug(FOUND_BY_ID, student);
         return student;
     }
 
     @Override
-    public List<Student> getAll() throws DaoException {
-        logger.debug("getAll()");
-        List<Student> students;
-        try {
-            students = jdbcTemplate.query(getAll, studentMapper);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_GET_ALL, STUDENTS);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Found {} {}", students.size(), STUDENTS);
+    public List<Student> getAll() {
+        log.debug(GET_ALL);
+
+        @SuppressWarnings("unchecked")
+        List<Student> students = sessionFactory.getCurrentSession().createQuery(QUERY_GET_ALL).list();
+
+        log.debug(FOUND_ALL, students.size(), STUDENTS);
         return students;
     }
 
     @Override
-    public void update(int id, Student student) throws DaoException {
-        logger.debug("update id {}, {}", id, student);
-        try {
-            jdbcTemplate.update(this.update, student.getFirstName(), student.getLastName(), student.getPhone(), id);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_UPDATE, STUDENT, id);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("{} for id {} was updated", student, id);
+    public void update(Student student) {
+        log.debug(UPDATE, student);
+
+        sessionFactory.getCurrentSession().update(student);
+
+        log.debug(UPDATED, student);
     }
 
     @Override
-    public void delete(int id) throws DaoException {
-        logger.debug("delete Id {}", id);
-        try {
-            jdbcTemplate.update(delete, id);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_DELETE, STUDENT, id);
-            logger.error(message);
-            throw new DaoException(message, e);
+    public void delete(int id) {
+        log.debug(DELETE, id);
+
+        Session session = sessionFactory.getCurrentSession();
+        Student student = session.get(Student.class, id);
+
+        if (student != null) {
+            session.delete(student);
+            log.debug(DELETED, student);
         }
-        logger.debug("{} with {} was deleted", STUDENT, id);
     }
 
     @Override
-    public List<Student> getByGroupId(int groupId) throws DaoException {
-        logger.debug("getByGroupId {}", groupId);
-        List<Student> students;
-        try {
-            students = jdbcTemplate.query(getByGroupId, studentMapper, groupId);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_GET_BY_GROUP_ID, STUDENTS, groupId);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Found {} {}", students.size(), STUDENTS);
+    public List<Student> getByGroupId(int groupId) {
+        log.debug(GET_BY_GROUP_ID, groupId);
+
+        @SuppressWarnings("unchecked")
+        List<Student> students = sessionFactory.getCurrentSession().createQuery(QUERY_GET_BY_GROUP_ID).setParameter(GROUP_ID, groupId).list();
+
+        log.debug(FOUND_BY_GROUP_ID, students.size(), STUDENTS);
         return students;
-    }
-
-    @Override
-    public void assignToGroup(int groupId, int studentId) throws DaoException {
-        logger.debug("assignToGroup(groupId {}, studentId {})", groupId, studentId);
-        try {
-            jdbcTemplate.update(assignToGroup, groupId, studentId);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_ASSIGN_STUDENT_TO_GROUP, studentId, groupId);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Student with id {} was assigned to group with groupId {}", studentId, groupId);
-    }
-
-    @Override
-    public void updateAssignment(int groupId, int studentId) throws DaoException {
-        logger.debug("updateAssignment(groupId {}, studentId {})", groupId, studentId);
-        try {
-            jdbcTemplate.update(updateAssignment, groupId, studentId);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_UPDATE_ASSIGNMENT_STUDENT_TO_GROUP, studentId, groupId);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Assignment student with id {} to group with id {} was updated", studentId, groupId);
-    }
-
-    @Override
-    public void deleteAssignment(int studentId) throws DaoException {
-        logger.debug("deleteAssignment(studentId {})", studentId);
-        try {
-            jdbcTemplate.update(deleteAssignment, studentId);
-        } catch (DataAccessException e) {
-            String message = format(UNABLE_DELETE_ASSIGNMENT_STUDENT, studentId);
-            logger.error(message);
-            throw new DaoException(message, e);
-        }
-        logger.debug("Student with id {} was deleted from group", studentId);
     }
 }

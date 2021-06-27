@@ -18,11 +18,9 @@ import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.Student;
 
 import javax.sql.DataSource;
-import java.util.List;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
@@ -56,6 +54,7 @@ class StudentControllerTest {
     private static final String POST_EDIT_STUDENT_URL_TEMPLATE = "/students/1";
 
     private static final String DELETE_STUDENT_VIEW_NAME = "/students/1";
+
 
     public MockMvc mockMvc;
 
@@ -201,9 +200,6 @@ class StudentControllerTest {
 
     @Test
     void shouldReturnCorrectedStudentAttributesWhenGetStudents() throws Exception {
-        Group group1 = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_1_VALUE));
-        Group group2 = new Group(ID_2_VALUE, GROUP_2_NAME_VALUE, new Cathedra(ID_2_VALUE));
-
         mockMvc.perform(get(GET_ALL_URL_TEMPLATE))
             .andExpect(status().isOk())
             .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasProperty(TOTAL_ELEMENTS, equalTo(TOTAL_ELEMENTS_VALUE_2))))
@@ -212,23 +208,19 @@ class StudentControllerTest {
                     hasProperty(ID, is(ID_1_VALUE)),
                     hasProperty(FIRST_NAME, is(STUDENT_1_FIRST_NAME_VALUE)),
                     hasProperty(LAST_NAME, is(STUDENT_1_LAST_NAME_VALUE)),
-                    hasProperty(PHONE, is(STUDENT_1_PHONE_VALUE)),
-                    hasProperty(GROUP, is(group1))
+                    hasProperty(PHONE, is(STUDENT_1_PHONE_VALUE))
                 ))))
             .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasItem(
                 allOf(
                     hasProperty(ID, is(ID_2_VALUE)),
                     hasProperty(FIRST_NAME, is(STUDENT_2_FIRST_NAME_VALUE)),
                     hasProperty(LAST_NAME, is(STUDENT_2_LAST_NAME_VALUE)),
-                    hasProperty(PHONE, is(STUDENT_2_PHONE_VALUE)),
-                    hasProperty(GROUP, is(group2))
+                    hasProperty(PHONE, is(STUDENT_2_PHONE_VALUE))
                 ))));
     }
 
     @Test
     void shouldReturnCorrectedStudentAttributesWhenGetStudentsByGroupId() throws Exception {
-        Group group = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_1_VALUE));
-
         mockMvc.perform(get(GET_BY_GROUP_ID_URL_TEMPLATE))
             .andExpect(status().isOk())
             .andExpect(model().attribute(GET_BY_GROUP_ID_PROPERTY_NAME, hasProperty(TOTAL_ELEMENTS, equalTo(TOTAL_ELEMENTS_VALUE_1))))
@@ -237,15 +229,13 @@ class StudentControllerTest {
                     hasProperty(ID, is(ID_1_VALUE)),
                     hasProperty(FIRST_NAME, is(STUDENT_1_FIRST_NAME_VALUE)),
                     hasProperty(LAST_NAME, is(STUDENT_1_LAST_NAME_VALUE)),
-                    hasProperty(PHONE, is(STUDENT_1_PHONE_VALUE)),
-                    hasProperty(GROUP, is(group))
+                    hasProperty(PHONE, is(STUDENT_1_PHONE_VALUE))
                 ))));
     }
 
     @Test
     void shouldReturnCorrectedStudentAttributesWhenGetStudentById() throws Exception {
-        Group group = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_1_VALUE));
-        Student student = new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE, group);
+        Student student = new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE);
 
         mockMvc.perform(get(GET_BY_ID_URL_TEMPLATE))
             .andExpect(status().isOk())
@@ -254,11 +244,7 @@ class StudentControllerTest {
 
     @Test
     void shouldReturnCorrectedStudentAttributesWhenGetNewStudent() throws Exception {
-        Cathedra cathedra1 = new Cathedra(ID_1_VALUE);
-        Cathedra cathedra2 = new Cathedra(ID_2_VALUE);
-        List<Student> students1 = singletonList(new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE, new Group(ID_1_VALUE)));
-        List<Student> students2 = singletonList(new Student(ID_2_VALUE, STUDENT_2_FIRST_NAME_VALUE, STUDENT_2_LAST_NAME_VALUE, STUDENT_2_PHONE_VALUE, new Group(ID_2_VALUE)));
-        Student emptyStudent = new Student(ID_0_VALUE, null, null, null, new Group());
+        Student emptyStudent = new Student(ID_0_VALUE, null, null, null);
 
         mockMvc.perform(get(GET_NEW_STUDENT_URL_TEMPLATE))
             .andExpect(status().isOk())
@@ -266,24 +252,19 @@ class StudentControllerTest {
             .andExpect(model().attribute(GET_NEW_STUDENT_GROUPS_PROPERTY_NAME, hasItem(
                 allOf(
                     hasProperty(ID, is(ID_1_VALUE)),
-                    hasProperty(NAME, is(GROUP_1_NAME_VALUE)),
-                    hasProperty(STUDENTS, is(students1)),
-                    hasProperty(CATHEDRA, is(cathedra1))
+                    hasProperty(NAME, is(GROUP_1_NAME_VALUE))
                 ))))
             .andExpect(model().attribute(GET_NEW_STUDENT_GROUPS_PROPERTY_NAME, hasItem(
                 allOf(
                     hasProperty(ID, is(ID_2_VALUE)),
-                    hasProperty(NAME, is(GROUP_2_NAME_VALUE)),
-                    hasProperty(STUDENTS, is(students2)),
-                    hasProperty(CATHEDRA, is(cathedra2))
+                    hasProperty(NAME, is(GROUP_2_NAME_VALUE))
                 ))))
             .andExpect(model().attribute(GET_NEW_STUDENT_PROPERTY_NAME, equalTo(emptyStudent)));
     }
 
     @Test
     void shouldReturnCorrectedStudentAttributesWhenGetEditStudent() throws Exception {
-        Group group = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, new Cathedra(ID_1_VALUE));
-        Student student = new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE, group);
+        Student student = new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE);
 
         mockMvc.perform(get(GET_EDIT_STUDENT_URL_TEMPLATE))
             .andExpect(status().isOk())

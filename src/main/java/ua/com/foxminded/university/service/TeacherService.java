@@ -6,16 +6,10 @@ import ua.com.foxminded.university.entities.Teacher;
 
 import java.util.List;
 
-public interface TeacherService extends GenericService<Teacher> {
+public interface TeacherService extends GenericServiceJpa<Teacher> {
     Page<Teacher> getAll(Pageable pageable);
 
     List<Teacher> getByCathedraId(int cathedraId);
 
     Page<Teacher> getByCathedraId(int cathedraId, Pageable pageable);
-
-    void assignToCathedra(int cathedraId, int teacherId);
-
-    void updateAssignment(int cathedraId, int teacherId);
-
-    void deleteAssignment(int teacherId);
 }

@@ -58,7 +58,7 @@ public class MonthTimetableController {
     }
 
     @GetMapping("/new")
-    public String newMonthTimetable(@ModelAttribute(MONTH_TIMETABLE) MonthTimetable monthTimetable, Model model) {
+    public String newMonthTimetable(@ModelAttribute(MONTH_TIMETABLE) MonthTimetable monthTimetable) {
         return GET_NEW_MONTH_TIMETABLE_VIEW_NAME;
     }
 
@@ -76,8 +76,8 @@ public class MonthTimetableController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(MONTH_TIMETABLE) MonthTimetable monthTimetable, @PathVariable(ID) int id) {
-        monthTimetableService.update(id, monthTimetable);
+    public String update(@ModelAttribute(MONTH_TIMETABLE) MonthTimetable monthTimetable) {
+        monthTimetableService.update(monthTimetable);
         return format(REDIRECT, MONTH_TIMETABLES_VIEW_NAME);
     }
 

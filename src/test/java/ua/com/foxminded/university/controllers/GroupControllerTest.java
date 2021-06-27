@@ -3,7 +3,6 @@ package ua.com.foxminded.university.controllers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
@@ -29,7 +28,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {WebTestConfig.class})
 @WebAppConfiguration
@@ -58,6 +56,7 @@ class GroupControllerTest {
     private static final String POST_EDIT_GROUP_URL_TEMPLATE = "/groups/1";
 
     private static final String DELETE_GROUP_VIEW_NAME = "/groups/1";
+
 
     public MockMvc mockMvc;
 
@@ -195,48 +194,36 @@ class GroupControllerTest {
 
     @Test
     void shouldReturnCorrectedGroupAttributesWhenGetGroups() throws Exception {
-        Cathedra physicsCathedra = new Cathedra(ID_1_VALUE, PHYSICS);
-        Cathedra medicalsCathedra = new Cathedra(ID_2_VALUE, MEDICALS);
-
         mockMvc.perform(get(GET_ALL_URL_TEMPLATE))
             .andExpect(status().isOk())
             .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasProperty(TOTAL_ELEMENTS, equalTo(TOTAL_ELEMENTS_VALUE_2))))
             .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasItem(
                 allOf(
                     hasProperty(ID, is(ID_1_VALUE)),
-                    hasProperty(NAME, is(GROUP_1_NAME_VALUE)),
-                    hasProperty(STUDENTS, is(nullValue())),
-                    hasProperty(CATHEDRA, is(physicsCathedra))
+                    hasProperty(NAME, is(GROUP_1_NAME_VALUE))
                 ))))
             .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasItem(
                 allOf(
                     hasProperty(ID, is(ID_2_VALUE)),
-                    hasProperty(NAME, is(GROUP_2_NAME_VALUE)),
-                    hasProperty(STUDENTS, is(nullValue())),
-                    hasProperty(CATHEDRA, is(medicalsCathedra))
+                    hasProperty(NAME, is(GROUP_2_NAME_VALUE))
                 ))));
     }
 
     @Test
     void shouldReturnCorrectedGroupAttributesWhenGetGroupsByCathedraId() throws Exception {
-        Cathedra physicsCathedra = new Cathedra(ID_1_VALUE, PHYSICS);
-
         mockMvc.perform(get(GET_BY_CATHEDRA_ID_URL_TEMPLATE))
             .andExpect(status().isOk())
             .andExpect(model().attribute(GET_BY_CATHEDRA_ID_PROPERTY_NAME, hasProperty(TOTAL_ELEMENTS, equalTo(TOTAL_ELEMENTS_VALUE_1))))
             .andExpect(model().attribute(GET_BY_CATHEDRA_ID_PROPERTY_NAME, hasItem(
                 allOf(
                     hasProperty(ID, is(ID_1_VALUE)),
-                    hasProperty(NAME, is(GROUP_1_NAME_VALUE)),
-                    hasProperty(STUDENTS, is(nullValue())),
-                    hasProperty(CATHEDRA, is(physicsCathedra))
+                    hasProperty(NAME, is(GROUP_1_NAME_VALUE))
                 ))));
     }
 
     @Test
     void shouldReturnCorrectedGroupAttributesWhenGetGroupById() throws Exception {
-        List<Student> students = singletonList(new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE, new Group(ID_1_VALUE)));
-        Group group = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, students, new Cathedra(ID_1_VALUE, PHYSICS));
+        Group group = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE);
 
         mockMvc.perform(get(GET_BY_ID_URL_TEMPLATE))
             .andExpect(status().isOk())

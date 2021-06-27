@@ -50,10 +50,10 @@
         <td th:text="${cathedra.getName()}"></td>
         <td></td>
         <td class="d-flex flex-row text-nowrap bd-highlight">
-            <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId = ${cathedra.getId()})}"
+            <a th:href="@{/teachers/by-cathedra/{cathedraId}(cathedraId = ${cathedra.getId()})}"
                class="btn btn-outline-primary ms-1"
                role="button">Show teachers</a>
-            <a th:href="@{/groups/by_cathedra/{cathedraId}(cathedraId = ${cathedra.getId()})}"
+            <a th:href="@{/groups/by-cathedra/{cathedraId}(cathedraId = ${cathedra.getId()})}"
                class="btn btn-outline-primary ms-1"
                role="button">Show groups</a>
             <a class="btn btn-outline-primary ms-3"
@@ -92,7 +92,7 @@
     <form th:method="PATCH" th:action="@{/cathedras/{id}(id=${cathedra.getId()})}" th:object="${cathedra}" class="row mb-1 m-lg-2">
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3 col-form-label">
-                <label for="name" class="form-label">First Name</label>
+                <label for="name" class="form-label">Name</label>
                 <input th:field="*{name}" id="name" type="text" class="form-control"
                        placeholder="Enter the first name of student">
             </div>

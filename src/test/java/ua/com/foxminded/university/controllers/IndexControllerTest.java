@@ -3,7 +3,6 @@ package ua.com.foxminded.university.controllers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
@@ -22,13 +21,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 import static ua.com.foxminded.university.utils.Constants.TEST_DATA_SQL_PATH;
 
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {WebTestConfig.class})
 @WebAppConfiguration
 class IndexControllerTest {
     private static final String INDEX_URL_TEMPLATE = "/";
     private static final String INDEX_VIEW_NAME = "/index";
+
 
     public MockMvc mockMvc;
 

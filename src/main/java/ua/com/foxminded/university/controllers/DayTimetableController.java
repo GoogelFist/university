@@ -27,22 +27,17 @@ public class DayTimetableController {
     private static final String PAGE_NUMBERS = "pageNumbers";
     private static final String MONTH_TIMETABLES_VIEW_NAME = "month-timetables";
     private static final String ID = "id";
-    private static final String GROUP_ID = "groupId";
     private static final String GROUPS = "groups";
-    private static final String TEACHER_ID = "teacherId";
     private static final String TEACHERS = "teachers";
-    private static final String DAY_TIMETABLES_BY_TEACHER = "dayTimetablesByTeacher";
-    private static final String DAY_TIMETABLES_BY_GROUP = "dayTimetablesByGroup";
     private static final String DAY_TIMETABLE_BY_MONTH_TIMETABLE = "dayTimetablesByMonthTimetable";
     private static final String DAY_TIMETABLE = "dayTimetable";
     private static final String MONTH_TIMETABLE_ID = "monthTimetableId";
 
     private static final String GET_BY_ID_VIEW_NAME = "/daytimetables/day-timetable-info";
     private static final String GET_BY_MONTH_TIMETABLES_ID_VIEW_NAME = "/daytimetables/day-timetables-by-month-timetable";
-    private static final String GET_BY_GROUP_ID_VIEW_NAME = "/daytimetables/day-timetables-by-group";
-    private static final String GET_BY_TEACHER_ID_VIEW_NAME = "/daytimetables/day-timetables-by-teacher";
     private static final String GET_EDIT_DAY_TIMETABLE_VIEW_NAME = "/daytimetables/day-timetable-update";
     private static final String GET_NEW_DAY_TIMETABLE_VIEW_NAME = "/daytimetables/new-day-timetable";
+
 
     public final GroupService groupService;
     public final TeacherService teacherService;
@@ -76,32 +71,6 @@ public class DayTimetableController {
         return GET_BY_MONTH_TIMETABLES_ID_VIEW_NAME;
     }
 
-    @GetMapping("/by-group/{groupId}")
-    public String showDayTimetablesByGroup(@PathVariable(GROUP_ID) int groupId, Model model, Pageable pageable) {
-        Page<DayTimetable> dayTimetablePage = dayTimeTableService.getByGroupId(groupId, pageable);
-        model.addAttribute(DAY_TIMETABLES_BY_GROUP, dayTimetablePage);
-
-        int totalPages = dayTimetablePage.getTotalPages();
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
-            model.addAttribute(PAGE_NUMBERS, pageNumbers);
-        }
-        return GET_BY_GROUP_ID_VIEW_NAME;
-    }
-
-    @GetMapping("/by-teacher/{teacherId}")
-    public String showDayTimetablesByTeacher(@PathVariable(TEACHER_ID) int teacherId, Model model, Pageable pageable) {
-        Page<DayTimetable> dayTimetablePage = dayTimeTableService.getByTeacherId(teacherId, pageable);
-        model.addAttribute(DAY_TIMETABLES_BY_TEACHER, dayTimetablePage);
-
-        int totalPages = dayTimetablePage.getTotalPages();
-        if (totalPages > 0) {
-            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
-            model.addAttribute(PAGE_NUMBERS, pageNumbers);
-        }
-        return GET_BY_TEACHER_ID_VIEW_NAME;
-    }
-
     @GetMapping("/{id}/new")
     public String newDayTimetable(@PathVariable(ID) int id, @ModelAttribute(DAY_TIMETABLE) DayTimetable dayTimetable, Model model) {
         List<Teacher> allTeachers = teacherService.getAll();
@@ -131,8 +100,8 @@ public class DayTimetableController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(DAY_TIMETABLE) DayTimetable dayTimetable, @PathVariable(ID) int id) {
-        dayTimeTableService.update(id, dayTimetable);
+    public String update(@ModelAttribute(DAY_TIMETABLE) DayTimetable dayTimetable) {
+        dayTimeTableService.update(dayTimetable);
         return format(REDIRECT, MONTH_TIMETABLES_VIEW_NAME);
     }
 

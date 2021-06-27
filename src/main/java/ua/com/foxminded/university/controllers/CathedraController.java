@@ -77,8 +77,8 @@ public class CathedraController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(CATHEDRA) Cathedra cathedra, @PathVariable(ID) int id) {
-        cathedraService.update(id, cathedra);
+    public String update(@ModelAttribute(CATHEDRA) Cathedra cathedra) {
+        cathedraService.update(cathedra);
         return format(REDIRECT, CATHEDRAS);
     }
 

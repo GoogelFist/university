@@ -83,12 +83,9 @@
             <td th:text="${group.getCathedra().getName()}"></td>
             <td></td>
             <td class="d-flex flex-row text-nowrap bd-highlight">
-                <a th:href="@{/students/by_group/{groupId}(groupId = ${group.getId()})}"
+                <a th:href="@{/students/by-group/{groupId}(groupId = ${group.getId()})}"
                    class="btn btn-outline-primary ms-1"
                    role="button">Students</a>
-                <a th:href="@{/day_timetables/by_group/{groupId}(groupId=${group.getId()})}"
-                   class="btn btn-outline-primary ms-1"
-                   role="button">Timetable</a>
                 <a th:href="@{/groups/{id}(id = ${group.getId()})}"
                    class="btn btn-outline-primary ms-3"
                    role="button">Info</a>
@@ -104,6 +101,32 @@
     </table>
 </div>
 
+<div th:fragment="groups-by-cathedra">
+    <table aria-label="Groups table" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Cathedra</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="group: ${groupsByCathedraId}">
+            <td th:text="${group.getName()}"></td>
+            <td th:text="${group.getCathedra().getName()}"></td>
+            <td>
+                <a th:href="@{/students/by-group/{groupId}(groupId = ${group.getId()})}"
+                   class="btn btn-outline-primary"
+                   role="button">Show students</a>
+                <a th:href="@{/groups/{id}(id = ${group.getId()})}"
+                   class="btn btn-outline-primary"
+                   role="button">Info</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
 <div th:fragment="update-group">
     <form th:method="PATCH" th:action="@{/groups/{id}(id=${group.getId()})}" th:object="${group}" class="row mb-1 m-lg-2">
         <div class="row mb-1 col-form-label">
@@ -111,6 +134,18 @@
                 <label for="name" class="form-label">Name</label>
                 <input th:field="*{name}" id="name" type="text" class="form-control"
                        placeholder="Enter name of group">
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputState" class="form-label">Cathedra</label>
+                <select th:field="*{cathedra.id}" id="inputState" class="form-select"/>
+                    <option selected="selected" th:value="${String}">Select</option>
+                    <option th:each="cathedra : ${cathedras}"
+                            th:value="${cathedra.id}"
+                            th:text="${cathedra.getName()}">
+                    </option>
+                </select>
             </div>
         </div>
         <div class="row mb-1">
@@ -155,23 +190,23 @@
             <li th:if="${groupsByCathedraId.isFirst()}" class="page-item disabled"><a class="page-link"
                                                                                       href="">Previous</a></li>
             <li th:unless="${groupsByCathedraId.isFirst()}" class="page-item">
-                <a th:href="@{/groups/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${groupsByCathedraId.size}, page=${groupsByCathedraId.previousPageable().getPageNumber()})}"
+                <a th:href="@{/groups/by-cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${groupsByCathedraId.size}, page=${groupsByCathedraId.previousPageable().getPageNumber()})}"
                    class="page-link">Previous</a>
             </li>
             <div th:each="pageNumber : ${pageNumbers}" class="page-item">
                 <li th:if="${pageNumber - 1 == groupsByCathedraId.number}" class="page-item active" aria-current="page">
-                    <a th:href="@{/groups/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${groupsByCathedraId.size}, page=${pageNumber - 1})}"
+                    <a th:href="@{/groups/by-cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${groupsByCathedraId.size}, page=${pageNumber - 1})}"
                        th:text="${pageNumber}" class="page-link">1</a>
                 </li>
                 <li th:unless="${pageNumber - 1 == groupsByCathedraId.number}" class="page-item">
-                    <a th:href="@{/groups/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${groupsByCathedraId.size}, page=${pageNumber - 1})}"
+                    <a th:href="@{/groups/by-cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${groupsByCathedraId.size}, page=${pageNumber - 1})}"
                        th:text="${pageNumber}" class="page-link">1</a>
                 </li>
             </div>
             <li th:if="${groupsByCathedraId.isLast()}" class="page-item disabled"><a class="page-link" href="#">Next</a>
             </li>
             <li th:unless="${groupsByCathedraId.isLast()}" class="page-item">
-                <a th:href="@{/groups/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${groupsByCathedraId.size}, page=${groupsByCathedraId.nextPageable().getPageNumber()})}"
+                <a th:href="@{/groups/by-cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${groupsByCathedraId.size}, page=${groupsByCathedraId.nextPageable().getPageNumber()})}"
                    class="page-link">Next</a>
             </li>
         </ul>

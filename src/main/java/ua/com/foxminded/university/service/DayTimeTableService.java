@@ -6,16 +6,8 @@ import ua.com.foxminded.university.entities.DayTimetable;
 
 import java.util.List;
 
-public interface DayTimeTableService extends GenericService<DayTimetable> {
+public interface DayTimeTableService extends GenericServiceJpa<DayTimetable> {
     Page<DayTimetable> getAll(Pageable pageable);
-
-    Page<DayTimetable> getByGroupId(int groupId, Pageable pageable);
-
-    List<DayTimetable> getByGroupId(int groupId);
-
-    Page<DayTimetable> getByTeacherId(int teacherId, Pageable pageable);
-
-    List<DayTimetable> getByTeacherId(int teacherId);
 
     List<DayTimetable> getByMonthTimetableId(int id);
 

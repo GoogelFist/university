@@ -3,7 +3,6 @@ package ua.com.foxminded.university.controllers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
@@ -26,7 +25,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {WebTestConfig.class})
 @WebAppConfiguration
@@ -55,6 +53,7 @@ class TeacherControllerTest {
     private static final String POST_EDIT_TEACHER_URL_TEMPLATE = "/teachers/1";
 
     private static final String DELETE_TEACHER_VIEW_NAME = "/teachers/1";
+
 
     public MockMvc mockMvc;
 
@@ -204,9 +203,6 @@ class TeacherControllerTest {
 
     @Test
     void shouldReturnCorrectedTeacherAttributesWhenGetTeachers() throws Exception {
-        Cathedra physicsCathedra = new Cathedra(ID_1_VALUE, PHYSICS);
-        Cathedra medicalsCathedra = new Cathedra(ID_2_VALUE, MEDICALS);
-
         mockMvc.perform(get(GET_ALL_URL_TEMPLATE))
             .andExpect(status().isOk())
             .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasProperty(TOTAL_ELEMENTS, equalTo(TOTAL_ELEMENTS_VALUE_2))))
@@ -216,8 +212,7 @@ class TeacherControllerTest {
                     hasProperty(FIRST_NAME, is(TEACHER_1_FIRST_NAME_VALUE)),
                     hasProperty(LAST_NAME, is(TEACHER_1_LAST_NAME_VALUE)),
                     hasProperty(PHONE, is(TEACHER_1_PHONE_VALUE)),
-                    hasProperty(QUALIFICATION, is(QUALIFICATION_1_VALUE)),
-                    hasProperty(CATHEDRA, is(physicsCathedra))
+                    hasProperty(QUALIFICATION, is(QUALIFICATION_1_VALUE))
                 ))))
             .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasItem(
                 allOf(
@@ -225,15 +220,12 @@ class TeacherControllerTest {
                     hasProperty(FIRST_NAME, is(TEACHER_2_FIRST_NAME_VALUE)),
                     hasProperty(LAST_NAME, is(TEACHER_2_LAST_NAME_VALUE)),
                     hasProperty(PHONE, is(TEACHER_2_PHONE_VALUE)),
-                    hasProperty(QUALIFICATION, is(QUALIFICATION_2_VALUE)),
-                    hasProperty(CATHEDRA, is(medicalsCathedra))
+                    hasProperty(QUALIFICATION, is(QUALIFICATION_2_VALUE))
                 ))));
     }
 
     @Test
     void shouldReturnCorrectedTeacherAttributesWhenGetTeachersByCathedra() throws Exception {
-        Cathedra physicsCathedra = new Cathedra(ID_1_VALUE, PHYSICS);
-
         mockMvc.perform(get(GET_BY_CATHEDRA_ID_URL_TEMPLATE))
             .andExpect(status().isOk())
             .andExpect(model().attribute(GET_BY_CATHEDRA_ID_PROPERTY_NAME, hasProperty(TOTAL_ELEMENTS, equalTo(TOTAL_ELEMENTS_VALUE_1))))
@@ -243,14 +235,13 @@ class TeacherControllerTest {
                     hasProperty(FIRST_NAME, is(TEACHER_1_FIRST_NAME_VALUE)),
                     hasProperty(LAST_NAME, is(TEACHER_1_LAST_NAME_VALUE)),
                     hasProperty(PHONE, is(TEACHER_1_PHONE_VALUE)),
-                    hasProperty(QUALIFICATION, is(QUALIFICATION_1_VALUE)),
-                    hasProperty(CATHEDRA, is(physicsCathedra))
+                    hasProperty(QUALIFICATION, is(QUALIFICATION_1_VALUE))
                 ))));
     }
 
     @Test
     void shouldReturnCorrectedTeacherAttributesWhenGetTeacherById() throws Exception {
-        Teacher teacher = new Teacher(ID_1_VALUE, TEACHER_1_FIRST_NAME_VALUE, TEACHER_1_LAST_NAME_VALUE, TEACHER_1_PHONE_VALUE, QUALIFICATION_1_VALUE, new Cathedra(ID_1_VALUE, PHYSICS));
+        Teacher teacher = new Teacher(ID_1_VALUE, TEACHER_1_FIRST_NAME_VALUE, TEACHER_1_LAST_NAME_VALUE, TEACHER_1_PHONE_VALUE, QUALIFICATION_1_VALUE);
 
         mockMvc.perform(get(GET_BY_ID_URL_TEMPLATE))
             .andExpect(status().isOk())

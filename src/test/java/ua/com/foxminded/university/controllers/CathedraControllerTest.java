@@ -3,7 +3,6 @@ package ua.com.foxminded.university.controllers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
@@ -24,7 +23,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {WebTestConfig.class})
 @WebAppConfiguration
@@ -48,6 +46,7 @@ class CathedraControllerTest {
     private static final String POST_EDIT_CATHEDRA_URL_TEMPLATE = "/cathedras/1";
 
     private static final String DELETE_CATHEDRA_VIEW_NAME = "/cathedras/1";
+
 
     public MockMvc mockMvc;
 

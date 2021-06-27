@@ -26,7 +26,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@ExtendWith(MockitoExtension.class)
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {WebTestConfig.class})
 @WebAppConfiguration
@@ -51,6 +50,7 @@ class MonthTimetableControllerTest {
 
     private static final String DELETE_MONTH_TIMETABLE_VIEW_NAME = "/month-timetables/1";
     private static final String MONTH_TIMETABLES_VIEW_NAME = "month-timetables";
+
 
     public MockMvc mockMvc;
 
@@ -187,12 +187,7 @@ class MonthTimetableControllerTest {
 
     @Test
     void shouldReturnCorrectedStudentAttributesWhenGetMonthTimetablesById() throws Exception {
-        List<Student> students = singletonList(new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE, new Group(ID_1_VALUE)));
-        Cathedra cathedra = new Cathedra(ID_1_VALUE, PHYSICS);
-        Group group = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE, students, cathedra);
-        Teacher teacher = new Teacher(ID_1_VALUE, TEACHER_1_FIRST_NAME_VALUE, TEACHER_1_LAST_NAME_VALUE, TEACHER_1_PHONE_VALUE, QUALIFICATION_1_VALUE, cathedra);
-        List<DayTimetable> dayTimetables = singletonList(new DayTimetable(ID_1_VALUE, DAY_TIMETABLE_1_TIME_VALUE, LECTURE_HALL_1_VALUE, SUBJECT_1_VALUE, group, teacher, new MonthTimetable(ID_1_VALUE)));
-        MonthTimetable monthTimetable = new MonthTimetable(ID_1_VALUE, MONTH_TIMETABLE_DATE_VALUE_1, dayTimetables);
+        MonthTimetable monthTimetable = new MonthTimetable(ID_1_VALUE, MONTH_TIMETABLE_DATE_VALUE_1);
 
         mockMvc.perform(get(GET_BY_ID_URL_TEMPLATE))
             .andExpect(status().isOk())

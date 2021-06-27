@@ -1,86 +1,84 @@
 package ua.com.foxminded.university.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.MonthTimetableDAO;
-import ua.com.foxminded.university.dao.exceptions.DaoException;
-import ua.com.foxminded.university.entities.DayTimetable;
 import ua.com.foxminded.university.entities.MonthTimetable;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
+import static java.lang.String.*;
+import static java.lang.String.format;
+
+@Slf4j
 @Service
+@Transactional
 public class MonthTimetableServiceImpl implements MonthTimetableService {
-    private final MonthTimetableDAO monthTimetableDAO;
-    private final DayTimeTableService dayTimeTableService;
+    private static final String LOG_MESSAGE = "MonthTimetableService calls monthTimetableDAO.%s";
+    private static final String CREATE = "create({})";
+    private static final String GET_BY_ID = "getById({})";
+    private static final String GET_ALL = "getAll()";
+    private static final String GET_ALL_PAGEABLE = "getAll({})";
+    private static final String UPDATE = "update({})";
+    private static final String DELETE = "delete(Id {})";
 
-    private static final Logger logger = LoggerFactory.getLogger(MonthTimetableServiceImpl.class);
+    private static final String ERROR_MESSAGE = "Entity %s with id %s not found";
+    private static final String MONTH_TIMETABLE = "monthTimetable";
+
+
+    private final MonthTimetableDAO monthTimetableDAO;
 
     @Autowired
-    public MonthTimetableServiceImpl(MonthTimetableDAO monthTimetableDAO, DayTimeTableService dayTimeTableService) {
+    public MonthTimetableServiceImpl(MonthTimetableDAO monthTimetableDAO) {
         this.monthTimetableDAO = monthTimetableDAO;
-        this.dayTimeTableService = dayTimeTableService;
     }
 
     @Override
     public void create(MonthTimetable monthTimetable) {
-        logger.debug("MonthTimetableService calls monthTimeTableDAO.create({})", monthTimetable);
-        try {
-            monthTimetableDAO.create(monthTimetable);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+        log.debug(format(LOG_MESSAGE, CREATE), monthTimetable);
+
+        monthTimetableDAO.create(monthTimetable);
     }
 
     @Override
     public MonthTimetable getById(int id) {
-        logger.debug("MonthTimetableService calls monthTimeTableDAO.grtByID(id {})", id);
-        MonthTimetable monthTimetableById;
-        try {
-            monthTimetableById = monthTimetableDAO.getById(id);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
+        log.debug(format(LOG_MESSAGE, GET_BY_ID), id);
+
+        MonthTimetable monthTimetable = monthTimetableDAO.getById(id);
+        if (Objects.isNull(monthTimetable)) {
+            String message = format(ERROR_MESSAGE, MONTH_TIMETABLE, id);
+            throw new ServiceException(message);
         }
-        setDayTimetablesInMonthTimetable(monthTimetableById);
-        return monthTimetableById;
+        return monthTimetable;
     }
 
     @Override
     public List<MonthTimetable> getAll() {
-        logger.debug("MonthTimetableService calls monthTimeTableDAO.getAll()");
-        List<MonthTimetable> monthTimetables;
-        try {
-            monthTimetables = monthTimetableDAO.getAll();
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-        monthTimetables.forEach(this::setDayTimetablesInMonthTimetable);
-        return monthTimetables;
+        log.debug(format(LOG_MESSAGE, GET_ALL));
+
+        return monthTimetableDAO.getAll();
     }
 
     @Override
     public Page<MonthTimetable> getAll(Pageable pageable) {
-        logger.debug("TeacherService calls teacherDAO.getAll({})", pageable);
+        log.debug(format(LOG_MESSAGE, GET_ALL_PAGEABLE), pageable);
+
         int pageSize = pageable.getPageSize();
         int currentPage = pageable.getPageNumber();
         int startItem = currentPage * pageSize;
-        List<MonthTimetable> monthTimetables;
         List<MonthTimetable> list;
-        try {
-            monthTimetables = monthTimetableDAO.getAll();
-            monthTimetables.sort(Comparator.comparing(MonthTimetable::getDate));
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+
+        List<MonthTimetable> monthTimetables = monthTimetableDAO.getAll();
+
         if (monthTimetables.size() < startItem) {
             list = Collections.emptyList();
         } else {
@@ -91,33 +89,16 @@ public class MonthTimetableServiceImpl implements MonthTimetableService {
     }
 
     @Override
-    public void update(int id, MonthTimetable monthTimetable) {
-        logger.debug("MonthTimetableService calls monthTimeTableDAO.update (id {}, {})", id, monthTimetable);
-        try {
-            monthTimetableDAO.update(id, monthTimetable);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+    public void update(MonthTimetable monthTimetable) {
+        log.debug(format(LOG_MESSAGE, UPDATE), monthTimetable);
+
+        monthTimetableDAO.update(monthTimetable);
     }
 
     @Override
     public void delete(int id) {
-        logger.debug("MonthTimetableService calls monthTimeTableDAO.delete(id {})", id);
-        try {
-            monthTimetableDAO.delete(id);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-    }
+        log.debug(format(LOG_MESSAGE, DELETE), id);
 
-    private void setDayTimetablesInMonthTimetable(MonthTimetable monthTimetable) {
-        logger.debug("Call monthTimetable.getId()");
-        int id = monthTimetable.getId();
-
-        logger.debug("Call dayTimeTableService.getByMonthTimetableId(id {})", id);
-        List<DayTimetable> dayTimetablesByMonthTimetableId = dayTimeTableService.getByMonthTimetableId(id);
-
-        logger.debug("Set {} to the {}", dayTimetablesByMonthTimetableId, monthTimetable);
-        monthTimetable.setDayTimetables(dayTimetablesByMonthTimetableId);
+        monthTimetableDAO.delete(id);
     }
 }

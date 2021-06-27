@@ -137,6 +137,18 @@
                        placeholder="Enter the phone of student">
             </div>
         </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputState" class="form-label">Group</label>
+                <select th:field="*{group.id}" id="inputState" class="form-select"/>
+                    <option selected="selected" th:value="${String}">Select</option>
+                    <option th:each="group : ${groups}"
+                            th:value="${group.id}"
+                            th:text="${group.getName()}">
+                    </option>
+                </select>
+            </div>
+        </div>
         <div class="row mb-1">
             <div class="col-sm">
                 <button type="submit" class="btn btn-primary">Update</button>

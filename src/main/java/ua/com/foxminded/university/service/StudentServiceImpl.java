@@ -1,209 +1,132 @@
 package ua.com.foxminded.university.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import ua.com.foxminded.university.dao.GroupDAO;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.dao.StudentDAO;
-import ua.com.foxminded.university.dao.exceptions.DaoException;
-import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.Student;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
+import java.util.Objects;
 
+import static java.lang.String.format;
+
+@Slf4j
 @Service
+@Transactional
 public class StudentServiceImpl implements StudentService {
-    private final StudentDAO studentDAO;
-    private final GroupDAO groupDAO;
+    private static final String LOG_MESSAGE = "StudentService calls studentDAO.%s";
+    private static final String CREATE = "create({})";
+    private static final String GET_BY_ID = "getById({})";
+    private static final String GET_ALL = "getAll()";
+    private static final String GET_ALL_PAGEABLE = "getAll({})";
+    private static final String UPDATE = "update({})";
+    private static final String DELETE = "delete(Id {})";
+    private static final String GET_BY_GROUP_ID = "getByGroupId({})";
+    private static final String GET_BY_GROUP_ID_PAGEABLE = "getByGroupId({}, {})";
 
-    private static final Logger logger = LoggerFactory.getLogger(StudentServiceImpl.class);
+    private static final String ERROR_MESSAGE = "Entity %s with id %s not found";
+    private static final String STUDENT = "student";
+
+
+    private final StudentDAO studentDAO;
 
     @Autowired
-    public StudentServiceImpl(StudentDAO studentDAO, GroupDAO groupDAO) {
+    public StudentServiceImpl(StudentDAO studentDAO) {
         this.studentDAO = studentDAO;
-        this.groupDAO = groupDAO;
     }
 
     @Override
     public void create(Student student) {
-        logger.debug("StudentService calls studentDao.create({})", student);
-        try {
-            studentDAO.create(student);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+        log.debug(format(LOG_MESSAGE, CREATE), student);
+
+        studentDAO.create(student);
     }
 
     @Override
     public Student getById(int id) {
-        logger.debug("StudentService calls studentDao.getById(id {})", id);
-        Student studentById;
-        try {
-            studentById = studentDAO.getById(id);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
+        log.debug(format(LOG_MESSAGE, GET_BY_ID), id);
+
+        Student student = studentDAO.getById(id);
+        if (Objects.isNull(student)) {
+            String message = format(ERROR_MESSAGE, STUDENT, id);
+            throw new ServiceException(message);
         }
-        setGroupToStudent(studentById);
-        return studentById;
+        return student;
     }
 
     @Override
     public List<Student> getAll() {
-        logger.debug("StudentService calls studentDao.getAll()");
-        List<Student> students;
-        try {
-            students = studentDAO.getAll();
-            students.sort(Comparator.comparing(Student::getId));
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-        students.forEach(this::setGroupToStudent);
-        return students;
+        log.debug(format(LOG_MESSAGE, GET_ALL));
+
+        return studentDAO.getAll();
     }
 
+    @Override
     public Page<Student> getAll(Pageable pageable) {
-        logger.debug("StudentService calls studentDao.getAll({})", pageable);
+        log.debug(format(LOG_MESSAGE, GET_ALL_PAGEABLE), pageable);
+
         int pageSize = pageable.getPageSize();
         int currentPage = pageable.getPageNumber();
         int startItem = currentPage * pageSize;
-        List<Student> students;
         List<Student> list;
-        try {
-            students = studentDAO.getAll();
-            students.sort(Comparator.comparing(Student::getId));
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+
+        List<Student> students = studentDAO.getAll();
+
         if (students.size() < startItem) {
             list = Collections.emptyList();
         } else {
             int toIndex = Math.min(startItem + pageSize, students.size());
             list = students.subList(startItem, toIndex);
-            list.forEach(this::setGroupToStudent);
         }
         return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), students.size());
     }
 
     @Override
-    public void update(int id, Student student) {
-        logger.debug("StudentService calls studentDao.update(id {}, {})", id, student);
-        try {
-            studentDAO.update(id, student);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+    public void update(Student student) {
+        log.debug(format(LOG_MESSAGE, UPDATE), student);
+
+        studentDAO.update(student);
     }
 
     @Override
     public void delete(int id) {
-        logger.debug("StudentService calls studentDao.delete(id {})", id);
-        try {
-            studentDAO.delete(id);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+        log.debug(format(LOG_MESSAGE, DELETE), id);
+
+        studentDAO.delete(id);
     }
 
     @Override
     public List<Student> getByGroupId(int groupId) {
-        checkingGroupInDao(groupId);
+        log.debug(format(LOG_MESSAGE, GET_BY_GROUP_ID), groupId);
 
-        logger.debug("StudentService calls studentDao.getByGroupId(groupId {})", groupId);
-        List<Student> studentsByGroupId;
-        try {
-            studentsByGroupId = studentDAO.getByGroupId(groupId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-        return studentsByGroupId;
+        return studentDAO.getByGroupId(groupId);
     }
 
     @Override
     public Page<Student> getByGroupId(int groupId, Pageable pageable) {
-        checkingGroupInDao(groupId);
+        log.debug(format(LOG_MESSAGE, GET_BY_GROUP_ID_PAGEABLE), groupId, pageable);
 
-        logger.debug("StudentService calls studentDao.getByGroupId({}, {})",groupId, pageable);
         int pageSize = pageable.getPageSize();
         int currentPage = pageable.getPageNumber();
         int startItem = currentPage * pageSize;
-        List<Student> students;
         List<Student> list;
-        try {
-            students = studentDAO.getByGroupId(groupId);
-            students.sort(Comparator.comparing(Student::getId));
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
+
+        List<Student> students = studentDAO.getByGroupId(groupId);
+
         if (students.size() < startItem) {
             list = Collections.emptyList();
         } else {
             int toIndex = Math.min(startItem + pageSize, students.size());
             list = students.subList(startItem, toIndex);
-            list.forEach(this::setGroupToStudent);
         }
         return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), students.size());
-    }
-
-    @Override
-    public void assignToGroup(int groupId, int studentId) {
-        checkingGroupInDao(groupId);
-
-        logger.debug("StudentService calls studentDao.assignToGroup(groupId {}, studentId {})", groupId, studentId);
-        try {
-            studentDAO.assignToGroup(groupId, studentId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void updateAssignment(int groupId, int studentId) {
-        checkingGroupInDao(groupId);
-
-        logger.debug("StudentService calls studentDao.updateAssignment(groupId {}, studentId {})", groupId, studentId);
-        try {
-            studentDAO.updateAssignment(groupId, studentId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-    }
-
-    @Override
-    public void deleteAssignment(int studentId) {
-        logger.debug("StudentService calls studentDao.deleteAssignment(studentId {})", studentId);
-        try {
-            studentDAO.deleteAssignment(studentId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-    }
-
-    private void setGroupToStudent(Student student) {
-        logger.debug("Call student.getGroup().getId()");
-        int studentGroupId = student.getGroup().getId();
-        Group group;
-        logger.debug("Call groupDAO.getById {}", studentGroupId);
-        try {
-            group = groupDAO.getById(studentGroupId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-        logger.debug("Set {} to {}", group, student);
-        student.setGroup(group);
-    }
-
-    private void checkingGroupInDao(int groupId) {
-        logger.debug("Checking the presence of a group");
-        try {
-            groupDAO.getById(groupId);
-        } catch (DaoException e) {
-            throw new ServiceException(e.getMessage(), e);
-        }
-        logger.debug("Group is present");
     }
 }

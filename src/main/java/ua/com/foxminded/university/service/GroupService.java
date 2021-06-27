@@ -6,16 +6,10 @@ import ua.com.foxminded.university.entities.Group;
 
 import java.util.List;
 
-public interface GroupService extends GenericService<Group> {
+public interface GroupService extends GenericServiceJpa<Group> {
     Page<Group> getByCathedraId(int cathedraId, Pageable pageable);
 
     Page<Group> getAll(Pageable pageable);
 
     List<Group> getByCathedraId(int cathedraId);
-
-    void assignToCathedra(int cathedraId, int groupId);
-
-    void updateAssignment(int cathedraId, int groupId);
-
-    void deleteAssignment(int cathedraId);
 }

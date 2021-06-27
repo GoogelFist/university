@@ -31,7 +31,6 @@ public class Constants {
     public static final String CATHEDRAS = "cathedras";
     public static final String CATHEDRA_ID = "cathedra.id";
     public static final String MONTH_TIMETABLE = "monthTimetable";
-    public static final String MONTH_TIMETABLES = "monthTimetables";
     public static final String MONTH_TIMETABLE_ID = "monthTimetable.id";
     public static final String DAY_TIMETABLE = "dayTimetable";
     public static final String NAME = "name";
@@ -102,40 +101,17 @@ public class Constants {
     public static final String SUBJECT_3_VALUE = "physic";
     public static final String SUBJECT_4_VALUE = "arts";
 
-    public static final String MESSAGE_PROPERTY_VALUE = "student with ID 101 not found";
-
     public static final Long TOTAL_ELEMENTS_VALUE_1 = 1L;
     public static final Long TOTAL_ELEMENTS_VALUE_2 = 2L;
-
-    public static final String COLUMN_LABEL_ID = "id";
-    public static final String COLUMN_START_TIME = "start_time";
-    public static final String COLUMN_LABEL_NAME = "name";
-    public static final String COLUMN_LABEL_FIRST_NAME = "first_name";
-    public static final String COLUMN_LABEL_LAST_NAME = "last_name";
-    public static final String COLUMN_LABEL_DATE = "date";
-    public static final String COLUMN_LABEL_PHONE = "phone";
-    public static final String COLUMN_LABEL_QUALIFICATION = "qualification";
-    public static final String COLUMN_LABEL_LECTURE_HALL = "lecture_hall";
-    public static final String COLUMN_LABEL_SUBJECT = "subject";
-    public static final String COLUMN_LABEL_GROUP_ID = "group_id";
-    public static final String COLUMN_LABEL_TEACHER_ID = "teacher_id";
-    public static final String COLUMN_LABEL_MONT_TIMETABLE_ID = "month_timetable_id";
-    public static final String COLUMN_LABEL_CATHEDRA_ID = "cathedra_id";
 
     public static final int NUMBER_OF_INVOCATIONS_VALUE = 1;
     public static final int PAGE = 0;
     public static final int SIZE = 2;
 
     public static final String SERVICE_EXCEPTION_MESSAGE_BY_ID = "Unable to %s %s with Id %s";
-    public static final String SERVICE_EXCEPTION_MESSAGE_BY_ENTITY_ID = "Unable to %s %s by %s with Id %s";
-    public static final String SERVICE_EXCEPTION_MESSAGE_CREATE = "Unable to create %s";
-    public static final String SERVICE_EXCEPTION_MESSAGE_GET_ALL = "Unable to get all %s";
-    public static final String SERVICE_EXCEPTION_MESSAGE_ASSIGN = "Unable %s %s with id %s to %s with id %s";
-    public static final String SERVICE_EXCEPTION_MESSAGE_ASSIGNMENT = "Unable to %s assignment %s with id %s to %s with id %s";
+
     public static final String GET = "get";
-    public static final String UPDATE = "update";
-    public static final String DELETE = "delete";
-    public static final String ASSIGN = "assign";
+    public static final String ENTITY_NOT_FOUND = "Entity %s not found";
 
     public static final String REDIRECT = "redirect:/%s";
 }

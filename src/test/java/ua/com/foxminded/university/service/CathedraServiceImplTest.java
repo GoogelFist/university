@@ -11,7 +11,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 import ua.com.foxminded.university.dao.CathedraDAO;
-import ua.com.foxminded.university.dao.exceptions.DaoException;
 import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
@@ -31,32 +30,26 @@ class CathedraServiceImplTest {
     @Mock
     private CathedraDAO mockCathedraDAO;
 
-    @Mock
-    private GroupService mockGroupService;
-
-    @Mock
-    private TeacherService mockTeacherService;
-
     private CathedraService cathedraService;
     private Cathedra cathedra;
     private List<Cathedra> cathedras;
 
     @BeforeEach
     void setUp() {
-        cathedraService = new CathedraServiceImpl(mockCathedraDAO, mockGroupService, mockTeacherService);
+        cathedraService = new CathedraServiceImpl(mockCathedraDAO);
         cathedra = new Cathedra(ID_1_VALUE, CATHEDRA_1_NAME_VALUE);
         cathedras = singletonList(cathedra);
     }
 
     @Test
-    void shouldCallCreateCathedra() throws DaoException {
+    void shouldCallCreateCathedra() {
         cathedraService.create(cathedra);
 
         verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).create(cathedra);
     }
 
     @Test
-    void shouldCallGetByCathedraId() throws DaoException {
+    void shouldCallGetByCathedraId() {
         when(mockCathedraDAO.getById(ID_1_VALUE)).thenReturn(cathedra);
         Cathedra actualCathedra = cathedraService.getById(ID_1_VALUE);
 
@@ -66,7 +59,7 @@ class CathedraServiceImplTest {
     }
 
     @Test
-    void shouldCallGetAllCathedras() throws DaoException {
+    void shouldCallGetAllCathedras() {
         when(mockCathedraDAO.getAll()).thenReturn(cathedras);
         List<Cathedra> actualCathedras = cathedraService.getAll();
 
@@ -75,7 +68,7 @@ class CathedraServiceImplTest {
     }
 
     @Test
-    void shouldCallGetAllCathedrasPageable() throws DaoException {
+    void shouldCallGetAllCathedrasPageable() {
         cathedras = new ArrayList<>();
         cathedras.add(new Cathedra(ID_1_VALUE, CATHEDRA_1_NAME_VALUE));
         Pageable pageable = PageRequest.of(PAGE, SIZE);
@@ -90,69 +83,25 @@ class CathedraServiceImplTest {
 
 
     @Test
-    void shouldCallUpdateCathedra() throws DaoException {
-        cathedraService.update(ID_1_VALUE, cathedra);
+    void shouldCallUpdateCathedra() {
+        cathedraService.update(cathedra);
 
-        verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).update(ID_1_VALUE, cathedra);
+        verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).update(cathedra);
     }
 
     @Test
-    void shouldCallDeleteCathedra() throws DaoException {
+    void shouldCallDeleteCathedra() {
         cathedraService.delete(ID_1_VALUE);
 
         verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).delete(ID_1_VALUE);
     }
 
     @Test
-    void shouldThrowServiceExceptionWhenCantCreateCathedra() throws DaoException {
-        String message = format(SERVICE_EXCEPTION_MESSAGE_CREATE, CATHEDRA);
-        doThrow(new ServiceException(message)).when(mockCathedraDAO).create(cathedra);
-
-        Exception exception = assertThrows(ServiceException.class, () -> mockCathedraDAO.create(cathedra));
-        String actual = exception.getMessage();
-
-        assertEquals(message, actual);
-    }
-
-    @Test
-    void shouldThrowServiceExceptionWhenCantGetByCathedraId() throws DaoException {
-        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ID, GET, CATHEDRA, ID_5_VALUE);
+    void shouldThrowServiceExceptionWhenCantGetByCathedraId() {
+        String message = format(ENTITY_NOT_FOUND, CATHEDRA);
         doThrow(new ServiceException(message)).when(mockCathedraDAO).getById(ID_5_VALUE);
 
         Exception exception = assertThrows(ServiceException.class, () -> mockCathedraDAO.getById(ID_5_VALUE));
-        String actual = exception.getMessage();
-
-        assertEquals(message, actual);
-    }
-
-    @Test
-    void shouldThrowServiceExceptionWhenCantGetAllCathedras() throws DaoException {
-        String message = format(SERVICE_EXCEPTION_MESSAGE_GET_ALL, CATHEDRAS);
-        doThrow(new ServiceException(message)).when(mockCathedraDAO).getAll();
-
-        Exception exception = assertThrows(ServiceException.class, () -> mockCathedraDAO.getAll());
-        String actual = exception.getMessage();
-
-        assertEquals(message, actual);
-    }
-
-    @Test
-    void shouldThrowServiceExceptionWhenCantUpdateCathedra() throws DaoException {
-        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ID, UPDATE, CATHEDRA, ID_5_VALUE);
-        doThrow(new ServiceException(message)).when(mockCathedraDAO).update(ID_5_VALUE, cathedra);
-
-        Exception exception = assertThrows(ServiceException.class, () -> mockCathedraDAO.update(ID_5_VALUE, cathedra));
-        String actual = exception.getMessage();
-
-        assertEquals(message, actual);
-    }
-
-    @Test
-    void shouldThrowServiceExceptionWhenCantDeleteCathedra() throws DaoException {
-        String message = format(SERVICE_EXCEPTION_MESSAGE_BY_ID, DELETE, CATHEDRA, ID_5_VALUE);
-        doThrow(new ServiceException(message)).when(mockCathedraDAO).delete(ID_5_VALUE);
-
-        Exception exception = assertThrows(ServiceException.class, () -> mockCathedraDAO.delete(ID_5_VALUE));
         String actual = exception.getMessage();
 
         assertEquals(message, actual);
