@@ -2,14 +2,13 @@ package ua.com.foxminded.university.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.TestPropertySource;
 import ua.com.foxminded.university.dao.CathedraDAO;
 import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
@@ -24,8 +23,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@ExtendWith(MockitoExtension.class)
-@SpringJUnitConfig(ServiceTestConfig.class)
+@SpringBootTest
+@TestPropertySource(locations = "classpath:application-test.properties")
 class CathedraServiceImplTest {
     @Mock
     private CathedraDAO mockCathedraDAO;

@@ -1,34 +1,26 @@
 package ua.com.foxminded.university.controllers;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import ua.com.foxminded.university.entities.*;
-
-import javax.sql.DataSource;
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.entities.MonthTimetable;
 
 import static java.lang.String.format;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {WebTestConfig.class})
-@WebAppConfiguration
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@TestPropertySource(locations = "classpath:application-test.properties")
 class MonthTimetableControllerTest {
     private static final String GET_ALL_URL_TEMPLATE = "/month-timetables/";
     private static final String GET_ALL_VIEW_NAME = "/monthtimetables/month-timetables";
@@ -52,22 +44,8 @@ class MonthTimetableControllerTest {
     private static final String MONTH_TIMETABLES_VIEW_NAME = "month-timetables";
 
 
+    @Autowired
     public MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
-    private DataSource dataSource;
-
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-
-        ResourceDatabasePopulator tables = new ResourceDatabasePopulator();
-        tables.addScript(new ClassPathResource(TEST_DATA_SQL_PATH));
-        DatabasePopulatorUtils.execute(tables, dataSource);
-    }
 
     @Test
     void shouldReturnCorrectedMonthTimetablesPageWhenGetMonthTimetablesPage() throws Exception {
@@ -148,16 +126,14 @@ class MonthTimetableControllerTest {
     void shouldCheckForAttributeExistenceWhenCreateNewTimetablePage() throws Exception {
         mockMvc.perform(post(POST_NEW_TIMETABLE_URL_TEMPLATE)
             .param(DATE, String.valueOf(MONTH_TIMETABLE_DATE_VALUE_1)))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(model().attributeExists(MONTH_TIMETABLE));
+            .andExpect(status().is3xxRedirection());
     }
 
     @Test
     void shouldCheckForAttributeExistenceWhenEditTimetablePage() throws Exception {
         mockMvc.perform(patch(POST_EDIT_TIMETABLE_URL_TEMPLATE)
             .param(DATE, String.valueOf(MONTH_TIMETABLE_DATE_VALUE_1)))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(model().attributeExists(MONTH_TIMETABLE));
+            .andExpect(status().is3xxRedirection());
     }
 
     @Test

@@ -1,14 +1,15 @@
 package ua.com.foxminded.university.entities;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
-import java.util.Objects;
 
-@Entity
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
+@EqualsAndHashCode
+@Entity
 @Table(name = "students")
 public class Student {
     @Id
@@ -25,10 +26,8 @@ public class Student {
     @Column(name = "phone")
     private String phone;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST,
-        CascadeType.DETACH,
-        CascadeType.REFRESH,
-        CascadeType.MERGE})
+    @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "group_id")
     private Group group;
 
@@ -37,27 +36,5 @@ public class Student {
         this.firstName = firstName;
         this.lastName = lastName;
         this.phone = phone;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Student student = (Student) o;
-        return id == student.id && Objects.equals(firstName, student.firstName) && Objects.equals(lastName, student.lastName) && Objects.equals(phone, student.phone);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, firstName, lastName, phone);
-    }
-
-    @Override
-    public String toString() {
-        return "Student{" +
-            "firstName='" + firstName + '\'' +
-            ", lastName='" + lastName + '\'' +
-            ", phone='" + phone + '\'' +
-            '}';
     }
 }

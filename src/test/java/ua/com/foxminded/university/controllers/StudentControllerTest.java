@@ -1,23 +1,14 @@
 package ua.com.foxminded.university.controllers;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import ua.com.foxminded.university.entities.Cathedra;
-import ua.com.foxminded.university.entities.Group;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.entities.Student;
-
-import javax.sql.DataSource;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -26,9 +17,11 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {WebTestConfig.class})
-@WebAppConfiguration
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@TestPropertySource(locations = "classpath:application-test.properties")
 class StudentControllerTest {
     private static final String GET_ALL_URL_TEMPLATE = "/students/";
     private static final String GET_ALL_VIEW_NAME = "/students/students";
@@ -56,22 +49,8 @@ class StudentControllerTest {
     private static final String DELETE_STUDENT_VIEW_NAME = "/students/1";
 
 
+    @Autowired
     public MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
-    private DataSource dataSource;
-
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-
-        ResourceDatabasePopulator tables = new ResourceDatabasePopulator();
-        tables.addScript(new ClassPathResource(TEST_DATA_SQL_PATH));
-        DatabasePopulatorUtils.execute(tables, dataSource);
-    }
 
     @Test
     void shouldReturnCorrectedStudentsPageWhenGetStudentsPage() throws Exception {
@@ -176,8 +155,7 @@ class StudentControllerTest {
             .param(LAST_NAME, STUDENT_1_LAST_NAME_VALUE)
             .param(PHONE, STUDENT_1_PHONE_VALUE)
             .param(GROUP_ID, valueOf(ID_1_VALUE)))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(model().attributeExists(STUDENT));
+            .andExpect(status().is3xxRedirection());
     }
 
     @Test
@@ -186,8 +164,7 @@ class StudentControllerTest {
             .param(FIRST_NAME, STUDENT_1_FIRST_NAME_VALUE)
             .param(LAST_NAME, STUDENT_1_LAST_NAME_VALUE)
             .param(PHONE, STUDENT_1_PHONE_VALUE))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(model().attributeExists(STUDENT));
+            .andExpect(status().is3xxRedirection());
     }
 
     @Test

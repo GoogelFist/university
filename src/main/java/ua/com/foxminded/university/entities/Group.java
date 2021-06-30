@@ -1,15 +1,16 @@
 package ua.com.foxminded.university.entities;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Objects;
 
-@Entity
-@Data
+@Getter
+@Setter
+@ToString
 @NoArgsConstructor
+@EqualsAndHashCode
+@Entity
 @Table(name = "groups")
 public class Group {
     @Id
@@ -20,35 +21,18 @@ public class Group {
     @Column(name = "name")
     private String name;
 
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "group")
     private List<Student> students;
 
     @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "cathedra_id")
     private Cathedra cathedra;
 
     public Group(int id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Group group = (Group) o;
-        return id == group.id && Objects.equals(name, group.name);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, name);
-    }
-
-    @Override
-    public String toString() {
-        return "Group{" +
-            "name='" + name + '\'' +
-            '}';
     }
 }

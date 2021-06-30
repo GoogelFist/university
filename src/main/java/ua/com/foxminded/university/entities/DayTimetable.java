@@ -1,17 +1,18 @@
 package ua.com.foxminded.university.entities;
 
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 import java.time.LocalTime;
-import java.util.Objects;
 
-@Data
+@Getter
+@Setter
+@ToString
+@NoArgsConstructor
+@EqualsAndHashCode
 @Entity
 @Table(name = "day_timetables")
-@NoArgsConstructor
 public class DayTimetable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,24 +29,18 @@ public class DayTimetable {
     @Column(name = "subject")
     private String subject;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST,
-        CascadeType.DETACH,
-        CascadeType.REFRESH,
-        CascadeType.MERGE})
+    @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "group_id")
     private Group group;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST,
-        CascadeType.DETACH,
-        CascadeType.REFRESH,
-        CascadeType.MERGE})
+    @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
-    @ManyToOne(cascade = {CascadeType.PERSIST,
-        CascadeType.DETACH,
-        CascadeType.REFRESH,
-        CascadeType.MERGE})
+    @ManyToOne
+    @EqualsAndHashCode.Exclude
     @JoinColumn(name = "month_timetable_id")
     private MonthTimetable monthTimetable;
 
@@ -54,27 +49,5 @@ public class DayTimetable {
         this.startTime = startTime;
         this.lectureHall = lectureHall;
         this.subject = subject;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        DayTimetable that = (DayTimetable) o;
-        return id == that.id && Objects.equals(startTime, that.startTime) && Objects.equals(lectureHall, that.lectureHall) && Objects.equals(subject, that.subject);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(id, startTime, lectureHall, subject);
-    }
-
-    @Override
-    public String toString() {
-        return "DayTimetable{" +
-            "startTime=" + startTime +
-            ", lectureHall='" + lectureHall + '\'' +
-            ", subject='" + subject + '\'' +
-            '}';
     }
 }

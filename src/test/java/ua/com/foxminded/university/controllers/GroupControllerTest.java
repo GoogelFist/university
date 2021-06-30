@@ -1,36 +1,27 @@
 package ua.com.foxminded.university.controllers;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import ua.com.foxminded.university.entities.Cathedra;
+import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.entities.Group;
-import ua.com.foxminded.university.entities.Student;
-
-import javax.sql.DataSource;
-import java.util.List;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
-import static java.util.Collections.singletonList;
 import static org.hamcrest.Matchers.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {WebTestConfig.class})
-@WebAppConfiguration
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
+@TestPropertySource(locations = "classpath:application-test.properties")
 class GroupControllerTest {
     private static final String GET_ALL_URL_TEMPLATE = "/groups/";
     private static final String GET_ALL_VIEW_NAME = "/groups/groups";
@@ -58,22 +49,8 @@ class GroupControllerTest {
     private static final String DELETE_GROUP_VIEW_NAME = "/groups/1";
 
 
+    @Autowired
     public MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
-    private DataSource dataSource;
-
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-
-        ResourceDatabasePopulator tables = new ResourceDatabasePopulator();
-        tables.addScript(new ClassPathResource(TEST_DATA_SQL_PATH));
-        DatabasePopulatorUtils.execute(tables, dataSource);
-    }
 
     @Test
     void shouldReturnCorrectedGroupsPageWhenGetGroupsPage() throws Exception {
@@ -172,16 +149,14 @@ class GroupControllerTest {
         mockMvc.perform(post(POST_NEW_GROUP_URL_TEMPLATE)
             .param(NAME, GROUP_1_NAME_VALUE)
             .param(CATHEDRA_ID, valueOf(ID_1_VALUE)))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(model().attributeExists(GROUP));
+            .andExpect(status().is3xxRedirection());
     }
 
     @Test
     void shouldCheckForAttributeExistenceWhenEditGroupPage() throws Exception {
         mockMvc.perform(patch(POST_EDIT_GROUP_URL_TEMPLATE)
             .param(NAME, GROUP_1_NAME_VALUE))
-            .andExpect(status().is3xxRedirection())
-            .andExpect(model().attributeExists(GROUP));
+            .andExpect(status().is3xxRedirection());
     }
 
     @Test

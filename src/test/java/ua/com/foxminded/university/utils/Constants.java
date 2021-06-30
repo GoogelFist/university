@@ -6,7 +6,8 @@ import java.time.LocalTime;
 public class Constants {
     private Constants() {
     }
-    public static final String TEST_DATA_SQL_PATH = "/testData.sql";
+
+    public static final String TEST_DATA_SQL_PATH = "/data.sql";
     public static final String CREATE_TABLES_SQL_PATH = "classpath:createTestTable.sql";
 
     public static final String TOTAL_ELEMENTS = "totalElements";

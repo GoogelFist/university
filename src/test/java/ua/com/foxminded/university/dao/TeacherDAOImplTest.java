@@ -3,10 +3,11 @@ package ua.com.foxminded.university.dao;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
 import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.entities.Teacher;
 
@@ -17,8 +18,9 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static ua.com.foxminded.university.utils.Constants.*;
 
-@SpringJUnitConfig(DaoTestConfig.class)
+@SpringBootTest
 @Transactional
+@TestPropertySource(locations = "classpath:application-test.properties")
 class TeacherDAOImplTest {
     @Autowired
     private TeacherDAO teacherDAO;

@@ -1,32 +1,25 @@
 package ua.com.foxminded.university.controllers.handlers;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ClassPathResource;
-import org.springframework.jdbc.datasource.init.DatabasePopulatorUtils;
-import org.springframework.jdbc.datasource.init.ResourceDatabasePopulator;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.context.web.WebAppConfiguration;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
-import ua.com.foxminded.university.controllers.WebTestConfig;
-
-import javax.sql.DataSource;
+import org.springframework.transaction.annotation.Transactional;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static ua.com.foxminded.university.utils.Constants.*;
+import static ua.com.foxminded.university.utils.Constants.MESSAGE_PROPERTY_NAME;
+import static ua.com.foxminded.university.utils.Constants.STUDENT;
 
-@ExtendWith(SpringExtension.class)
-@ContextConfiguration(classes = {WebTestConfig.class})
-@WebAppConfiguration
+@SpringBootTest
+@AutoConfigureMockMvc
+@Transactional
+@TestPropertySource(locations = "classpath:application-test.properties")
 class GlobalExceptionHandlerTest {
     private static final String ERROR_URL_TEMPLATE = "/students/101";
     private static final String ERROR_ATTRIBUTE = "exception";
@@ -36,22 +29,8 @@ class GlobalExceptionHandlerTest {
     private static final String STUDENT_ID = "101";
 
 
+    @Autowired
     public MockMvc mockMvc;
-
-    @Autowired
-    private WebApplicationContext context;
-
-    @Autowired
-    private DataSource dataSource;
-
-    @BeforeEach
-    void setup() {
-        mockMvc = MockMvcBuilders.webAppContextSetup(context).build();
-
-        ResourceDatabasePopulator tables = new ResourceDatabasePopulator();
-        tables.addScript(new ClassPathResource(TEST_DATA_SQL_PATH));
-        DatabasePopulatorUtils.execute(tables, dataSource);
-    }
 
     @Test
     void shouldReturnCorrectedErrorPageWhenGetIncorrectStudentsPage() throws Exception {

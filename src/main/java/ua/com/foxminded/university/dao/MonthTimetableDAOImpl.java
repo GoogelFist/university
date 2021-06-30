@@ -2,11 +2,11 @@ package ua.com.foxminded.university.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.entities.MonthTimetable;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Slf4j
@@ -28,18 +28,19 @@ public class MonthTimetableDAOImpl implements MonthTimetableDAO {
     private static final String DELETED = "{} was deleted";
 
 
-    private final SessionFactory sessionFactory;
+    private final EntityManager entityManager;
 
     @Autowired
-    public MonthTimetableDAOImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public MonthTimetableDAOImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
     public void create(MonthTimetable monthTimetable) {
         log.debug(CREATE, monthTimetable);
 
-        sessionFactory.getCurrentSession().saveOrUpdate(monthTimetable);
+        Session session = entityManager.unwrap(Session.class);
+        session.saveOrUpdate(monthTimetable);
 
         log.debug(CREATED, monthTimetable);
     }
@@ -48,7 +49,8 @@ public class MonthTimetableDAOImpl implements MonthTimetableDAO {
     public MonthTimetable getById(int id) {
         log.debug(GET_BY_ID, id);
 
-        MonthTimetable monthTimetable = sessionFactory.getCurrentSession().get(MonthTimetable.class, id);
+        Session session = entityManager.unwrap(Session.class);
+        MonthTimetable monthTimetable = session.get(MonthTimetable.class, id);
 
         log.debug(FOUND_BY_ID, monthTimetable);
         return monthTimetable;
@@ -58,8 +60,9 @@ public class MonthTimetableDAOImpl implements MonthTimetableDAO {
     public List<MonthTimetable> getAll() {
         log.debug(GET_ALL);
 
+        Session session = entityManager.unwrap(Session.class);
         @SuppressWarnings("unchecked")
-        List<MonthTimetable> monthTimetables = sessionFactory.getCurrentSession().createQuery(QUERY_GET_ALL).list();
+        List<MonthTimetable> monthTimetables = session.createQuery(QUERY_GET_ALL).list();
 
         log.debug(FOUND_ALL, monthTimetables.size(), MONTH_TIMETABLES);
         return monthTimetables;
@@ -69,7 +72,8 @@ public class MonthTimetableDAOImpl implements MonthTimetableDAO {
     public void update(MonthTimetable monthTimetable) {
         log.debug(UPDATE, monthTimetable);
 
-        sessionFactory.getCurrentSession().update(monthTimetable);
+        Session session = entityManager.unwrap(Session.class);
+        session.update(monthTimetable);
 
         log.debug(UPDATED, monthTimetable);
     }
@@ -78,7 +82,7 @@ public class MonthTimetableDAOImpl implements MonthTimetableDAO {
     public void delete(int id) {
         log.debug(DELETE, id);
 
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
         MonthTimetable monthTimetable = session.get(MonthTimetable.class, id);
 
         if (monthTimetable != null) {

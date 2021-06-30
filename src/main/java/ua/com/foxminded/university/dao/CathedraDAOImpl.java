@@ -2,11 +2,11 @@ package ua.com.foxminded.university.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.entities.Cathedra;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Slf4j
@@ -27,18 +27,19 @@ public class CathedraDAOImpl implements CathedraDAO {
     private static final String DELETED = "{} was deleted";
 
 
-    private final SessionFactory sessionFactory;
+    private final EntityManager entityManager;
 
     @Autowired
-    public CathedraDAOImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public CathedraDAOImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
     public void create(Cathedra cathedra) {
         log.debug(CREATE, cathedra);
 
-        sessionFactory.getCurrentSession().saveOrUpdate(cathedra);
+        Session session = entityManager.unwrap(Session.class);
+        session.saveOrUpdate(cathedra);
 
         log.debug(CREATED, cathedra);
     }
@@ -47,7 +48,8 @@ public class CathedraDAOImpl implements CathedraDAO {
     public Cathedra getById(int id) {
         log.debug(GET_BY_ID, id);
 
-        Cathedra cathedra = sessionFactory.getCurrentSession().get(Cathedra.class, id);
+        Session session = entityManager.unwrap(Session.class);
+        Cathedra cathedra = session.get(Cathedra.class, id);
 
         log.debug(FOUND_BY_ID, cathedra);
         return cathedra;
@@ -57,8 +59,9 @@ public class CathedraDAOImpl implements CathedraDAO {
     public List<Cathedra> getAll() {
         log.debug(GET_ALL);
 
+        Session session = entityManager.unwrap(Session.class);
         @SuppressWarnings("unchecked")
-        List<Cathedra> cathedras = sessionFactory.getCurrentSession().createQuery(QUERY_GET_ALL).list();
+        List<Cathedra> cathedras = session.createQuery(QUERY_GET_ALL).list();
 
         log.debug(FOUND_ALL, cathedras.size(), CATHEDRAS);
         return cathedras;
@@ -68,7 +71,8 @@ public class CathedraDAOImpl implements CathedraDAO {
     public void update(Cathedra cathedra) {
         log.debug(UPDATE, cathedra);
 
-        sessionFactory.getCurrentSession().update(cathedra);
+        Session session = entityManager.unwrap(Session.class);
+        session.update(cathedra);
 
         log.debug(UPDATED, cathedra);
     }
@@ -77,7 +81,7 @@ public class CathedraDAOImpl implements CathedraDAO {
     public void delete(int id) {
         log.debug(DELETE, id);
 
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
         Cathedra cathedra = session.get(Cathedra.class, id);
 
         if (cathedra != null) {

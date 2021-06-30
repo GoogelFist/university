@@ -2,11 +2,11 @@ package ua.com.foxminded.university.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.entities.Group;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Slf4j
@@ -31,18 +31,19 @@ public class GroupDAOImpl implements GroupDAO {
     private static final String FOUND_BY_CATHEDRA_ID = "Found {} {}";
 
 
-    private final SessionFactory sessionFactory;
+    private final EntityManager entityManager;
 
     @Autowired
-    public GroupDAOImpl(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public GroupDAOImpl(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
     public void create(Group group) {
         log.debug(CREATE, group);
 
-        sessionFactory.getCurrentSession().saveOrUpdate(group);
+        Session session = entityManager.unwrap(Session.class);
+        session.saveOrUpdate(group);
 
         log.debug(CREATED, group);
     }
@@ -51,7 +52,8 @@ public class GroupDAOImpl implements GroupDAO {
     public Group getById(int id) {
         log.debug(GET_BY_ID, id);
 
-        Group group = sessionFactory.getCurrentSession().get(Group.class, id);
+        Session session = entityManager.unwrap(Session.class);
+        Group group = session.get(Group.class, id);
 
         log.debug(FOUND_BY_ID, group);
         return group;
@@ -61,8 +63,9 @@ public class GroupDAOImpl implements GroupDAO {
     public List<Group> getAll() {
         log.debug(GET_ALL);
 
+        Session session = entityManager.unwrap(Session.class);
         @SuppressWarnings("unchecked")
-        List<Group> groups = sessionFactory.getCurrentSession().createQuery(QUERY_GET_ALL).list();
+        List<Group> groups = session.createQuery(QUERY_GET_ALL).list();
 
         log.debug(FOUND_ALL, groups.size(), GROUPS);
         return groups;
@@ -72,7 +75,8 @@ public class GroupDAOImpl implements GroupDAO {
     public void update(Group group) {
         log.debug(UPDATE, group);
 
-        sessionFactory.getCurrentSession().update(group);
+        Session session = entityManager.unwrap(Session.class);
+        session.update(group);
 
         log.debug(UPDATED, group);
     }
@@ -81,7 +85,7 @@ public class GroupDAOImpl implements GroupDAO {
     public void delete(int id) {
         log.debug(DELETE, id);
 
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
         Group group = session.get(Group.class, id);
 
         if (group != null) {
@@ -94,8 +98,9 @@ public class GroupDAOImpl implements GroupDAO {
     public List<Group> getByCathedraId(int cathedraId) {
         log.debug(GET_BY_CATHEDRA_ID, cathedraId);
 
+        Session session = entityManager.unwrap(Session.class);
         @SuppressWarnings("unchecked")
-        List<Group> groups = sessionFactory.getCurrentSession().createQuery(QUERY_GET_BY_GROUP_ID).setParameter(CATHEDRA_ID, cathedraId).list();
+        List<Group> groups = session.createQuery(QUERY_GET_BY_GROUP_ID).setParameter(CATHEDRA_ID, cathedraId).list();
 
         log.debug(FOUND_BY_CATHEDRA_ID, groups.size(), GROUPS);
         return groups;

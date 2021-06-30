@@ -2,11 +2,11 @@ package ua.com.foxminded.university.dao;
 
 import lombok.extern.slf4j.Slf4j;
 import org.hibernate.Session;
-import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 import ua.com.foxminded.university.entities.DayTimetable;
 
+import javax.persistence.EntityManager;
 import java.util.List;
 
 @Slf4j
@@ -32,18 +32,19 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     private static final String FOUND_BY_MONTH_TIMETABLE = "Found {} {}";
 
 
-    private final SessionFactory sessionFactory;
+    private final EntityManager entityManager;
 
     @Autowired
-    public DayTimetableDAOIml(SessionFactory sessionFactory) {
-        this.sessionFactory = sessionFactory;
+    public DayTimetableDAOIml(EntityManager entityManager) {
+        this.entityManager = entityManager;
     }
 
     @Override
     public void create(DayTimetable dayTimetable) {
         log.debug(CREATE, dayTimetable);
 
-        sessionFactory.getCurrentSession().saveOrUpdate(dayTimetable);
+        Session session = entityManager.unwrap(Session.class);
+        session.saveOrUpdate(dayTimetable);
 
         log.debug(CREATED, dayTimetable);
     }
@@ -52,7 +53,8 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     public DayTimetable getById(int id) {
         log.debug(GET_BY_ID, id);
 
-        DayTimetable dayTimetable = sessionFactory.getCurrentSession().get(DayTimetable.class, id);
+        Session session = entityManager.unwrap(Session.class);
+        DayTimetable dayTimetable = session.get(DayTimetable.class, id);
 
         log.debug(FOUND_BY_ID, dayTimetable);
         return dayTimetable;
@@ -62,8 +64,9 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     public List<DayTimetable> getAll() {
         log.debug(GET_ALL);
 
+        Session session = entityManager.unwrap(Session.class);
         @SuppressWarnings("unchecked")
-        List<DayTimetable> dayTimetables = sessionFactory.getCurrentSession().createQuery(QUERY_GET_ALL).list();
+        List<DayTimetable> dayTimetables = session.createQuery(QUERY_GET_ALL).list();
 
         log.debug(FOUND_ALL, dayTimetables.size(), DAY_TIMETABLES);
         return dayTimetables;
@@ -73,7 +76,8 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     public void update(DayTimetable dayTimetable) {
         log.debug(UPDATE, dayTimetable);
 
-        sessionFactory.getCurrentSession().update(dayTimetable);
+        Session session = entityManager.unwrap(Session.class);
+        session.update(dayTimetable);
 
         log.debug(UPDATED, dayTimetable);
     }
@@ -82,7 +86,7 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     public void delete(int id) {
         log.debug(DELETE, id);
 
-        Session session = sessionFactory.getCurrentSession();
+        Session session = entityManager.unwrap(Session.class);
         DayTimetable dayTimetable = session.get(DayTimetable.class, id);
 
         if (dayTimetable != null) {
@@ -95,8 +99,9 @@ public class DayTimetableDAOIml implements DayTimetableDAO {
     public List<DayTimetable> getByMonthTimetableId(int id) {
         log.debug(GET_BY_MONTH_TIMETABLE_ID, id);
 
+        Session session = entityManager.unwrap(Session.class);
         @SuppressWarnings("unchecked")
-        List<DayTimetable> dayTimetables = sessionFactory.getCurrentSession().createQuery(QUERY_GET_BY_MONTH_TIMETABLE_ID).setParameter(MONTH_TIMETABLE_ID, id).list();
+        List<DayTimetable> dayTimetables = session.createQuery(QUERY_GET_BY_MONTH_TIMETABLE_ID).setParameter(MONTH_TIMETABLE_ID, id).list();
 
         log.debug(FOUND_BY_MONTH_TIMETABLE, dayTimetables.size(), DAY_TIMETABLES);
         return dayTimetables;
