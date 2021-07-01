@@ -9,8 +9,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
-import ua.com.foxminded.university.dao.CathedraDAO;
 import ua.com.foxminded.university.entities.Cathedra;
+import ua.com.foxminded.university.repository.CathedraRepository;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import static ua.com.foxminded.university.utils.Constants.*;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class CathedraServiceImplTest {
     @Mock
-    private CathedraDAO mockCathedraDAO;
+    private CathedraRepository mockCathedraRepository;
 
     private CathedraService cathedraService;
     private Cathedra cathedra;
@@ -35,7 +35,7 @@ class CathedraServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        cathedraService = new CathedraServiceImpl(mockCathedraDAO);
+        cathedraService = new CathedraServiceImpl(mockCathedraRepository);
         cathedra = new Cathedra(ID_1_VALUE, CATHEDRA_1_NAME_VALUE);
         cathedras = singletonList(cathedra);
     }
@@ -44,25 +44,25 @@ class CathedraServiceImplTest {
     void shouldCallCreateCathedra() {
         cathedraService.create(cathedra);
 
-        verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).create(cathedra);
+        verify(mockCathedraRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).save(cathedra);
     }
 
     @Test
     void shouldCallGetByCathedraId() {
-        when(mockCathedraDAO.getById(ID_1_VALUE)).thenReturn(cathedra);
+        when(mockCathedraRepository.findById(ID_1_VALUE)).thenReturn(java.util.Optional.ofNullable(cathedra));
         Cathedra actualCathedra = cathedraService.getById(ID_1_VALUE);
 
-        verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
+        verify(mockCathedraRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findById(ID_1_VALUE);
 
         assertEquals(cathedra, actualCathedra);
     }
 
     @Test
     void shouldCallGetAllCathedras() {
-        when(mockCathedraDAO.getAll()).thenReturn(cathedras);
+        when(mockCathedraRepository.findAll()).thenReturn(cathedras);
         List<Cathedra> actualCathedras = cathedraService.getAll();
 
-        verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getAll();
+        verify(mockCathedraRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll();
         assertEquals(cathedras, actualCathedras);
     }
 
@@ -71,13 +71,14 @@ class CathedraServiceImplTest {
         cathedras = new ArrayList<>();
         cathedras.add(new Cathedra(ID_1_VALUE, CATHEDRA_1_NAME_VALUE));
         Pageable pageable = PageRequest.of(PAGE, SIZE);
-        when(mockCathedraDAO.getAll()).thenReturn(cathedras);
+        Page<Cathedra> expectedPageCathedras = new PageImpl<>(cathedras, pageable, cathedras.size());
 
-        Page<Cathedra> expectedPageStudents = new PageImpl<>(cathedras, pageable, cathedras.size());
+        when(mockCathedraRepository.findAll(pageable)).thenReturn(expectedPageCathedras);
+
         Page<Cathedra> actualPageStudents = cathedraService.getAll(pageable);
 
-        verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getAll();
-        assertEquals(expectedPageStudents, actualPageStudents);
+        verify(mockCathedraRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll(pageable);
+        assertEquals(expectedPageCathedras, actualPageStudents);
     }
 
 
@@ -85,22 +86,22 @@ class CathedraServiceImplTest {
     void shouldCallUpdateCathedra() {
         cathedraService.update(cathedra);
 
-        verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).update(cathedra);
+        verify(mockCathedraRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).save(cathedra);
     }
 
     @Test
     void shouldCallDeleteCathedra() {
         cathedraService.delete(ID_1_VALUE);
 
-        verify(mockCathedraDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).delete(ID_1_VALUE);
+        verify(mockCathedraRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).deleteById(ID_1_VALUE);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantGetByCathedraId() {
         String message = format(ENTITY_NOT_FOUND, CATHEDRA);
-        doThrow(new ServiceException(message)).when(mockCathedraDAO).getById(ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockCathedraRepository).findById(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockCathedraDAO.getById(ID_5_VALUE));
+        Exception exception = assertThrows(ServiceException.class, () -> mockCathedraRepository.findById(ID_5_VALUE));
         String actual = exception.getMessage();
 
         assertEquals(message, actual);

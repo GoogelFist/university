@@ -9,7 +9,7 @@ import java.util.List;
 public interface DayTimeTableService extends GenericServiceJpa<DayTimetable> {
     Page<DayTimetable> getAll(Pageable pageable);
 
-    List<DayTimetable> getByMonthTimetableId(int id);
+    List<DayTimetable> getByMonthTimetableId(int monthTimetableId);
 
-    Page<DayTimetable> getByMonthTimetableId(int id, Pageable pageable);
+    Page<DayTimetable> getByMonthTimetableId(int monthTimetableId, Pageable pageable);
 }

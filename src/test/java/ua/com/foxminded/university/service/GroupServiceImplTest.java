@@ -9,8 +9,8 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
-import ua.com.foxminded.university.dao.GroupDAO;
 import ua.com.foxminded.university.entities.Group;
+import ua.com.foxminded.university.repository.GroupRepository;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import static ua.com.foxminded.university.utils.Constants.*;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class GroupServiceImplTest {
     @Mock
-    private GroupDAO mockGroupDAO;
+    private GroupRepository mockGroupRepository;
 
     private GroupService groupService;
     private Group group;
@@ -35,7 +35,7 @@ class GroupServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        groupService = new GroupServiceImpl(mockGroupDAO);
+        groupService = new GroupServiceImpl(mockGroupRepository);
         group = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE);
         groups = singletonList(group);
     }
@@ -44,24 +44,25 @@ class GroupServiceImplTest {
     void shouldCallCreateGroup() {
         groupService.create(group);
 
-        verify(mockGroupDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).create(group);
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).save(group);
     }
 
     @Test
     void shouldCallGetGroupByID() {
-        when(mockGroupDAO.getById(ID_1_VALUE)).thenReturn(group);
+        when(mockGroupRepository.findById(ID_1_VALUE)).thenReturn(java.util.Optional.ofNullable(group));
+
         Group actualGroup = groupService.getById(ID_1_VALUE);
 
-        verify(mockGroupDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getById(ID_1_VALUE);
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findById(ID_1_VALUE);
         assertEquals(group, actualGroup);
     }
 
     @Test
     void shouldCallGetAllGroups() {
-        when(mockGroupDAO.getAll()).thenReturn(groups);
+        when(mockGroupRepository.findAll()).thenReturn(groups);
         List<Group> actualGroups = groupService.getAll();
 
-        verify(mockGroupDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getAll();
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll();
         assertEquals(groups, actualGroups);
     }
 
@@ -70,12 +71,13 @@ class GroupServiceImplTest {
         Pageable pageable = PageRequest.of(PAGE, SIZE);
         groups = new ArrayList<>();
         groups.add(new Group(ID_1_VALUE, GROUP_1_NAME_VALUE));
-        when(mockGroupDAO.getAll()).thenReturn(groups);
-
         Page<Group> expectedPageGroups = new PageImpl<>(groups, pageable, groups.size());
+
+        when(mockGroupRepository.findAll(pageable)).thenReturn(expectedPageGroups);
+
         Page<Group> actualPageGroups = groupService.getAll(pageable);
 
-        verify(mockGroupDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getAll();
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll(pageable);
         assertEquals(expectedPageGroups, actualPageGroups);
     }
 
@@ -83,22 +85,22 @@ class GroupServiceImplTest {
     void shouldCallUpdateGroup() {
         groupService.update(group);
 
-        verify(mockGroupDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).update(group);
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).save(group);
     }
 
     @Test
     void shouldCallDeleteGroup() {
         groupService.delete(ID_1_VALUE);
 
-        verify(mockGroupDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).delete(ID_1_VALUE);
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).deleteById(ID_1_VALUE);
     }
 
     @Test
     void shouldCallGetGroupsByCathedraId() {
-        when(mockGroupDAO.getByCathedraId(ID_1_VALUE)).thenReturn(groups);
+        when(mockGroupRepository.findByCathedraId(ID_1_VALUE)).thenReturn(groups);
         List<Group> actualGroups = groupService.getByCathedraId(ID_1_VALUE);
 
-        verify(mockGroupDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByCathedraId(ID_1_VALUE);
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findByCathedraId(ID_1_VALUE);
         assertEquals(groups, actualGroups);
     }
 
@@ -107,21 +109,22 @@ class GroupServiceImplTest {
         Pageable pageable = PageRequest.of(PAGE, SIZE);
         groups = new ArrayList<>();
         groups.add(new Group(ID_1_VALUE, GROUP_1_NAME_VALUE));
-        when(mockGroupDAO.getByCathedraId(ID_1_VALUE)).thenReturn(groups);
+        Page<Group> expectedPageGroups = new PageImpl<>(groups, pageable, groups.size());
 
-        Page<Group> expectedPageStudents = new PageImpl<>(groups, pageable, groups.size());
+        when(mockGroupRepository.findByCathedraId(ID_1_VALUE, pageable)).thenReturn(expectedPageGroups);
+
         Page<Group> actualPageStudents = groupService.getByCathedraId(ID_1_VALUE, pageable);
 
-        verify(mockGroupDAO, times(NUMBER_OF_INVOCATIONS_VALUE)).getByCathedraId(ID_1_VALUE);
-        assertEquals(expectedPageStudents, actualPageStudents);
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findByCathedraId(ID_1_VALUE, pageable);
+        assertEquals(expectedPageGroups, actualPageStudents);
     }
 
     @Test
     void shouldThrowServiceExceptionWhenCantGetByGroupId() {
         String message = format(ENTITY_NOT_FOUND, GROUP);
-        doThrow(new ServiceException(message)).when(mockGroupDAO).getById(ID_5_VALUE);
+        doThrow(new ServiceException(message)).when(mockGroupRepository).findById(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockGroupDAO.getById(ID_5_VALUE));
+        Exception exception = assertThrows(ServiceException.class, () -> mockGroupRepository.findById(ID_5_VALUE));
         String actual = exception.getMessage();
 
         assertEquals(message, actual);

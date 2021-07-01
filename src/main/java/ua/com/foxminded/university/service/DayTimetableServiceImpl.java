@@ -3,18 +3,15 @@ package ua.com.foxminded.university.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.dao.DayTimetableDAO;
 import ua.com.foxminded.university.entities.DayTimetable;
+import ua.com.foxminded.university.repository.DayTimetableRepository;
 import ua.com.foxminded.university.service.exceptions.ServiceException;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 
 import static java.lang.String.format;
 
@@ -36,97 +33,71 @@ public class DayTimetableServiceImpl implements DayTimeTableService {
     private static final String DAY_TIMETABLE = "dayTimetable";
 
 
-    private final DayTimetableDAO dayTimetableDAO;
+    private final DayTimetableRepository dayTimetableRepository;
 
     @Autowired
-    public DayTimetableServiceImpl(DayTimetableDAO dayTimetableDAO) {
-        this.dayTimetableDAO = dayTimetableDAO;
+    public DayTimetableServiceImpl(DayTimetableRepository dayTimetableRepository) {
+        this.dayTimetableRepository = dayTimetableRepository;
     }
 
     @Override
     public void create(DayTimetable dayTimetable) {
         log.debug(format(LOG_MESSAGE, CREATE), dayTimetable);
 
-        dayTimetableDAO.create(dayTimetable);
+        dayTimetableRepository.save(dayTimetable);
     }
 
     @Override
     public DayTimetable getById(int id) {
         log.debug(format(LOG_MESSAGE, GET_BY_ID), id);
 
-        DayTimetable dayTimetable = dayTimetableDAO.getById(id);
-        if (Objects.isNull(dayTimetable)) {
+        Optional<DayTimetable> optionalDayTimetable = dayTimetableRepository.findById(id);
+        if (!optionalDayTimetable.isPresent()) {
             String message = format(ERROR_MESSAGE, DAY_TIMETABLE, id);
             throw new ServiceException(message);
         }
-        return dayTimetable;
+        return optionalDayTimetable.get();
     }
 
     @Override
     public List<DayTimetable> getAll() {
         log.debug(format(LOG_MESSAGE, GET_ALL));
 
-        return dayTimetableDAO.getAll();
+        return (List<DayTimetable>) dayTimetableRepository.findAll();
     }
 
     @Override
     public Page<DayTimetable> getAll(Pageable pageable) {
         log.debug(format(LOG_MESSAGE, GET_ALL_PAGEABLE), pageable);
 
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<DayTimetable> list;
-
-        List<DayTimetable> dayTimetables = dayTimetableDAO.getAll();
-
-        if (dayTimetables.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, dayTimetables.size());
-            list = dayTimetables.subList(startItem, toIndex);
-        }
-        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), dayTimetables.size());
+        return dayTimetableRepository.findAll(pageable);
     }
 
     @Override
     public void update(DayTimetable dayTimetable) {
         log.debug(format(LOG_MESSAGE, UPDATE), dayTimetable);
 
-        dayTimetableDAO.update(dayTimetable);
+        dayTimetableRepository.save(dayTimetable);
     }
 
     @Override
     public void delete(int id) {
         log.debug(format(LOG_MESSAGE, DELETE), id);
 
-        dayTimetableDAO.delete(id);
+        dayTimetableRepository.deleteById(id);
     }
 
     @Override
-    public List<DayTimetable> getByMonthTimetableId(int id) {
-        log.debug(format(LOG_MESSAGE, GET_BY_MONTH_TIMETABLE_ID), id);
+    public List<DayTimetable> getByMonthTimetableId(int monthTimetableId) {
+        log.debug(format(LOG_MESSAGE, GET_BY_MONTH_TIMETABLE_ID), monthTimetableId);
 
-        return dayTimetableDAO.getByMonthTimetableId(id);
+        return dayTimetableRepository.findByMonthTimetableId(monthTimetableId);
     }
 
     @Override
-    public Page<DayTimetable> getByMonthTimetableId(int id, Pageable pageable) {
-        log.debug(format(LOG_MESSAGE, GET_BY_MONTH_TIMETABLE_ID_PAGEABLE), id, pageable);
+    public Page<DayTimetable> getByMonthTimetableId(int monthTimetableId, Pageable pageable) {
+        log.debug(format(LOG_MESSAGE, GET_BY_MONTH_TIMETABLE_ID_PAGEABLE), monthTimetableId, pageable);
 
-        int pageSize = pageable.getPageSize();
-        int currentPage = pageable.getPageNumber();
-        int startItem = currentPage * pageSize;
-        List<DayTimetable> list;
-
-        List<DayTimetable> dayTimetables = dayTimetableDAO.getByMonthTimetableId(id);
-
-        if (dayTimetables.size() < startItem) {
-            list = Collections.emptyList();
-        } else {
-            int toIndex = Math.min(startItem + pageSize, dayTimetables.size());
-            list = dayTimetables.subList(startItem, toIndex);
-        }
-        return new PageImpl<>(list, PageRequest.of(currentPage, pageSize), dayTimetables.size());
+        return dayTimetableRepository.findByMonthTimetableId(monthTimetableId, pageable);
     }
 }
