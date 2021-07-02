@@ -100,6 +100,18 @@ class TeacherControllerTest {
     }
 
     @Test
+    void shouldReturnCorrectedTeachersPageWhenCreateNewTeacherPageWithInvalidateParameters() throws Exception {
+        mockMvc.perform(post(POST_NEW_TEACHER_URL_TEMPLATE)
+            .param(FIRST_NAME, EMPTY_STRING)
+            .param(LAST_NAME, EMPTY_STRING)
+            .param(PHONE, EMPTY_STRING)
+            .param(QUALIFICATION, EMPTY_STRING)
+            .param(CATHEDRA_ID, valueOf(ID_1_VALUE)))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_NEW_TEACHER_VIEW_NAME));
+    }
+
+    @Test
     void shouldReturnCorrectedTeachersPageWhenEditTeacherPage() throws Exception {
         mockMvc.perform(patch(POST_EDIT_TEACHER_URL_TEMPLATE)
             .param(FIRST_NAME, TEACHER_1_FIRST_NAME_VALUE)
@@ -108,6 +120,17 @@ class TeacherControllerTest {
             .param(QUALIFICATION, QUALIFICATION_1_VALUE))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, TEACHERS)));
+    }
+
+    @Test
+    void shouldReturnCorrectedTeachersPageWhenEditTeacherPageWithInvalidateParameters() throws Exception {
+        mockMvc.perform(patch(POST_EDIT_TEACHER_URL_TEMPLATE)
+            .param(FIRST_NAME, EMPTY_STRING)
+            .param(LAST_NAME, EMPTY_STRING)
+            .param(PHONE, EMPTY_STRING)
+            .param(QUALIFICATION, EMPTY_STRING))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_EDIT_TEACHER_VIEW_NAME));
     }
 
     @Test

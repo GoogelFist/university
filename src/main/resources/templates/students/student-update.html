@@ -5,7 +5,53 @@
 
 <div th:replace="fragments/students-fragments :: menu-site-for-students"></div>
 
-<div th:replace="fragments/students-fragments :: update-student"></div>
+<div th:fragment="update-student">
+    <form th:method="PATCH" th:action="@{/students/{id}(id=${student.getId()})}" th:object="${student}"
+          class="row mb-1 m-lg-2">
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="firstName" class="form-label">First Name</label>
+                <input th:field="*{firstName}" id="firstName" type="text" class="form-control"
+                       placeholder="Enter the first name of student">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Firstname Error
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input th:field="*{lastName}" id="lastName" type="text" class="form-control"
+                       placeholder="Enter the last name of student">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">Lastname Error</div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="phone" class="form-label">Phone</label>
+                <input th:field="*{phone}" id="phone" type="text" class="form-control"
+                       placeholder="Enter the phone of student">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Phone Error</div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputState" class="form-label">Group</label>
+                <select th:field="*{group.id}" id="inputState" class="form-select">
+                    <option th:each="group : ${groups}"
+                            th:value="${group.id}"
+                            th:text="${group.getName()}">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-sm">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 </body>
 </html>

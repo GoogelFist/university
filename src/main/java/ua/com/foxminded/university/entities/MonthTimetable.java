@@ -4,6 +4,7 @@ import lombok.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -15,11 +16,14 @@ import java.util.List;
 @Entity
 @Table(name = "month_timetables")
 public class MonthTimetable {
+    private static final String FIELD_CAN_NOT_BE_EMPTY = "This field cannot be empty";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private int id;
 
+    @NotNull(message = FIELD_CAN_NOT_BE_EMPTY)
     @Column(name = "date")
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate date;

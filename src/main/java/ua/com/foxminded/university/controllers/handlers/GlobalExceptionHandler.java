@@ -17,4 +17,13 @@ public class GlobalExceptionHandler {
         modelAndView.setViewName(EXCEPTION_VIEW_NAME);
         return modelAndView;
     }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ModelAndView serviceException(RuntimeException exception) {
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.addObject(EXCEPTION_ATTRIBUTE_NAME, exception);
+        modelAndView.setViewName(EXCEPTION_VIEW_NAME);
+        return modelAndView;
+    }
+
 }

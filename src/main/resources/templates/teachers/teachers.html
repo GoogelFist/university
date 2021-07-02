@@ -5,7 +5,47 @@
 
 <div th:replace="fragments/teachers-fragments :: menu-site-for-teachers"></div>
 
-<div th:replace="fragments/teachers-fragments :: all-teachers"></div>
+<div th:fragment="all-teachers">
+    <table aria-label="Teachers table" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">First Name</th>
+            <th scope="col">Last Name</th>
+            <th scope="col">Phone</th>
+            <th scope="col">Qualification</th>
+            <th scope="col">Cathedra</th>
+            <th scope="col">
+                <a th:href="@{/teachers/new}"
+                   type="button"
+                   class="btn btn-outline-primary">New teacher
+                </a>
+            </th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="teacher: ${teachers}">
+            <td th:text="${teacher.getFirstName()}"></td>
+            <td th:text="${teacher.getLastName()}"></td>
+            <td th:text="${teacher.getPhone()}"></td>
+            <td th:text="${teacher.getQualification()}"></td>
+            <td th:text="${teacher.getCathedra().getName()}"></td>
+            <td></td>
+            <td class="d-flex flex-row text-nowrap bd-highlight">
+                <a class="btn btn-outline-primary ms-3"
+                   th:href="@{/teachers/{id}(id = ${teacher.getId()})}"
+                   role="button">Info</a>
+                <a th:href="@{/teachers/{id}/edit(id = ${teacher.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Edit</a>
+                <form th:method="DELETE" th:action="@{/teachers/{id}(id=${teacher.getId()})}" class="input-group ms-1">
+                    <input type="submit" class="btn btn-outline-primary" value="Delete"/>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
 <div th:replace="fragments/teachers-fragments :: teachers-pagination"></div>
 

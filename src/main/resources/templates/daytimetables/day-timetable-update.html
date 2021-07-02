@@ -5,7 +5,66 @@
 
 <div th:replace="fragments/day-timetables-fragments :: menu-site-for-day-timetables"></div>
 
-<div th:replace="fragments/day-timetables-fragments :: day-timetable-update"></div>
+<div th:fragment="day-timetable-update">
+    <form th:method="PATCH" th:action="@{/day-timetables/{id}(id=${dayTimetable.getId()})}" th:object="${dayTimetable}" class="row mb-1 m-lg-2">
+        <div>
+            <input type="hidden" class="form-control" th:field="*{monthTimetable.id}" th:value="${dayTimetable.monthTimetable.id}">
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="startTime" class="form-label">Start time</label>
+                <input th:field="*{startTime}" id="startTime"
+                       type="time" class="form-control"
+                       placeholder="Enter start time">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('startTime')}" th:errors="*{startTime}">Start time Error</div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="lectureHall" class="form-label">Lecture hall</label>
+                <input th:field="*{lectureHall}" id="lectureHall" type="text" class="form-control"
+                       placeholder="Enter lecture hall">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('lectureHall')}" th:errors="*{lectureHall}">Lecture hall Error</div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="subject" class="form-label">Subject</label>
+                <input th:field="*{subject}" id="subject" type="text" class="form-control"
+                       placeholder="Enter subject">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('subject')}" th:errors="*{subject}">Subject Error</div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputGroup" class="form-label">Group</label>
+                <select th:field="*{group.id}" id="inputGroup" class="form-select">
+                    <option th:each="group : ${groups}"
+                            th:value="${group.id}"
+                            th:text="${group.getName()}">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputTeacher" class="form-label">Teacher</label>
+                <select th:field="*{teacher.id}" id="inputTeacher" class="form-select">
+                    <option th:each="teacher : ${teachers}"
+                            th:value="${teacher.id}"
+                            th:text="| ${teacher.getFirstName()} ${teacher.getLastName()} |">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-12">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 </body>
 </html>

@@ -84,6 +84,14 @@ class MonthTimetableControllerTest {
     }
 
     @Test
+    void shouldReturnCorrectedMonthTimetablesPageWhenCreateNewTimetablePageWithIncorrectParameters() throws Exception {
+        mockMvc.perform(post(POST_NEW_TIMETABLE_URL_TEMPLATE)
+            .param(DATE, EMPTY_STRING))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_NEW_TIMETABLE_VIEW_NAME));
+    }
+
+    @Test
     void shouldReturnCorrectedMonthTimetablesPageWhenDeleteTimetablePage() throws Exception {
         mockMvc.perform(delete(DELETE_MONTH_TIMETABLE_VIEW_NAME))
             .andExpect(status().is3xxRedirection())
@@ -96,6 +104,14 @@ class MonthTimetableControllerTest {
             .param(DATE, String.valueOf(MONTH_TIMETABLE_DATE_VALUE_1)))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, MONTH_TIMETABLES_VIEW_NAME)));
+    }
+
+    @Test
+    void shouldReturnCorrectedMonthTimetablesPageWhenEditTimetablePageWithIncorrectParameters() throws Exception {
+        mockMvc.perform(patch(POST_EDIT_TIMETABLE_URL_TEMPLATE)
+            .param(DATE, EMPTY_STRING))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_EDIT_TIMETABLE_VIEW_NAME));
     }
 
     @Test

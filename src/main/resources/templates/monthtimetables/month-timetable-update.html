@@ -5,7 +5,24 @@
 
 <div th:replace="fragments/month-timetables-fragments :: menu-site-month-timetables"></div>
 
-<div th:replace="fragments/month-timetables-fragments :: update-month-timetable"></div>
+<div th:fragment="update-month-timetable">
+    <form th:method="PATCH" th:action="@{/month-timetables/{id}(id=${monthTimetable.getId()})}" th:object="${monthTimetable}" class="row mb-1 m-lg-2">
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="date" class="form-label">Date</label>
+                <input th:field="*{date}" id="date" type="date" class="form-control"
+                       placeholder="Enter date">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('date')}" th:errors="*{date}">Date Error</div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-sm">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 </body>
 </html>

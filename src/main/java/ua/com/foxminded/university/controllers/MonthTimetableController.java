@@ -5,10 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.MonthTimetable;
 import ua.com.foxminded.university.service.MonthTimetableService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -63,7 +65,10 @@ public class MonthTimetableController {
     }
 
     @PostMapping()
-    public String createMonthTimetable(@ModelAttribute(MONTH_TIMETABLE) MonthTimetable monthTimetable) {
+    public String createMonthTimetable(@ModelAttribute(MONTH_TIMETABLE) @Valid MonthTimetable monthTimetable, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return GET_NEW_MONTH_TIMETABLE_VIEW_NAME;
+        }
         monthTimetableService.create(monthTimetable);
         return format(REDIRECT, MONTH_TIMETABLES_VIEW_NAME);
     }
@@ -76,7 +81,10 @@ public class MonthTimetableController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(MONTH_TIMETABLE) MonthTimetable monthTimetable) {
+    public String update(@ModelAttribute(MONTH_TIMETABLE) @Valid MonthTimetable monthTimetable, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return GET_EDIT_MONTH_TIMETABLE_VIEW_NAME;
+        }
         monthTimetableService.update(monthTimetable);
         return format(REDIRECT, MONTH_TIMETABLES_VIEW_NAME);
     }

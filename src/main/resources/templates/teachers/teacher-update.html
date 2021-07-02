@@ -5,7 +5,63 @@
 
 <head th:replace="fragments/teachers-fragments :: menu-site-for-teachers"></head>
 
-<div th:replace="fragments/teachers-fragments :: update-teacher"> </div>
+<div th:fragment="update-teacher">
+    <form th:method="PATCH" th:action="@{/teachers/{id}(id=${teacher.getId()})}" th:object="${teacher}"
+          class="row mb-1 m-lg-2">
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="firstName" class="form-label">First Name</label>
+                <input th:field="*{firstName}" id="firstName" type="text" class="form-control"
+                       placeholder="Enter the first name of teacher">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Firstname Error
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="lastName" class="form-label">Last Name</label>
+                <input th:field="*{lastName}" id="lastName" type="text" class="form-control"
+                       placeholder="Enter the last name of teacher">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">Lastname Error</div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="phone" class="form-label">Phone</label>
+                <input th:field="*{phone}" id="phone" type="text" class="form-control"
+                       placeholder="Enter the phone of teacher">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Phone Error</div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="qualification" class="form-label">Qualification</label>
+                <input th:field="*{qualification}" id="qualification" type="text" class="form-control"
+                       placeholder="Enter the qualification of teacher">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('qualification')}" th:errors="*{qualification}">
+                Qualification Error
+            </div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputState" class="form-label">Cathedra</label>
+                <select th:field="*{cathedra.id}" id="inputState" class="form-select">
+                    <option th:each="cathedra : ${cathedras}"
+                            th:value="${cathedra.id}"
+                            th:text="${cathedra.getName()}">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-sm">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 </body>
 </html>

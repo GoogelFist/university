@@ -5,6 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.DayTimetable;
 import ua.com.foxminded.university.entities.Group;
@@ -14,6 +15,7 @@ import ua.com.foxminded.university.service.DayTimeTableService;
 import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.TeacherService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -82,7 +84,20 @@ public class DayTimetableController {
     }
 
     @PostMapping()
-    public String createDayTimetable(@ModelAttribute(DAY_TIMETABLE) DayTimetable dayTimetable) {
+    public String createDayTimetable(@ModelAttribute(DAY_TIMETABLE) @Valid DayTimetable dayTimetable, BindingResult bindingResult, Model model) {
+        if (dayTimetable.getGroup() == null || dayTimetable.getGroup().getId() < 1) {
+            bindingResult.rejectValue("group.id", "error.dayTimetable.group", "Choose a group");
+        }
+        if (dayTimetable.getTeacher() == null || dayTimetable.getTeacher().getId() < 1) {
+            bindingResult.rejectValue("teacher.id", "error.dayTimetable.teacher", "Choose a teacher");
+        }
+        if (bindingResult.hasErrors()) {
+            List<Group> groups = groupService.getAll();
+            List<Teacher> teachers = teacherService.getAll();
+            model.addAttribute(GROUPS, groups);
+            model.addAttribute(TEACHERS, teachers);
+            return GET_NEW_DAY_TIMETABLE_VIEW_NAME;
+        }
         dayTimeTableService.create(dayTimetable);
         return format(REDIRECT, MONTH_TIMETABLES_VIEW_NAME);
     }
@@ -100,7 +115,10 @@ public class DayTimetableController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(DAY_TIMETABLE) DayTimetable dayTimetable) {
+    public String update(@ModelAttribute(DAY_TIMETABLE) @Valid DayTimetable dayTimetable, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return GET_EDIT_DAY_TIMETABLE_VIEW_NAME;
+        }
         dayTimeTableService.update(dayTimetable);
         return format(REDIRECT, MONTH_TIMETABLES_VIEW_NAME);
     }

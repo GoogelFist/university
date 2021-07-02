@@ -93,6 +93,19 @@ class DayTimetableControllerTest {
     }
 
     @Test
+    void shouldReturnCorrectedDayTimetablesPageWhenCreateNewTimetablePageWithIncorrectParameters() throws Exception {
+        mockMvc.perform(post(POST_NEW_TIMETABLE_URL_TEMPLATE)
+            .param(START_TIME, EMPTY_STRING)
+            .param(LECTURE_HALL, EMPTY_STRING)
+            .param(SUBJECT, EMPTY_STRING)
+            .param(GROUP_ID, String.valueOf(ID_1_VALUE))
+            .param(TEACHER_ID, String.valueOf(ID_1_VALUE))
+            .param(MONTH_TIMETABLE_ID, String.valueOf(ID_1_VALUE)))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_NEW_TIMETABLE_VIEW_NAME));
+    }
+
+    @Test
     void shouldReturnCorrectedDayTimetablesPageWhenDeleteTimetablePage() throws Exception {
         mockMvc.perform(delete(DELETE_TIMETABLE_VIEW_NAME))
             .andExpect(status().is3xxRedirection())
@@ -110,6 +123,19 @@ class DayTimetableControllerTest {
             .param(MONTH_TIMETABLE_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, MONTH_TIMETABLES_VIEW_NAME)));
+    }
+
+    @Test
+    void shouldReturnCorrectedDayTimetablesPageWhenEditTimetablePageWithIncorrectParameters() throws Exception {
+        mockMvc.perform(patch(POST_EDIT_TIMETABLE_URL_TEMPLATE)
+            .param(START_TIME, EMPTY_STRING)
+            .param(LECTURE_HALL, EMPTY_STRING)
+            .param(SUBJECT, EMPTY_STRING)
+            .param(GROUP_ID, String.valueOf(ID_1_VALUE))
+            .param(TEACHER_ID, String.valueOf(ID_1_VALUE))
+            .param(MONTH_TIMETABLE_ID, String.valueOf(ID_1_VALUE)))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_EDIT_TIMETABLE_VIEW_NAME));
     }
 
     @Test

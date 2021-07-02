@@ -83,6 +83,14 @@ class CathedraControllerTest {
     }
 
     @Test
+    void shouldReturnCorrectedCathedrasPageWhenCreateNewCathedraPageWithIncorrectParameters() throws Exception {
+        mockMvc.perform(post(POST_NEW_CATHEDRA_URL_TEMPLATE)
+            .param(NAME, EMPTY_STRING))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_NEW_CATHEDRA_VIEW_NAME));
+    }
+
+    @Test
     void shouldReturnCorrectedCathedrasPageWhenDeleteCathedrasPage() throws Exception {
         mockMvc.perform(delete(DELETE_CATHEDRA_VIEW_NAME))
             .andExpect(status().is3xxRedirection())
@@ -95,6 +103,14 @@ class CathedraControllerTest {
             .param(NAME, CATHEDRA_1_NAME_VALUE))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, CATHEDRAS)));
+    }
+
+    @Test
+    void shouldReturnCorrectedCathedrasPageWhenEditCathedraPageWithIncorrectParameters() throws Exception {
+        mockMvc.perform(patch(POST_EDIT_CATHEDRA_URL_TEMPLATE)
+            .param(NAME, EMPTY_STRING))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_EDIT_CATHEDRA_VIEW_NAME));
     }
 
     @Test

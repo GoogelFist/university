@@ -5,7 +5,24 @@
 
 <div th:replace="fragments/cathedras-fragments :: menu-site-for-cathedras"></div>
 
-<div th:replace="fragments/cathedras-fragments :: update-cathedra"></div>
+<div th:fragment="update-cathedra">
+    <form th:method="PATCH" th:action="@{/cathedras/{id}(id=${cathedra.getId()})}" th:object="${cathedra}" class="row mb-1 m-lg-2">
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="name" class="form-label">Name</label>
+                <input th:field="*{name}" id="name" type="text" class="form-control"
+                       placeholder="Enter the first name of student">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-sm">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 </body>
 </html>

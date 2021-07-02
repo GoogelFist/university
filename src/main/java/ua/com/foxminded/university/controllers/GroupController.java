@@ -5,12 +5,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.service.CathedraService;
 import ua.com.foxminded.university.service.GroupService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -86,7 +88,15 @@ public class GroupController {
     }
 
     @PostMapping()
-    public String createGroup(@ModelAttribute(GROUP) Group group) {
+    public String createGroup(@ModelAttribute(GROUP) @Valid Group group, BindingResult bindingResult, Model model) {
+        if (group.getCathedra() == null || group.getCathedra().getId() < 1) {
+            bindingResult.rejectValue("cathedra.id", "error.group", "Choose a cathedra");
+        }
+        if (bindingResult.hasErrors()) {
+            List<Cathedra> cathedras = cathedraService.getAll();
+            model.addAttribute(CATHEDRAS, cathedras);
+            return GET_NEW_GROUP_VIEW_NAME;
+        }
         groupService.create(group);
         return format(REDIRECT, GROUPS);
     }
@@ -101,7 +111,10 @@ public class GroupController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(GROUP) Group group) {
+    public String update(@ModelAttribute(GROUP) @Valid Group group, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return GET_EDIT_GROUP_VIEW_NAME;
+        }
         groupService.update(group);
         return format(REDIRECT, GROUPS);
     }

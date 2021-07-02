@@ -97,6 +97,15 @@ class GroupControllerTest {
     }
 
     @Test
+    void shouldReturnCorrectedGroupPageWhenCreateNewGroupsPageWithIncorrectParameters() throws Exception {
+        mockMvc.perform(post(POST_NEW_GROUP_URL_TEMPLATE)
+            .param(NAME, EMPTY_STRING)
+            .param(CATHEDRA_ID, valueOf(ID_1_VALUE)))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_NEW_GROUP_VIEW_NAME));
+    }
+
+    @Test
     void shouldReturnCorrectedGroupsPageWhenDeleteGroupsPage() throws Exception {
         mockMvc.perform(delete(DELETE_GROUP_VIEW_NAME))
             .andExpect(status().is3xxRedirection())
@@ -109,6 +118,14 @@ class GroupControllerTest {
             .param(NAME, GROUP_1_NAME_VALUE))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, GROUPS)));
+    }
+
+    @Test
+    void shouldReturnCorrectedGroupsPageWhenEditGroupsPageWithIncorrectParameters() throws Exception {
+        mockMvc.perform(patch(POST_EDIT_GROUP_URL_TEMPLATE)
+            .param(NAME, EMPTY_STRING))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_EDIT_GROUP_VIEW_NAME));
     }
 
     @Test

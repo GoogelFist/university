@@ -5,12 +5,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.Student;
 import ua.com.foxminded.university.service.GroupService;
 import ua.com.foxminded.university.service.StudentService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -85,7 +87,15 @@ public class StudentController {
     }
 
     @PostMapping()
-    public String createStudent(@ModelAttribute(STUDENT) Student student) {
+    public String createStudent(@ModelAttribute(STUDENT) @Valid Student student, BindingResult bindingResult, Model model) {
+        if (student.getGroup() == null || student.getGroup().getId() < 1) {
+            bindingResult.rejectValue("group.id", "error.student", "Choose a group");
+        }
+        if (bindingResult.hasErrors()) {
+            List<Group> groups = groupService.getAll();
+            model.addAttribute(GROUPS, groups);
+            return GET_NEW_STUDENT_VIEW_NAME;
+        }
         studentService.create(student);
         return format(REDIRECT, STUDENTS);
     }
@@ -100,7 +110,10 @@ public class StudentController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(STUDENT) Student student) {
+    public String update(@ModelAttribute(STUDENT) @Valid Student student, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return GET_EDIT_STUDENT_VIEW_NAME;
+        }
         studentService.update(student);
         return format(REDIRECT, STUDENTS);
     }

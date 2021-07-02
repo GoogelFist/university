@@ -82,9 +82,9 @@ ALTER TABLE students
     ALTER COLUMN id RESTART WITH 1;
 
 INSERT INTO students
-VALUES (1, 'James', 'Gosling', '12345', 1);
+VALUES (1, 'James', 'Gosling', '+79001230210', 1);
 INSERT INTO students
-VALUES (2, 'Mikhail', 'Denver', '54321', 2);
+VALUES (2, 'Mikhail', 'Denver', '+79001231210', 2);
 
 DELETE
 FROM teachers
@@ -93,9 +93,9 @@ ALTER TABLE teachers
     ALTER COLUMN id RESTART WITH 1;
 
 INSERT INTO teachers
-VALUES (1, 'Jonathan', 'Bride', '612345', '1', 1);
+VALUES (1, 'Jonathan', 'Bride', '+79001231212', '1', 1);
 INSERT INTO teachers
-VALUES (2, 'Bill', 'Noise', '64321', '2', 2);
+VALUES (2, 'Bill', 'Noise', '+79001230213', '2', 2);
 
 DELETE
 FROM month_timetables

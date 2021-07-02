@@ -5,10 +5,12 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.service.CathedraService;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -64,7 +66,10 @@ public class CathedraController {
     }
 
     @PostMapping()
-    public String createCathedra(@ModelAttribute(CATHEDRA) Cathedra cathedra) {
+    public String createCathedra(@ModelAttribute(CATHEDRA) @Valid Cathedra cathedra, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return GET_NEW_CATHEDRA_VIEW_NAME;
+        }
         cathedraService.create(cathedra);
         return format(REDIRECT, CATHEDRAS);
     }
@@ -77,7 +82,10 @@ public class CathedraController {
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(CATHEDRA) Cathedra cathedra) {
+    public String update(@ModelAttribute(CATHEDRA) @Valid Cathedra cathedra, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            return GET_EDIT_CATHEDRA_VIEW_NAME;
+        }
         cathedraService.update(cathedra);
         return format(REDIRECT, CATHEDRAS);
     }

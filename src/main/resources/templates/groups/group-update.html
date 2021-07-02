@@ -1,11 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/fragments :: header ('Group update')"></head>
 <body>
 
 <div th:replace="fragments/groups-fragments :: menu-site-for-groups"></div>
 
-<div th:replace="fragments/groups-fragments :: update-group"></div>
+<div th:fragment="update-group">
+    <form th:method="PATCH" th:action="@{/groups/{id}(id=${group.getId()})}" th:object="${group}"
+          class="row mb-1 m-lg-2">
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3 col-form-label">
+                <label for="name" class="form-label">Name</label>
+                <input th:field="*{name}" id="name" type="text" class="form-control"
+                       placeholder="Enter name of group">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Name Error</div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputState" class="form-label">Cathedra</label>
+                <select th:field="*{cathedra.id}" id="inputState" class="form-select">
+                    <option th:each="cathedra : ${cathedras}"
+                            th:value="${cathedra.id}"
+                            th:text="${cathedra.getName()}">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row mb-1">
+            <div class="col-sm">
+                <button type="submit" class="btn btn-primary">Update</button>
+                <button onclick="history.back()" class="btn btn-secondary">Go back</button>
+            </div>
+        </div>
+    </form>
+</div>
 
 </body>
 </html>

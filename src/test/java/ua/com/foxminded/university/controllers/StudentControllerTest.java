@@ -99,6 +99,17 @@ class StudentControllerTest {
     }
 
     @Test
+    void shouldReturnCorrectedStudentsPageWhenCreateNewStudentsPageWithInvalidateParameters() throws Exception {
+        mockMvc.perform(post(POST_NEW_STUDENT_URL_TEMPLATE)
+            .param(FIRST_NAME, EMPTY_STRING)
+            .param(LAST_NAME, EMPTY_STRING)
+            .param(PHONE, EMPTY_STRING)
+            .param(GROUP_ID, valueOf(ID_1_VALUE)))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_NEW_STUDENT_VIEW_NAME));
+    }
+
+    @Test
     void shouldReturnCorrectedStudentsPageWhenEditStudentsPage() throws Exception {
         mockMvc.perform(patch(POST_EDIT_STUDENT_URL_TEMPLATE)
             .param(FIRST_NAME, STUDENT_1_FIRST_NAME_VALUE)
@@ -106,6 +117,17 @@ class StudentControllerTest {
             .param(PHONE, STUDENT_1_PHONE_VALUE))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, STUDENTS)));
+    }
+
+    @Test
+    void shouldReturnCorrectedStudentsPageWhenEditStudentsPageWithInvalidateParameters() throws Exception {
+        mockMvc.perform(patch(POST_EDIT_STUDENT_URL_TEMPLATE)
+            .param(FIRST_NAME, EMPTY_STRING)
+            .param(LAST_NAME, EMPTY_STRING)
+            .param(PHONE, EMPTY_STRING)
+            .param(GROUP_ID, valueOf(ID_1_VALUE)))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_EDIT_STUDENT_VIEW_NAME));
     }
 
     @Test

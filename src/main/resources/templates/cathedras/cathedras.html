@@ -5,7 +5,43 @@
 
 <div th:replace="fragments/cathedras-fragments :: menu-site-for-cathedras"></div>
 
-<div th:replace="fragments/cathedras-fragments :: all-cathedras"></div>
+<div th:fragment="all-cathedras"><table aria-label="Cathedras table" class="table table-striped">
+    <thead>
+    <tr>
+        <th scope="col">Name</th>
+        <th scope="col">
+            <a th:href="@{/cathedras/new}"
+               type="button"
+               class="btn btn-outline-primary">New cathedra
+            </a>
+        </th>
+        <th scope="col"></th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="cathedra: ${cathedras}">
+        <td th:text="${cathedra.getName()}"></td>
+        <td></td>
+        <td class="d-flex flex-row text-nowrap bd-highlight">
+            <a th:href="@{/teachers/by-cathedra/{cathedraId}(cathedraId = ${cathedra.getId()})}"
+               class="btn btn-outline-primary ms-1"
+               role="button">Show teachers</a>
+            <a th:href="@{/groups/by-cathedra/{cathedraId}(cathedraId = ${cathedra.getId()})}"
+               class="btn btn-outline-primary ms-1"
+               role="button">Show groups</a>
+            <a class="btn btn-outline-primary ms-3"
+               th:href="@{/cathedras/{id}(id = ${cathedra.getId()})}"
+               role="button">Info</a>
+            <a th:href="@{/cathedras/{id}/edit(id = ${cathedra.getId()})}"
+               class="btn btn-outline-primary ms-1"
+               role="button">Edit</a>
+            <form th:method="DELETE" th:action="@{/cathedras/{id}(id=${cathedra.getId()})}" class="input-group ms-1">
+                <input type="submit" class="btn btn-outline-primary" value="Delete"/>
+            </form>
+        </td>
+    </tr>
+    </tbody>
+</table></div>
 
 <div th:replace="fragments/cathedras-fragments :: cathedra-pagination"></div>
 

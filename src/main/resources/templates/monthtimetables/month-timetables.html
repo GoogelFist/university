@@ -5,7 +5,44 @@
 
 <div th:replace="fragments/month-timetables-fragments :: menu-site-month-timetables"></div>
 
-<div th:replace="fragments/month-timetables-fragments :: all-month-timetables"></div>
+<div th:fragment="all-month-timetables">
+    <table aria-label="timetable table" class="table table-striped">
+        <thead>
+        <tr class="bg-light-gray">
+            <th scope="col">Date</th>
+            <th scope="col">
+                <a th:href="@{/month-timetables/new}"
+                   type="button"
+                   class="btn btn-outline-primary">New date
+                </a>
+            </th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="timetable: ${monthTimetables}">
+            <td th:text="${timetable.getDate()}" class="align-middle">VALUE</td>
+            <td></td>
+            <td class="d-flex flex-row text-nowrap bd-highlight">
+                <a th:href="@{/day-timetables/by-month-timetable/{id}(id=${timetable.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Show timetables</a>
+                <a th:href="@{/month-timetables/{id}(id=${timetable.getId()})}"
+                   class="btn btn-outline-primary ms-3"
+                   role="button">Info</a>
+                <a th:href="@{/month-timetables/{id}/edit(id = ${timetable.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Edit</a>
+                <form th:method="DELETE" th:action="@{/month-timetables/{id}(id=${timetable.getId()})}"
+                      class="input-group ms-1">
+                    <input type="submit" class="btn btn-outline-primary" value="Delete"/>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
 
 <div th:replace="fragments/month-timetables-fragments :: month-timetables-pagination"></div>
 
