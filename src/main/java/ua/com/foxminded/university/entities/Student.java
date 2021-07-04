@@ -36,8 +36,8 @@ public class Student {
     @Column(name = "phone")
     private String phone;
 
-    @ManyToOne
     @EqualsAndHashCode.Exclude
+    @ManyToOne
     @JoinColumn(name = "group_id")
     private Group group;
 

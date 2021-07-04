@@ -34,24 +34,18 @@ CREATE TABLE teachers
     cathedra_id   INT REFERENCES cathedras (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS month_timetables CASCADE;
-CREATE TABLE month_timetables
+DROP TABLE IF EXISTS timetables CASCADE;
+CREATE TABLE timetables
 (
-    id   SERIAL PRIMARY KEY,
-    date DATE NOT NULL
+    id           SERIAL PRIMARY KEY,
+    date         DATE        NOT NULL,
+    start_time   TIME        NOT NULL,
+    lecture_hall VARCHAR(50) NOT NULL,
+    subject      VARCHAR(50) NOT NULL,
+    group_id     INT REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE,
+    teacher_id   INT REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE
 );
 
-DROP TABLE IF EXISTS day_timetables CASCADE;
-CREATE TABLE day_timetables
-(
-    id                 SERIAL PRIMARY KEY,
-    start_time         TIME        NOT NULL,
-    lecture_hall       VARCHAR(50) NOT NULL,
-    subject            VARCHAR(50) NOT NULL,
-    group_id           INT REFERENCES groups (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    teacher_id         INT REFERENCES teachers (id) ON UPDATE CASCADE ON DELETE CASCADE,
-    month_timetable_id INT REFERENCES month_timetables (id) ON UPDATE CASCADE ON DELETE CASCADE
-);
 
 DELETE
 FROM cathedras
@@ -98,23 +92,12 @@ INSERT INTO teachers
 VALUES (2, 'Bill', 'Noise', '+79001230213', '2', 2);
 
 DELETE
-FROM month_timetables
+FROM timetables
 WHERE TRUE;
-ALTER TABLE month_timetables
+ALTER TABLE timetables
     ALTER COLUMN id RESTART WITH 1;
 
-INSERT INTO month_timetables
-VALUES (1, '2021-04-23');
-INSERT INTO month_timetables
-VALUES (2, '2021-04-24');
-
-DELETE
-FROM day_timetables
-WHERE TRUE;
-ALTER TABLE day_timetables
-    ALTER COLUMN id RESTART WITH 1;
-
-INSERT INTO day_timetables
-VALUES (1, '08:00', '112', 'math', 1, 1, 1);
-INSERT INTO day_timetables
-VALUES (2, '10:00', '312', 'physic', 2, 2, 2);
+INSERT INTO timetables
+VALUES (1, '2021-04-23', '08:00', '112', 'math', 1, 1);
+INSERT INTO timetables
+VALUES (2, '2021-04-24', '10:00', '312', 'physic', 2, 2);

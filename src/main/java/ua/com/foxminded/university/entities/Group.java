@@ -1,5 +1,6 @@
 package ua.com.foxminded.university.entities;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
@@ -28,10 +29,11 @@ public class Group {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @OneToMany(mappedBy = "group")
+    @JsonIgnore
     private List<Student> students;
 
-    @ManyToOne
     @EqualsAndHashCode.Exclude
+    @ManyToOne
     @JoinColumn(name = "cathedra_id")
     private Cathedra cathedra;
 

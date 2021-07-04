@@ -11,8 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.repository.CathedraRepository;
-import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,9 +99,9 @@ class CathedraServiceImplTest {
     @Test
     void shouldThrowServiceExceptionWhenCantGetByCathedraId() {
         String message = format(ENTITY_NOT_FOUND, CATHEDRA);
-        doThrow(new ServiceException(message)).when(mockCathedraRepository).findById(ID_5_VALUE);
+        doThrow(new EntityNotFoundException(message)).when(mockCathedraRepository).findById(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockCathedraRepository.findById(ID_5_VALUE));
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> mockCathedraRepository.findById(ID_5_VALUE));
         String actual = exception.getMessage();
 
         assertEquals(message, actual);

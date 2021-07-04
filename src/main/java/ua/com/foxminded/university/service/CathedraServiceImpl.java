@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.repository.CathedraRepository;
-import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 
 import static java.lang.String.format;
 
@@ -19,7 +18,7 @@ import static java.lang.String.format;
 @Service
 @Transactional
 public class CathedraServiceImpl implements CathedraService {
-    private static final String LOG_MESSAGE = "CathedraService calls cathedraDAO.%s";
+    private static final String LOG_MESSAGE = "CathedraService calls cathedraRepository.%s";
     private static final String CREATE = "create({})";
     private static final String GET_BY_ID = "getById({})";
     private static final String GET_ALL = "getAll()";
@@ -49,12 +48,8 @@ public class CathedraServiceImpl implements CathedraService {
     public Cathedra getById(int id) {
         log.debug(format(LOG_MESSAGE, GET_BY_ID), id);
 
-        Optional<Cathedra> optionalCathedra = cathedraRepository.findById(id);
-        if (!optionalCathedra.isPresent()) {
-            String message = format(ERROR_MESSAGE, CATHEDRA, id);
-            throw new ServiceException(message);
-        }
-        return optionalCathedra.get();
+        String message = format(ERROR_MESSAGE, CATHEDRA, id);
+        return cathedraRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(message));
     }
 
     @Override

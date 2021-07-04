@@ -11,8 +11,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
 import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.repository.GroupRepository;
-import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -122,9 +122,9 @@ class GroupServiceImplTest {
     @Test
     void shouldThrowServiceExceptionWhenCantGetByGroupId() {
         String message = format(ENTITY_NOT_FOUND, GROUP);
-        doThrow(new ServiceException(message)).when(mockGroupRepository).findById(ID_5_VALUE);
+        doThrow(new EntityNotFoundException(message)).when(mockGroupRepository).findById(ID_5_VALUE);
 
-        Exception exception = assertThrows(ServiceException.class, () -> mockGroupRepository.findById(ID_5_VALUE));
+        Exception exception = assertThrows(EntityNotFoundException.class, () -> mockGroupRepository.findById(ID_5_VALUE));
         String actual = exception.getMessage();
 
         assertEquals(message, actual);

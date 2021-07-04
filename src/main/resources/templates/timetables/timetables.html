@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Timetables')"></head>
+<body>
+
+<div th:replace="fragments/timetables-fragments :: menu-site-for-timetables"></div>
+
+<div th:fragment="all-timetables">
+    <table aria-label="day timetable" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Date</th>
+            <th scope="col">Start time</th>
+            <th scope="col">Lecture Hall</th>
+            <th scope="col">Subject</th>
+            <th scope="col">Group</th>
+            <th scope="col">Teacher</th>
+            <th scope="col">
+                <a th:href="@{/timetables/new}"
+                   type="button"
+                   class="btn btn-outline-primary">New timetable
+                </a>
+            </th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="timetableDto: ${timetablesDtoList}">
+            <td th:text="${timetableDto.getDate()}"></td>
+            <td th:text="${timetableDto.getStartTime()}"></td>
+            <td th:text="${timetableDto.getLectureHall()}"></td>
+            <td th:text="${timetableDto.getSubject()}"></td>
+            <td th:text="${timetableDto.groupName}"></td>
+            <td th:text="| ${timetableDto.getTeacherFirstName()} ${timetableDto.getTeacherLastName()} |"></td>
+            <td class="d-flex flex-row text-nowrap bd-highlight">
+                <a th:href="@{/timetables/{id}(id = ${timetableDto.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Info</a>
+                <a th:href="@{/timetables/{id}/edit(id = ${timetableDto.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Edit</a>
+                <form th:method="DELETE" th:action="@{/timetables/{id}(id=${timetableDto.getId()})}"
+                      class="input-group ms-1">
+                    <input type="submit" class="btn btn-outline-primary" value="Delete"/>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+</body>
+</html>

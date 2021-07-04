@@ -9,11 +9,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
 import static java.lang.String.format;
-import static org.hamcrest.Matchers.hasProperty;
 import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static ua.com.foxminded.university.utils.Constants.MESSAGE_PROPERTY_NAME;
 import static ua.com.foxminded.university.utils.Constants.STUDENT;
 
 @SpringBootTest
@@ -35,14 +33,14 @@ class GlobalExceptionHandlerTest {
     @Test
     void shouldReturnCorrectedErrorPageWhenGetIncorrectStudentsPage() throws Exception {
         mockMvc.perform(get(ERROR_URL_TEMPLATE))
-            .andExpect(status().is2xxSuccessful())
+            .andExpect(status().is4xxClientError())
             .andExpect(view().name(ERROR_VIEW_NAME));
     }
 
     @Test
     void shouldCheckForAttributeExistenceWhenGetErrorPage() throws Exception {
         mockMvc.perform(get(ERROR_URL_TEMPLATE))
-            .andExpect(status().is2xxSuccessful())
+            .andExpect(status().is4xxClientError())
             .andExpect(model().attributeExists(ERROR_ATTRIBUTE))
             .andExpect(view().name(ERROR_VIEW_NAME));
     }
@@ -50,7 +48,7 @@ class GlobalExceptionHandlerTest {
     @Test
     void shouldReturnCorrectedExceptionAttributesWhenGetIncorrectStudentPage() throws Exception {
         mockMvc.perform(get(ERROR_URL_TEMPLATE))
-            .andExpect(status().is2xxSuccessful())
+            .andExpect(status().is4xxClientError())
             .andExpect(model().attribute(ERROR_ATTRIBUTE, hasProperty(MESSAGE_PROPERTY_NAME, is(format(ERROR_MESSAGE, STUDENT, STUDENT_ID)))));
     }
 }

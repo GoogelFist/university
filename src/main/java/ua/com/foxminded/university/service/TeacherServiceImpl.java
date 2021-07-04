@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.entities.Teacher;
 import ua.com.foxminded.university.repository.TeacherRepository;
-import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 
 import static java.lang.String.format;
 
@@ -19,7 +18,7 @@ import static java.lang.String.format;
 @Service
 @Transactional
 public class TeacherServiceImpl implements TeacherService {
-    private static final String LOG_MESSAGE = "TeacherService calls teacherDAO.%s";
+    private static final String LOG_MESSAGE = "TeacherService calls teacherRepository.%s";
     private static final String CREATE = "create({})";
     private static final String GET_BY_ID = "getById({})";
     private static final String GET_ALL = "getAll()";
@@ -31,6 +30,7 @@ public class TeacherServiceImpl implements TeacherService {
 
     private static final String ERROR_MESSAGE = "Entity %s with id %s not found";
     private static final String TEACHER = "teacher";
+
 
     private final TeacherRepository teacherRepository;
 
@@ -50,12 +50,8 @@ public class TeacherServiceImpl implements TeacherService {
     public Teacher getById(int id) {
         log.debug(format(LOG_MESSAGE, GET_BY_ID), id);
 
-        Optional<Teacher> optionalTeacher = teacherRepository.findById(id);
-        if (!optionalTeacher.isPresent()) {
-            String message = String.format(ERROR_MESSAGE, TEACHER, id);
-            throw new ServiceException(message);
-        }
-        return optionalTeacher.get();
+        String message = String.format(ERROR_MESSAGE, TEACHER, id);
+        return teacherRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(message));
     }
 
     @Override

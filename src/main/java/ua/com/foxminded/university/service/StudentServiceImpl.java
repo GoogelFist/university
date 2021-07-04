@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.entities.Student;
 import ua.com.foxminded.university.repository.StudentRepository;
-import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 
 import static java.lang.String.format;
 
@@ -19,7 +18,7 @@ import static java.lang.String.format;
 @Service
 @Transactional
 public class StudentServiceImpl implements StudentService {
-    private static final String LOG_MESSAGE = "StudentService calls studentDAO.%s";
+    private static final String LOG_MESSAGE = "StudentService calls studentRepository.%s";
     private static final String CREATE = "create({})";
     private static final String GET_BY_ID = "getById({})";
     private static final String GET_ALL = "getAll()";
@@ -51,12 +50,8 @@ public class StudentServiceImpl implements StudentService {
     public Student getById(int id) {
         log.debug(format(LOG_MESSAGE, GET_BY_ID), id);
 
-        Optional<Student> optionalStudent = studentRepository.findById(id);
-        if (!optionalStudent.isPresent()) {
-            String message = format(ERROR_MESSAGE, STUDENT, id);
-            throw new ServiceException(message);
-        }
-        return optionalStudent.get();
+        String message = format(ERROR_MESSAGE, STUDENT, id);
+        return studentRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(message));
     }
 
     @Override

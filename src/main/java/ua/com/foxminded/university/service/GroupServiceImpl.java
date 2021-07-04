@@ -8,10 +8,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.repository.GroupRepository;
-import ua.com.foxminded.university.service.exceptions.ServiceException;
 
+import javax.persistence.EntityNotFoundException;
 import java.util.List;
-import java.util.Optional;
 
 import static java.lang.String.format;
 
@@ -19,7 +18,7 @@ import static java.lang.String.format;
 @Service
 @Transactional
 public class GroupServiceImpl implements GroupService {
-    private static final String LOG_MESSAGE = "GroupService calls groupDAO.%s";
+    private static final String LOG_MESSAGE = "GroupService calls groupRepository.%s";
     private static final String CREATE = "create({})";
     private static final String GET_BY_ID = "getById({})";
     private static final String GET_ALL = "getAll()";
@@ -51,12 +50,8 @@ public class GroupServiceImpl implements GroupService {
     public Group getById(int id) {
         log.debug(format(LOG_MESSAGE, GET_BY_ID), id);
 
-        Optional<Group> optionalGroup = groupRepository.findById(id);
-        if (!optionalGroup.isPresent()) {
-            String message = String.format(ERROR_MESSAGE, GROUP, id);
-            throw new ServiceException(message);
-        }
-        return optionalGroup.get();
+        String message = String.format(ERROR_MESSAGE, GROUP, id);
+        return groupRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(message));
     }
 
     @Override

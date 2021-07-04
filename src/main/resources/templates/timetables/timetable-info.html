@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/fragments :: header ('Timetable info')"></head>
+<body>
+
+<div th:replace="fragments/timetables-fragments :: menu-site-for-timetables"></div>
+
+<div class="card" style="width: 18rem;">
+    <img src="" class="card-img-top" alt="...">
+    <div class="card-body">
+        <h5 th:text="| ${timetableDto.getDate()} |" class="card-title">Card title</h5>
+        <p th:text="| Start time: ${timetableDto.getStartTime()} |" class="card-text">VALUE</p>
+        <p th:text="| Lecture hall: ${timetableDto.getLectureHall()} |" class="card-text">VALUE</p>
+        <p th:text="| Subject: ${timetableDto.getSubject()} |" class="card-text">VALUE</p>
+        <p th:text="| Group: ${timetableDto.getGroupName()} |" class="card-text">VALUE</p>
+        <p th:text="| Teacher: ${timetableDto.getTeacherFirstName()} ${timetableDto.getTeacherLastName()} |" class="card-text">VALUE</p>
+        <a onclick="history.back()" class="btn btn-primary">Go back</a>
+    </div>
+</div>
+
+</body>
+</html>
