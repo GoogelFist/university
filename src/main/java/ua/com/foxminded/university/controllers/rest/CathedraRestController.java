@@ -1,5 +1,7 @@
 package ua.com.foxminded.university.controllers.rest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
+@Api(tags = "Cathedra controller")
 @RestController
 @Slf4j
 @RequestMapping("/api/cathedras")
@@ -28,6 +31,12 @@ public class CathedraRestController {
     private static final String CATHEDRAS = "cathedras";
     private static final String CATHEDRA = "cathedra";
 
+    private static final String GET_ALL_OPERATION_VALUE = "Method used to fetch all cathedras";
+    private static final String GET_BY_ID_OPERATION_VALUE = "Method used to fetch a cathedra by ID";
+    private static final String CREATE_OPERATION_VALUE = "Method used to save a new cathedra";
+    private static final String UPDATE_OPERATION_VALUE = "Method used to update a cathedra by ID";
+    private static final String DELETE_OPERATION_VALUE = "Method used to delete a cathedra by ID";
+
 
     private final CathedraService cathedraService;
 
@@ -36,6 +45,7 @@ public class CathedraRestController {
         this.cathedraService = cathedraService;
     }
 
+    @ApiOperation(value = GET_ALL_OPERATION_VALUE)
     @GetMapping()
     public List<CathedraDtoResponse> showCathedras() {
         log.debug(format(SHOW_LOG_MESSAGE, CATHEDRAS));
@@ -43,6 +53,7 @@ public class CathedraRestController {
         return cathedras.stream().map(CathedraMapper.INSTANCE::toCathedraDtoResponse).collect(Collectors.toList());
     }
 
+    @ApiOperation(value = GET_BY_ID_OPERATION_VALUE)
     @GetMapping("/{id}")
     public CathedraDtoResponse showCathedra(@PathVariable(ID) int id) {
         log.debug(format(SHOW_BY_ID_LOG_MESSAGE, CATHEDRA), id);
@@ -50,6 +61,7 @@ public class CathedraRestController {
         return CathedraMapper.INSTANCE.toCathedraDtoResponse(cathedra);
     }
 
+    @ApiOperation(value = CREATE_OPERATION_VALUE)
     @PostMapping()
     public CathedraDtoResponse saveCathedra(@Valid @RequestBody CathedraDtoRequest cathedraDtoRequest) {
         log.debug(format(SAVE_LOG_MESSAGE, CATHEDRA), cathedraDtoRequest);
@@ -58,6 +70,7 @@ public class CathedraRestController {
         return CathedraMapper.INSTANCE.toCathedraDtoResponse(cathedra);
     }
 
+    @ApiOperation(value = UPDATE_OPERATION_VALUE)
     @PatchMapping("/{id}")
     public CathedraDtoResponse update(@Valid @RequestBody CathedraDtoRequest cathedraDtoRequest, @PathVariable(ID) int id) {
         log.debug(format(UPDATE_LOG_MESSAGE, CATHEDRA), cathedraDtoRequest, id);
@@ -66,6 +79,7 @@ public class CathedraRestController {
         return CathedraMapper.INSTANCE.toCathedraDtoResponse(cathedra);
     }
 
+    @ApiOperation(value = DELETE_OPERATION_VALUE)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable(ID) int id) {
         log.debug(format(DELETE_LOG_MESSAGE, CATHEDRA), id);

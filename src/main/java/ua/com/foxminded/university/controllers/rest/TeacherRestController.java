@@ -1,5 +1,7 @@
 package ua.com.foxminded.university.controllers.rest;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 
 import static java.lang.String.format;
 
+@Api(tags = "Teacher controller")
 @RestController
 @Slf4j
 @RequestMapping("/api/teachers")
@@ -28,6 +31,12 @@ public class TeacherRestController {
     private static final String TEACHER = "teacher";
     private static final String ID = "id";
 
+    private static final String GET_ALL_OPERATION_VALUE = "Method used to fetch all teachers";
+    private static final String GET_BY_ID_OPERATION_VALUE = "Method used to fetch a teacher by ID";
+    private static final String CREATE_OPERATION_VALUE = "Method used to save a new teacher";
+    private static final String UPDATE_OPERATION_VALUE = "Method used to update a teacher by ID";
+    private static final String DELETE_OPERATION_VALUE = "Method used to delete a teacher by ID";
+
 
     private final TeacherService teacherService;
 
@@ -36,6 +45,7 @@ public class TeacherRestController {
         this.teacherService = teacherService;
     }
 
+    @ApiOperation(value = GET_ALL_OPERATION_VALUE)
     @GetMapping()
     public List<TeacherDtoResponse> showTeachers() {
         log.debug(format(SHOW_LOG_MESSAGE, TEACHERS));
@@ -43,6 +53,7 @@ public class TeacherRestController {
         return teachers.stream().map(TeacherMapper.INSTANCE::toTeacherDtoResponse).collect(Collectors.toList());
     }
 
+    @ApiOperation(value = GET_BY_ID_OPERATION_VALUE)
     @GetMapping("/{id}")
     public TeacherDtoResponse showTeacher(@PathVariable(ID) int id) {
         log.debug(format(SHOW_BY_ID_LOG_MESSAGE, TEACHER), id);
@@ -50,6 +61,7 @@ public class TeacherRestController {
         return TeacherMapper.INSTANCE.toTeacherDtoResponse(teacher);
     }
 
+    @ApiOperation(value = CREATE_OPERATION_VALUE)
     @PostMapping()
     public TeacherDtoResponse saveTeacher(@Valid @RequestBody TeacherDtoRequest teacherDtoRequest) {
         log.debug(format(SAVE_LOG_MESSAGE, TEACHER), teacherDtoRequest);
@@ -58,6 +70,7 @@ public class TeacherRestController {
         return TeacherMapper.INSTANCE.toTeacherDtoResponse(teacher);
     }
 
+    @ApiOperation(value = UPDATE_OPERATION_VALUE)
     @PatchMapping("/{id}")
     public TeacherDtoResponse update(@Valid @RequestBody TeacherDtoRequest teacherDtoRequest, @PathVariable(ID) int id) {
         log.debug(format(UPDATE_LOG_MESSAGE, TEACHER), teacherDtoRequest, id);
@@ -66,6 +79,7 @@ public class TeacherRestController {
         return TeacherMapper.INSTANCE.toTeacherDtoResponse(teacher);
     }
 
+    @ApiOperation(value = DELETE_OPERATION_VALUE)
     @DeleteMapping("/{id}")
     public void delete(@PathVariable(ID) int id) {
         log.debug(format(DELETE_LOG_MESSAGE, TEACHER), id);

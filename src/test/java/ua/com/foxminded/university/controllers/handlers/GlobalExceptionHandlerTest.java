@@ -20,7 +20,7 @@ import static ua.com.foxminded.university.utils.Constants.STUDENT;
 @TestPropertySource(locations = "classpath:application-test.properties")
 class GlobalExceptionHandlerTest {
     private static final String ERROR_URL_TEMPLATE = "/students/101";
-    private static final String ERROR_ATTRIBUTE = "exception";
+    private static final String ERROR_ATTRIBUTE = "exceptionMessage";
     private static final String ERROR_VIEW_NAME = "error";
 
     private static final String ERROR_MESSAGE = "Entity %s with id %s not found";
@@ -49,6 +49,6 @@ class GlobalExceptionHandlerTest {
     void shouldReturnCorrectedExceptionAttributesWhenGetIncorrectStudentPage() throws Exception {
         mockMvc.perform(get(ERROR_URL_TEMPLATE))
             .andExpect(status().is4xxClientError())
-            .andExpect(model().attribute(ERROR_ATTRIBUTE, hasProperty(MESSAGE_PROPERTY_NAME, is(format(ERROR_MESSAGE, STUDENT, STUDENT_ID)))));
+            .andExpect(model().attribute(ERROR_ATTRIBUTE, is(format(ERROR_MESSAGE, STUDENT, STUDENT_ID))));
     }
 }

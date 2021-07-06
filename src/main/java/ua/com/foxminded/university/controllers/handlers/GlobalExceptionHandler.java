@@ -10,14 +10,14 @@ import javax.persistence.EntityNotFoundException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
-    private static final String EXCEPTION_ATTRIBUTE_NAME = "exception";
+    private static final String EXCEPTION_ATTRIBUTE_NAME = "exceptionMessage";
     private static final String EXCEPTION_VIEW_NAME = "error";
 
     @ResponseStatus(HttpStatus.NOT_FOUND)
     @ExceptionHandler(EntityNotFoundException.class)
     public ModelAndView notFound(EntityNotFoundException exception) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject(EXCEPTION_ATTRIBUTE_NAME, exception);
+        modelAndView.addObject(EXCEPTION_ATTRIBUTE_NAME, exception.getMessage());
         modelAndView.setViewName(EXCEPTION_VIEW_NAME);
         return modelAndView;
     }
@@ -26,7 +26,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ModelAndView error(RuntimeException exception) {
         ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject(EXCEPTION_ATTRIBUTE_NAME, exception);
+        modelAndView.addObject(EXCEPTION_ATTRIBUTE_NAME, exception.getMessage());
         modelAndView.setViewName(EXCEPTION_VIEW_NAME);
         return modelAndView;
     }
