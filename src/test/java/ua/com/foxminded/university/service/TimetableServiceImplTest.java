@@ -4,12 +4,19 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
+import ua.com.foxminded.university.entities.Group;
+import ua.com.foxminded.university.entities.Teacher;
 import ua.com.foxminded.university.entities.Timetable;
 import ua.com.foxminded.university.entities.dto.TimetableDto;
 import ua.com.foxminded.university.repository.TimetableRepository;
 
 import javax.persistence.EntityNotFoundException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -25,7 +32,6 @@ import static ua.com.foxminded.university.utils.Constants.*;
 class TimetableServiceImplTest {
     @Mock
     private TimetableRepository mockTimetableRepository;
-
     private TimetableService timetableService;
     private Timetable timetable;
     private TimetableDto timetableDto;
@@ -33,6 +39,16 @@ class TimetableServiceImplTest {
 
     @BeforeEach
     void setUp() {
+        Group group = new Group();
+        Teacher teacher = new Teacher();
+
+        teacher.setId(ID_1_VALUE);
+        teacher.setFirstName(TEACHER_1_FIRST_NAME_VALUE);
+        teacher.setLastName(TEACHER_1_LAST_NAME_VALUE);
+
+        group.setId(ID_1_VALUE);
+        group.setName(GROUP_1_NAME_VALUE);
+
         timetableService = new TimetableServiceImpl(mockTimetableRepository);
 
         timetable = new Timetable();
@@ -40,6 +56,8 @@ class TimetableServiceImplTest {
         timetable.setStartTime(TIME_1_VALUE);
         timetable.setLectureHall(LECTURE_HALL_1_VALUE);
         timetable.setSubject(SUBJECT_1_VALUE);
+        timetable.setTeacher(teacher);
+        timetable.setGroup(group);
 
         timetableDto = new TimetableDto();
         timetableDto.setDate(DATE_1_VALUE);
@@ -96,17 +114,28 @@ class TimetableServiceImplTest {
     }
 
     @Test
-    void shouldCallGetAllDtoTimetables() {
-        when(mockTimetableRepository.findAll()).thenReturn(timetables);
-        timetableService.getAllDto();
-        verify(mockTimetableRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll();
+    void shouldCallGetAllDtoTimetablesPageable() {
+        Pageable pageable = PageRequest.of(PAGE, SIZE);
+
+        Page<Timetable> timetablesPage = new PageImpl<>(timetables, pageable, timetables.size());
+        when(mockTimetableRepository.findAll(pageable)).thenReturn(timetablesPage);
+
+        List<TimetableDto> timetablesDto = new ArrayList<>();
+        timetablesDto.add(timetableDto);
+        Page<TimetableDto> expectedTimetablesDtoPage = new PageImpl<>(timetablesDto, pageable, timetablesDto.size());
+
+        Page<TimetableDto> actualTimetablesDtoPage = timetableService.getAllDto(pageable);
+
+        verify(mockTimetableRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll(pageable);
+        assertEquals(expectedTimetablesDtoPage, actualTimetablesDtoPage);
     }
 
     @Test
-    void shouldCallGetDtoTimetablesById() {
+    void shouldCallGetDtoTimetableById() {
         when(mockTimetableRepository.findById(ID_1_VALUE)).thenReturn(Optional.ofNullable(timetable));
-        timetableService.getDtoById(ID_1_VALUE);
+        TimetableDto actualTimetableDto = timetableService.getDtoById(ID_1_VALUE);
         verify(mockTimetableRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findById(ID_1_VALUE);
+        assertEquals(timetableDto, actualTimetableDto);
     }
 
     @Test

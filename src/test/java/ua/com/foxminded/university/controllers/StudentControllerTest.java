@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.entities.Student;
+import ua.com.foxminded.university.entities.dto.StudentDto;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -29,20 +29,20 @@ class StudentControllerTest {
 
     private static final String GET_BY_GROUP_ID_URL_TEMPLATE = "/students/by-group/1";
     private static final String GET_BY_GROUP_ID_VIEW_NAME = "/students/students-by-group-id";
-    private static final String GET_BY_GROUP_ID_PROPERTY_NAME = "studentsByGroupId";
+    private static final String GET_BY_GROUP_ID_PROPERTY_NAME = "students";
 
     private static final String GET_BY_ID_URL_TEMPLATE = "/students/1";
     private static final String GET_BY_ID_VIEW_NAME = "/students/student-info";
-    private static final String GET_BY_ID_PROPERTY_NAME = "student";
+    private static final String GET_BY_ID_PROPERTY_NAME = "studentDto";
 
     private static final String GET_NEW_STUDENT_URL_TEMPLATE = "/students/new";
-    private static final String GET_NEW_STUDENT_PROPERTY_NAME = "student";
+    private static final String GET_NEW_STUDENT_PROPERTY_NAME = "studentDto";
     private static final String GET_NEW_STUDENT_GROUPS_PROPERTY_NAME = "groups";
-    private static final String GET_NEW_STUDENT_VIEW_NAME = "/students/new-student";
+    private static final String GET_NEW_STUDENT_VIEW_NAME = "/students/student-new";
     private static final String POST_NEW_STUDENT_URL_TEMPLATE = "/students/";
 
     private static final String GET_EDIT_STUDENT_URL_TEMPLATE = "/students/1/edit";
-    private static final String GET_EDIT_STUDENT_PROPERTY_NAME = "student";
+    private static final String GET_EDIT_STUDENT_PROPERTY_NAME = "studentDto";
     private static final String GET_EDIT_STUDENT_VIEW_NAME = "/students/student-update";
     private static final String POST_EDIT_STUDENT_URL_TEMPLATE = "/students/1";
 
@@ -93,7 +93,7 @@ class StudentControllerTest {
             .param(FIRST_NAME, STUDENT_1_FIRST_NAME_VALUE)
             .param(LAST_NAME, STUDENT_1_LAST_NAME_VALUE)
             .param(PHONE, STUDENT_1_PHONE_VALUE)
-            .param(GROUP_ID, valueOf(ID_1_VALUE)))
+            .param(GROUP_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, STUDENTS)));
     }
@@ -104,7 +104,7 @@ class StudentControllerTest {
             .param(FIRST_NAME, EMPTY_STRING)
             .param(LAST_NAME, EMPTY_STRING)
             .param(PHONE, EMPTY_STRING)
-            .param(GROUP_ID, valueOf(ID_1_VALUE)))
+            .param(GROUP_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().isOk())
             .andExpect(view().name(GET_NEW_STUDENT_VIEW_NAME));
     }
@@ -114,7 +114,8 @@ class StudentControllerTest {
         mockMvc.perform(patch(POST_EDIT_STUDENT_URL_TEMPLATE)
             .param(FIRST_NAME, STUDENT_1_FIRST_NAME_VALUE)
             .param(LAST_NAME, STUDENT_1_LAST_NAME_VALUE)
-            .param(PHONE, STUDENT_1_PHONE_VALUE))
+            .param(PHONE, STUDENT_1_PHONE_VALUE)
+            .param(GROUP_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, STUDENTS)));
     }
@@ -176,7 +177,7 @@ class StudentControllerTest {
             .param(FIRST_NAME, STUDENT_1_FIRST_NAME_VALUE)
             .param(LAST_NAME, STUDENT_1_LAST_NAME_VALUE)
             .param(PHONE, STUDENT_1_PHONE_VALUE)
-            .param(GROUP_ID, valueOf(ID_1_VALUE)))
+            .param(GROUP_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection());
     }
 
@@ -185,7 +186,8 @@ class StudentControllerTest {
         mockMvc.perform(patch(POST_EDIT_STUDENT_URL_TEMPLATE)
             .param(FIRST_NAME, STUDENT_1_FIRST_NAME_VALUE)
             .param(LAST_NAME, STUDENT_1_LAST_NAME_VALUE)
-            .param(PHONE, STUDENT_1_PHONE_VALUE))
+            .param(PHONE, STUDENT_1_PHONE_VALUE)
+            .param(GROUP_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection());
     }
 
@@ -234,39 +236,16 @@ class StudentControllerTest {
 
     @Test
     void shouldReturnCorrectedStudentAttributesWhenGetStudentById() throws Exception {
-        Student student = new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE);
+        StudentDto studentDto = new StudentDto();
+        studentDto.setId(ID_1_VALUE);
+        studentDto.setFirstName(STUDENT_1_FIRST_NAME_VALUE);
+        studentDto.setLastName(STUDENT_1_LAST_NAME_VALUE);
+        studentDto.setPhone(STUDENT_1_PHONE_VALUE);
+        studentDto.setGroupId(ID_1_VALUE);
+        studentDto.setGroupName(GROUP_1_NAME_VALUE);
 
         mockMvc.perform(get(GET_BY_ID_URL_TEMPLATE))
             .andExpect(status().isOk())
-            .andExpect(model().attribute(GET_BY_ID_PROPERTY_NAME, equalTo(student)));
-    }
-
-    @Test
-    void shouldReturnCorrectedStudentAttributesWhenGetNewStudent() throws Exception {
-        Student emptyStudent = new Student(ID_0_VALUE, null, null, null);
-
-        mockMvc.perform(get(GET_NEW_STUDENT_URL_TEMPLATE))
-            .andExpect(status().isOk())
-            .andExpect(model().attribute(GET_NEW_STUDENT_GROUPS_PROPERTY_NAME, hasSize(INT_VALUE_2)))
-            .andExpect(model().attribute(GET_NEW_STUDENT_GROUPS_PROPERTY_NAME, hasItem(
-                allOf(
-                    hasProperty(ID, is(ID_1_VALUE)),
-                    hasProperty(NAME, is(GROUP_1_NAME_VALUE))
-                ))))
-            .andExpect(model().attribute(GET_NEW_STUDENT_GROUPS_PROPERTY_NAME, hasItem(
-                allOf(
-                    hasProperty(ID, is(ID_2_VALUE)),
-                    hasProperty(NAME, is(GROUP_2_NAME_VALUE))
-                ))))
-            .andExpect(model().attribute(GET_NEW_STUDENT_PROPERTY_NAME, equalTo(emptyStudent)));
-    }
-
-    @Test
-    void shouldReturnCorrectedStudentAttributesWhenGetEditStudent() throws Exception {
-        Student student = new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE);
-
-        mockMvc.perform(get(GET_EDIT_STUDENT_URL_TEMPLATE))
-            .andExpect(status().isOk())
-            .andExpect(model().attribute(GET_EDIT_STUDENT_PROPERTY_NAME, equalTo(student)));
+            .andExpect(model().attribute(GET_BY_ID_PROPERTY_NAME, equalTo(studentDto)));
     }
 }

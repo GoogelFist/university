@@ -10,7 +10,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import ua.com.foxminded.university.entities.dto.TimetableDto;
 
-import static org.hamcrest.Matchers.equalTo;
+import static java.lang.String.format;
+import static org.hamcrest.Matchers.*;
+import static org.hamcrest.Matchers.is;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 import static ua.com.foxminded.university.utils.Constants.*;
@@ -21,10 +23,13 @@ import static ua.com.foxminded.university.utils.Constants.*;
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.ANY)
 @TestPropertySource(locations = "classpath:application-test.properties")
 class TimetableControllerTest {
+    private static final String GET_ALL_URL_TEMPLATE = "/timetables/";
+    private static final String GET_ALL_PROPERTY_NAME = "timetables";
+    private static final String GET_ALL_VIEW_NAME = "/timetables/timetables";
+
     private static final String GET_BY_ID_PROPERTY_NAME = "timetableDto";
     private static final String GET_BY_ID_URL_TEMPLATE = "/timetables/1";
     private static final String GET_BY_ID_VIEW_NAME = "/timetables/timetable-info";
-    private static final String GET_ALL_VIEW_NAME = "/timetables/timetables";
 
     private static final String GET_NEW_TIMETABLE_URL_TEMPLATE = "/timetables/new";
     private static final String GET_NEW_TIMETABLE_PROPERTY_NAME = "timetableDto";
@@ -42,12 +47,20 @@ class TimetableControllerTest {
 
     private static final String DELETE_TIMETABLE_VIEW_NAME = "/timetables/1";
 
-    public static final String TEACHER_ID = "teacherId";
+
     public static final String GROUP_ID = "groupId";
+    private static final String TIMETABLES = "timetables";
 
 
     @Autowired
     public MockMvc mockMvc;
+
+    @Test
+    void shouldReturnCorrectedTeachersPageWhenGetTeachersPage() throws Exception {
+        mockMvc.perform(get(GET_ALL_URL_TEMPLATE))
+            .andExpect(status().isOk())
+            .andExpect(view().name(GET_ALL_VIEW_NAME));
+    }
 
     @Test
     void shouldReturnCorrectedTimetablesPageWhenGetTimetablesPageById() throws Exception {
@@ -99,25 +112,25 @@ class TimetableControllerTest {
     @Test
     void shouldReturnCorrectedTimetablesPageWhenDeleteTimetablePage() throws Exception {
         mockMvc.perform(delete(DELETE_TIMETABLE_VIEW_NAME))
-            .andExpect(status().isOk())
-            .andExpect(view().name(GET_ALL_VIEW_NAME));
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name(format(REDIRECT, TIMETABLES)));
     }
 
     @Test
-    void shouldReturnCorrectedDayTimetablesPageWhenPatchTimetablePage() throws Exception {
+    void shouldReturnCorrectedTimetablesPageWhenPatchTimetablePage() throws Exception {
         mockMvc.perform(patch(PATCH_EDIT_TIMETABLE_URL_TEMPLATE)
             .param(DATE, DATE_1_VALUE_STRING)
-            .param(START_TIME, TIME_1_STRING_VALUE)
+            .param(START_TIME, String.valueOf(TIME_1_VALUE))
             .param(LECTURE_HALL, LECTURE_HALL_1_VALUE)
             .param(SUBJECT, SUBJECT_1_VALUE)
             .param(GROUP_ID, String.valueOf(ID_1_VALUE))
             .param(TEACHER_ID, String.valueOf(ID_1_VALUE)))
-            .andExpect(status().isOk())
-            .andExpect(view().name(GET_EDIT_TIMETABLE_VIEW_NAME));
+            .andExpect(status().is3xxRedirection())
+            .andExpect(view().name(format(REDIRECT, TIMETABLES)));
     }
 
     @Test
-    void shouldReturnCorrectedDayTimetablesPageWhenPatchTimetablePageWithIncorrectParameters() throws Exception {
+    void shouldReturnCorrectedTimetablesPageWhenPatchTimetablePageWithIncorrectParameters() throws Exception {
         mockMvc.perform(patch(PATCH_EDIT_TIMETABLE_URL_TEMPLATE)
             .param(DATE, EMPTY_STRING)
             .param(START_TIME, EMPTY_STRING)
@@ -127,6 +140,14 @@ class TimetableControllerTest {
             .param(TEACHER_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().isOk())
             .andExpect(view().name(GET_EDIT_TIMETABLE_VIEW_NAME));
+    }
+
+    @Test
+    void shouldCheckForAttributeExistenceWhenGetTimetablesPage() throws Exception {
+        mockMvc.perform(get(GET_ALL_URL_TEMPLATE))
+            .andExpect(status().isOk())
+            .andExpect(model().attributeExists(GET_ALL_PROPERTY_NAME))
+            .andExpect(view().name(GET_ALL_VIEW_NAME));
     }
 
     @Test
@@ -151,25 +172,25 @@ class TimetableControllerTest {
     @Test
     void shouldCheckForAttributeExistenceWhenPostNewTimetablePage() throws Exception {
         mockMvc.perform(post(POST_NEW_TIMETABLE_URL_TEMPLATE)
-            .param(DATE, EMPTY_STRING)
-            .param(START_TIME, EMPTY_STRING)
+            .param(DATE, String.valueOf(DATE_1_VALUE))
+            .param(START_TIME, String.valueOf(TIME_1_VALUE))
             .param(LECTURE_HALL, LECTURE_HALL_1_VALUE)
             .param(SUBJECT, SUBJECT_1_VALUE)
             .param(GROUP_ID, String.valueOf(ID_1_VALUE))
             .param(TEACHER_ID, String.valueOf(ID_1_VALUE)))
-            .andExpect(status().isOk());
+            .andExpect(status().is3xxRedirection());
     }
 
     @Test
     void shouldCheckForAttributeExistenceWhenPatchTimetablePage() throws Exception {
         mockMvc.perform(patch(PATCH_EDIT_TIMETABLE_URL_TEMPLATE)
             .param(DATE, DATE_1_VALUE_STRING)
-            .param(START_TIME, TIME_1_STRING_VALUE)
+            .param(START_TIME, String.valueOf(TIME_1_VALUE))
             .param(LECTURE_HALL, LECTURE_HALL_1_VALUE)
             .param(SUBJECT, SUBJECT_1_VALUE)
             .param(GROUP_ID, String.valueOf(ID_1_VALUE))
             .param(TEACHER_ID, String.valueOf(ID_1_VALUE)))
-            .andExpect(status().isOk());
+            .andExpect(status().is3xxRedirection());
     }
 
     @Test
@@ -180,6 +201,39 @@ class TimetableControllerTest {
             .andExpect(model().attributeExists(GET_EDIT_TIMETABLE_PROPERTY_NAME_GROUP))
             .andExpect(model().attributeExists(GET_EDIT_TIMETABLE_PROPERTY_NAME_TEACHER))
             .andExpect(view().name(GET_EDIT_TIMETABLE_VIEW_NAME));
+    }
+
+    @Test
+    void shouldReturnCorrectedTimetablesAttributesWhenGetTimetables() throws Exception {
+        mockMvc.perform(get(GET_ALL_URL_TEMPLATE))
+            .andExpect(status().isOk())
+            .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasProperty(TOTAL_ELEMENTS, equalTo(TOTAL_ELEMENTS_VALUE_2))))
+            .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasItem(
+                allOf(
+                    hasProperty(ID, is(ID_1_VALUE)),
+                    hasProperty(DATE, is(DATE_1_VALUE)),
+                    hasProperty(TIME, is(TIME_1_VALUE)),
+                    hasProperty(LECTURE_HALL, is(LECTURE_HALL_1_VALUE)),
+                    hasProperty(SUBJECT, is(SUBJECT_1_VALUE)),
+                    hasProperty(GROUP_ID, is(ID_1_VALUE)),
+                    hasProperty(GROUP_NAME, is(GROUP_1_NAME_VALUE)),
+                    hasProperty(TEACHER_ID, is(ID_1_VALUE)),
+                    hasProperty(TEACHER_FIRST_NAME, is(TEACHER_1_FIRST_NAME_VALUE)),
+                    hasProperty(TEACHER_LAST_NAME, is(TEACHER_1_LAST_NAME_VALUE))
+                ))))
+            .andExpect(model().attribute(GET_ALL_PROPERTY_NAME, hasItem(
+                allOf(
+                    hasProperty(ID, is(ID_2_VALUE)),
+                    hasProperty(DATE, is(DATE_2_VALUE)),
+                    hasProperty(TIME, is(TIME_2_VALUE)),
+                    hasProperty(LECTURE_HALL, is(LECTURE_HALL_2_VALUE)),
+                    hasProperty(SUBJECT, is(SUBJECT_2_VALUE)),
+                    hasProperty(GROUP_ID, is(ID_2_VALUE)),
+                    hasProperty(GROUP_NAME, is(GROUP_2_NAME_VALUE)),
+                    hasProperty(TEACHER_ID, is(ID_2_VALUE)),
+                    hasProperty(TEACHER_FIRST_NAME, is(TEACHER_2_FIRST_NAME_VALUE)),
+                    hasProperty(TEACHER_LAST_NAME, is(TEACHER_2_LAST_NAME_VALUE))
+                ))));
     }
 
     @Test

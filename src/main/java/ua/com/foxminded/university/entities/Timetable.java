@@ -20,6 +20,8 @@ import java.time.LocalTime;
 public class Timetable {
     private static final String FIELD_CAN_NOT_BE_EMPTY = "This field cannot be empty";
     private static final String MUST_BE_POSITIVE = "Must be positive";
+    private static final String DATE_PATTERN = "yyyy-MM-dd";
+    private static final String TIME_PATTERN = "HH:mm";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,12 +30,12 @@ public class Timetable {
 
     @NotNull(message = FIELD_CAN_NOT_BE_EMPTY)
     @Column(name = "date")
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @DateTimeFormat(pattern = DATE_PATTERN)
     private LocalDate date;
 
     @NotNull(message = FIELD_CAN_NOT_BE_EMPTY)
     @Column(name = "start_time")
-    @DateTimeFormat(pattern = "HH:mm")
+    @DateTimeFormat(pattern = TIME_PATTERN)
     private LocalTime startTime;
 
     @NotBlank(message = FIELD_CAN_NOT_BE_EMPTY)

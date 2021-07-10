@@ -36,9 +36,4 @@ public class Group {
     @ManyToOne
     @JoinColumn(name = "cathedra_id")
     private Cathedra cathedra;
-
-    public Group(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 }

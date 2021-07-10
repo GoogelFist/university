@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.entities.Group;
+import ua.com.foxminded.university.entities.dto.GroupDto;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -29,20 +29,20 @@ class GroupControllerTest {
 
     private static final String GET_BY_CATHEDRA_ID_URL_TEMPLATE = "/groups/by-cathedra/1";
     private static final String GET_BY_CATHEDRA_ID_VIEW_NAME = "/groups/groups-by-cathedra-id";
-    private static final String GET_BY_CATHEDRA_ID_PROPERTY_NAME = "groupsByCathedraId";
+    private static final String GET_BY_CATHEDRA_ID_PROPERTY_NAME = "groups";
 
     private static final String GET_BY_ID_URL_TEMPLATE = "/groups/1";
     private static final String GET_BY_ID_VIEW_NAME = "/groups/group-info";
-    private static final String GET_BY_ID_PROPERTY_NAME = "group";
+    private static final String GET_BY_ID_PROPERTY_NAME = "groupDto";
 
     private static final String GET_NEW_GROUP_URL_TEMPLATE = "/groups/new";
-    private static final String GET_NEW_GROUP_PROPERTY_NAME = "group";
+    private static final String GET_NEW_GROUP_PROPERTY_NAME = "groupDto";
     private static final String GET_NEW_GROUP_CATHEDRAS_PROPERTY_NAME = "cathedras";
-    private static final String GET_NEW_GROUP_VIEW_NAME = "/groups/new-group";
+    private static final String GET_NEW_GROUP_VIEW_NAME = "/groups/group-new";
     private static final String POST_NEW_GROUP_URL_TEMPLATE = "/groups/";
 
     private static final String GET_EDIT_GROUP_URL_TEMPLATE = "/groups/1/edit";
-    private static final String GET_EDIT_GROUP_PROPERTY_NAME = "group";
+    private static final String GET_EDIT_GROUP_PROPERTY_NAME = "groupDto";
     private static final String GET_EDIT_GROUP_VIEW_NAME = "/groups/group-update";
     private static final String POST_EDIT_GROUP_URL_TEMPLATE = "/groups/1";
 
@@ -91,7 +91,7 @@ class GroupControllerTest {
     void shouldReturnCorrectedGroupPageWhenCreateNewGroupsPage() throws Exception {
         mockMvc.perform(post(POST_NEW_GROUP_URL_TEMPLATE)
             .param(NAME, GROUP_1_NAME_VALUE)
-            .param(CATHEDRA_ID, valueOf(ID_1_VALUE)))
+            .param(CATHEDRA_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, GROUPS)));
     }
@@ -100,7 +100,7 @@ class GroupControllerTest {
     void shouldReturnCorrectedGroupPageWhenCreateNewGroupsPageWithIncorrectParameters() throws Exception {
         mockMvc.perform(post(POST_NEW_GROUP_URL_TEMPLATE)
             .param(NAME, EMPTY_STRING)
-            .param(CATHEDRA_ID, valueOf(ID_1_VALUE)))
+            .param(CATHEDRA_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().isOk())
             .andExpect(view().name(GET_NEW_GROUP_VIEW_NAME));
     }
@@ -115,7 +115,8 @@ class GroupControllerTest {
     @Test
     void shouldReturnCorrectedGroupsPageWhenEditGroupsPage() throws Exception {
         mockMvc.perform(patch(POST_EDIT_GROUP_URL_TEMPLATE)
-            .param(NAME, GROUP_1_NAME_VALUE))
+            .param(NAME, GROUP_1_NAME_VALUE)
+            .param(CATHEDRA_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, GROUPS)));
     }
@@ -165,14 +166,15 @@ class GroupControllerTest {
     void shouldCheckForAttributeExistenceWhenCreateNewGroupPage() throws Exception {
         mockMvc.perform(post(POST_NEW_GROUP_URL_TEMPLATE)
             .param(NAME, GROUP_1_NAME_VALUE)
-            .param(CATHEDRA_ID, valueOf(ID_1_VALUE)))
+            .param(CATHEDRA_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection());
     }
 
     @Test
     void shouldCheckForAttributeExistenceWhenEditGroupPage() throws Exception {
         mockMvc.perform(patch(POST_EDIT_GROUP_URL_TEMPLATE)
-            .param(NAME, GROUP_1_NAME_VALUE))
+            .param(NAME, GROUP_1_NAME_VALUE)
+            .param(CATHEDRA_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection());
     }
 
@@ -215,10 +217,14 @@ class GroupControllerTest {
 
     @Test
     void shouldReturnCorrectedGroupAttributesWhenGetGroupById() throws Exception {
-        Group group = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE);
+        GroupDto groupDto = new GroupDto();
+        groupDto.setId(ID_1_VALUE);
+        groupDto.setName(GROUP_1_NAME_VALUE);
+        groupDto.setCathedraId(ID_1_VALUE);
+        groupDto.setCathedraName(CATHEDRA_1_NAME_VALUE);
 
         mockMvc.perform(get(GET_BY_ID_URL_TEMPLATE))
             .andExpect(status().isOk())
-            .andExpect(model().attribute(GET_BY_ID_PROPERTY_NAME, equalTo(group)));
+            .andExpect(model().attribute(GET_BY_ID_PROPERTY_NAME, equalTo(groupDto)));
     }
 }

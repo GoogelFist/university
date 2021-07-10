@@ -45,12 +45,4 @@ public class Teacher {
     @JoinColumn(name = "cathedra_id")
     @ToString.Exclude
     private Cathedra cathedra;
-
-    public Teacher(int id, String firstName, String lastName, String phone, String qualification) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.phone = phone;
-        this.qualification = qualification;
-    }
 }

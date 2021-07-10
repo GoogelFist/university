@@ -6,7 +6,7 @@
 <div th:replace="fragments/cathedras-fragments :: menu-site-for-cathedras"></div>
 
 <div th:fragment="new-cathedra">
-    <form th:method="POST" th:action="@{/cathedras}" th:object="${cathedra}" class="row mb-1 m-lg-2">
+    <form th:method="POST" th:action="@{/cathedras}" th:object="${cathedraDto}" class="row mb-1 m-lg-2">
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3">
                 <label for="name" class="form-label">Name</label>

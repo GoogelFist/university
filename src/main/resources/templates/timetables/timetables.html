@@ -25,21 +25,21 @@
         </tr>
         </thead>
         <tbody>
-        <tr th:each="timetableDto: ${timetablesDtoList}">
-            <td th:text="${timetableDto.getDate()}"></td>
-            <td th:text="${timetableDto.getStartTime()}"></td>
-            <td th:text="${timetableDto.getLectureHall()}"></td>
-            <td th:text="${timetableDto.getSubject()}"></td>
-            <td th:text="${timetableDto.groupName}"></td>
-            <td th:text="| ${timetableDto.getTeacherFirstName()} ${timetableDto.getTeacherLastName()} |"></td>
+        <tr th:each="timetable: ${timetables}">
+            <td th:text="${timetable.getDate()}"></td>
+            <td th:text="${timetable.getStartTime()}"></td>
+            <td th:text="${timetable.getLectureHall()}"></td>
+            <td th:text="${timetable.getSubject()}"></td>
+            <td th:text="${timetable.groupName}"></td>
+            <td th:text="| ${timetable.getTeacherFirstName()} ${timetable.getTeacherLastName()} |"></td>
             <td class="d-flex flex-row text-nowrap bd-highlight">
-                <a th:href="@{/timetables/{id}(id = ${timetableDto.getId()})}"
+                <a th:href="@{/timetables/{id}(id = ${timetable.getId()})}"
                    class="btn btn-outline-primary ms-1"
                    role="button">Info</a>
-                <a th:href="@{/timetables/{id}/edit(id = ${timetableDto.getId()})}"
+                <a th:href="@{/timetables/{id}/edit(id = ${timetable.getId()})}"
                    class="btn btn-outline-primary ms-1"
                    role="button">Edit</a>
-                <form th:method="DELETE" th:action="@{/timetables/{id}(id=${timetableDto.getId()})}"
+                <form th:method="DELETE" th:action="@{/timetables/{id}(id=${timetable.getId()})}"
                       class="input-group ms-1">
                     <input type="submit" class="btn btn-outline-primary" value="Delete"/>
                 </form>
@@ -48,6 +48,8 @@
         </tbody>
     </table>
 </div>
+
+<div th:replace="fragments/timetables-fragments :: timetables-pagination"></div>
 
 </body>
 </html>

@@ -1,4 +1,4 @@
-package ua.com.foxminded.university.entities.dto;
+package ua.com.foxminded.university.entities.dto.rest;
 
 import io.swagger.annotations.ApiModelProperty;
 import lombok.Data;

@@ -8,7 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
+import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.entities.Teacher;
+import ua.com.foxminded.university.entities.dto.TeacherDto;
 
 import static java.lang.String.format;
 import static java.lang.String.valueOf;
@@ -29,25 +31,24 @@ class TeacherControllerTest {
 
     private static final String GET_BY_CATHEDRA_ID_URL_TEMPLATE = "/teachers/by-cathedra/1";
     private static final String GET_BY_CATHEDRA_ID_VIEW_NAME = "/teachers/teachers-by-cathedra-id";
-    private static final String GET_BY_CATHEDRA_ID_PROPERTY_NAME = "teachersByCathedraId";
+    private static final String GET_BY_CATHEDRA_ID_PROPERTY_NAME = "teachers";
 
     private static final String GET_BY_ID_URL_TEMPLATE = "/teachers/1";
     private static final String GET_BY_ID_VIEW_NAME = "/teachers/teacher-info";
-    private static final String GET_BY_ID_PROPERTY_NAME = "teacher";
+    private static final String GET_BY_ID_PROPERTY_NAME = "teacherDto";
 
     private static final String GET_NEW_TEACHER_URL_TEMPLATE = "/teachers/new";
-    private static final String GET_NEW_TEACHER_PROPERTY_NAME = "teacher";
+    private static final String GET_NEW_TEACHER_PROPERTY_NAME = "teacherDto";
     private static final String GET_NEW_TEACHER_CATHEDRAS_PROPERTY_NAME = "cathedras";
-    private static final String GET_NEW_TEACHER_VIEW_NAME = "/teachers/new-teacher";
+    private static final String GET_NEW_TEACHER_VIEW_NAME = "/teachers/teacher-new";
     private static final String POST_NEW_TEACHER_URL_TEMPLATE = "/teachers/";
 
     private static final String GET_EDIT_TEACHER_URL_TEMPLATE = "/teachers/1/edit";
-    private static final String GET_EDIT_TEACHER_PROPERTY_NAME = "teacher";
+    private static final String GET_EDIT_TEACHER_PROPERTY_NAME = "teacherDto";
     private static final String GET_EDIT_TEACHER_VIEW_NAME = "/teachers/teacher-update";
     private static final String POST_EDIT_TEACHER_URL_TEMPLATE = "/teachers/1";
 
     private static final String DELETE_TEACHER_VIEW_NAME = "/teachers/1";
-
 
     @Autowired
     public MockMvc mockMvc;
@@ -117,7 +118,8 @@ class TeacherControllerTest {
             .param(FIRST_NAME, TEACHER_1_FIRST_NAME_VALUE)
             .param(LAST_NAME, TEACHER_1_LAST_NAME_VALUE)
             .param(PHONE, TEACHER_1_PHONE_VALUE)
-            .param(QUALIFICATION, QUALIFICATION_1_VALUE))
+            .param(QUALIFICATION, QUALIFICATION_1_VALUE)
+            .param(CATHEDRA_ID, valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection())
             .andExpect(view().name(format(REDIRECT, TEACHERS)));
     }
@@ -190,7 +192,8 @@ class TeacherControllerTest {
             .param(FIRST_NAME, TEACHER_1_FIRST_NAME_VALUE)
             .param(LAST_NAME, TEACHER_1_LAST_NAME_VALUE)
             .param(PHONE, TEACHER_1_PHONE_VALUE)
-            .param(QUALIFICATION, QUALIFICATION_1_VALUE))
+            .param(QUALIFICATION, QUALIFICATION_1_VALUE)
+            .param(CATHEDRA_ID, String.valueOf(ID_1_VALUE)))
             .andExpect(status().is3xxRedirection());
     }
 
@@ -242,10 +245,17 @@ class TeacherControllerTest {
 
     @Test
     void shouldReturnCorrectedTeacherAttributesWhenGetTeacherById() throws Exception {
-        Teacher teacher = new Teacher(ID_1_VALUE, TEACHER_1_FIRST_NAME_VALUE, TEACHER_1_LAST_NAME_VALUE, TEACHER_1_PHONE_VALUE, QUALIFICATION_1_VALUE);
+        TeacherDto teacherDto = new TeacherDto();
+        teacherDto.setId(ID_1_VALUE);
+        teacherDto.setFirstName(TEACHER_1_FIRST_NAME_VALUE);
+        teacherDto.setLastName(TEACHER_1_LAST_NAME_VALUE);
+        teacherDto.setPhone(TEACHER_1_PHONE_VALUE);
+        teacherDto.setQualification(QUALIFICATION_1_VALUE);
+        teacherDto.setCathedraId(ID_1_VALUE);
+        teacherDto.setCathedraName(CATHEDRA_1_NAME_VALUE);
 
         mockMvc.perform(get(GET_BY_ID_URL_TEMPLATE))
             .andExpect(status().isOk())
-            .andExpect(model().attribute(GET_BY_ID_PROPERTY_NAME, equalTo(teacher)));
+            .andExpect(model().attribute(GET_BY_ID_PROPERTY_NAME, equalTo(teacherDto)));
     }
 }

@@ -6,7 +6,7 @@
 <div th:replace="fragments/groups-fragments:: menu-site-for-groups"></div>
 
 <div th:fragment="new-group">
-    <form th:method="POST" th:action="@{/groups}" th:object="${group}" class="row mb-1 m-lg-2">
+    <form th:method="POST" th:action="@{/groups}" th:object="${groupDto}" class="row mb-1 m-lg-2">
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3">
                 <label for="name" class="form-label">Name</label>
@@ -18,14 +18,14 @@
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3">
                 <label for="inputState" class="form-label">Cathedra</label>
-                <select th:field="*{cathedra.id}" id="inputState" class="form-select">
+                <select th:field="*{cathedraId}" id="inputState" class="form-select">
                     <option th:value="0" disabled>Select</option>
                     <option th:each="cathedra : ${cathedras}"
                             th:value="${cathedra.id}"
                             th:text="${cathedra.getName()}">
                     </option>
                 </select>
-                <div style="color:red" th:if="${#fields.hasErrors('cathedra.id')}" th:errors="*{cathedra.id}"></div>
+                <div style="color:red" th:if="${#fields.hasErrors('cathedraId')}" th:errors="*{cathedraId}"></div>
             </div>
         </div>
         <div class="row mb-1">

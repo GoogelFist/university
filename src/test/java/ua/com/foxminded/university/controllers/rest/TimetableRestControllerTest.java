@@ -10,7 +10,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.entities.dto.TimetableDtoRequest;
+import ua.com.foxminded.university.entities.dto.rest.TimetableDtoRequest;
 
 import static org.hamcrest.Matchers.is;
 import static org.springframework.http.MediaType.APPLICATION_JSON;

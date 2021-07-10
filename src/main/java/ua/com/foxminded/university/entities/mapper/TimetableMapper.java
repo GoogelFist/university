@@ -5,8 +5,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 import ua.com.foxminded.university.entities.Timetable;
 import ua.com.foxminded.university.entities.dto.TimetableDto;
-import ua.com.foxminded.university.entities.dto.TimetableDtoRequest;
-import ua.com.foxminded.university.entities.dto.TimetableDtoResponse;
+import ua.com.foxminded.university.entities.dto.rest.TimetableDtoRequest;
+import ua.com.foxminded.university.entities.dto.rest.TimetableDtoResponse;
 
 @Mapper
 public interface TimetableMapper {

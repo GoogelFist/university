@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Group;
-import ua.com.foxminded.university.entities.dto.GroupDtoRequest;
-import ua.com.foxminded.university.entities.dto.GroupDtoResponse;
+import ua.com.foxminded.university.entities.dto.rest.GroupDtoRequest;
+import ua.com.foxminded.university.entities.dto.rest.GroupDtoResponse;
 import ua.com.foxminded.university.entities.mapper.GroupMapper;
 import ua.com.foxminded.university.service.GroupService;
 

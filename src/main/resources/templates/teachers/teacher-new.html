@@ -1,26 +1,25 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
-<head th:replace="fragments/fragments :: header ('New student')"></head>
+<head th:replace="fragments/fragments :: header ('New teacher')"></head>
 <body>
 
-<div th:replace="fragments/students-fragments :: menu-site-for-students"></div>
+<head th:replace="fragments/teachers-fragments :: menu-site-for-teachers"></head>
 
-<div th:fragment="new-student">
-    <form th:method="POST" th:action="@{/students}" th:object="${student}" class="row mb-1 m-lg-2">
+<div th:fragment="new-teacher">
+    <form th:method="POST" th:action="@{/teachers}" th:object="${teacherDto}" class="row mb-1 m-lg-2">
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3">
                 <label for="firstName" class="form-label">First Name</label>
                 <input th:field="*{firstName}" id="firstName" type="text" class="form-control"
-                       placeholder="Enter first name of student">
+                       placeholder="Enter first name of teacher">
             </div>
-            <div style="color:red" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Firstname Error
-            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('firstName')}" th:errors="*{firstName}">Firstname Error</div>
         </div>
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3">
                 <label for="lastName" class="form-label">Last Name</label>
                 <input th:field="*{lastName}" id="lastName" type="text" class="form-control"
-                       placeholder="Enter last name of student">
+                       placeholder="Enter last name of teacher">
             </div>
             <div style="color:red" th:if="${#fields.hasErrors('lastName')}" th:errors="*{lastName}">Lastname Error</div>
         </div>
@@ -28,21 +27,29 @@
             <div class="col-sm-3">
                 <label for="phone" class="form-label">Phone</label>
                 <input th:field="*{phone}" id="phone" type="text" class="form-control"
-                       placeholder="Enter phone of student">
+                       placeholder="Enter phone of teacher">
             </div>
             <div style="color:red" th:if="${#fields.hasErrors('phone')}" th:errors="*{phone}">Phone Error</div>
         </div>
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3">
-                <label for="inputState" class="form-label">Group</label>
-                <select th:field="*{group.id}" id="inputState" class="form-select">
+                <label for="qualification" class="form-label">Qualification</label>
+                <input th:field="*{qualification}" id="qualification" type="text" class="form-control"
+                       placeholder="Enter qualification of teacher">
+            </div>
+            <div style="color:red" th:if="${#fields.hasErrors('qualification')}" th:errors="*{qualification}">Qualification Error</div>
+        </div>
+        <div class="row mb-1 col-form-label">
+            <div class="col-sm-3">
+                <label for="inputState" class="form-label">Cathedra</label>
+                <select th:field="*{cathedraId}" id="inputState" class="form-select">
                     <option th:value="0" disabled>Select</option>
-                    <option th:each="group : ${groups}"
-                            th:value="${group.id}"
-                            th:text="${group.getName()}">
+                    <option th:each="cathedra : ${cathedras}"
+                            th:value="${cathedra.id}"
+                            th:text="${cathedra.getName()}">
                     </option>
                 </select>
-                <div style="color:red" th:if="${#fields.hasErrors('group.id')}" th:errors="*{group.id}"></div>
+                <div style="color:red" th:if="${#fields.hasErrors('cathedraId')}" th:errors="*{cathedraId}"></div>
             </div>
         </div>
         <div class="row mb-1">

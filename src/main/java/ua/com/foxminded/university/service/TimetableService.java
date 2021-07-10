@@ -1,12 +1,12 @@
 package ua.com.foxminded.university.service;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import ua.com.foxminded.university.entities.Timetable;
 import ua.com.foxminded.university.entities.dto.TimetableDto;
 
-import java.util.List;
-
 public interface TimetableService extends GenericServiceJpa<Timetable> {
-    List<TimetableDto> getAllDto();
+    Page<TimetableDto> getAllDto(Pageable pageable);
 
     TimetableDto getDtoById(int id);
 

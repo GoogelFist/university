@@ -17,12 +17,12 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="teacher: ${teachersByCathedraId}">
+    <tr th:each="teacher: ${teachers}">
         <td th:text="${teacher.getFirstName()}"></td>
         <td th:text="${teacher.getLastName()}"></td>
         <td th:text="${teacher.getPhone()}"></td>
         <td th:text="${teacher.getQualification()}"></td>
-        <td th:text="${teacher.getCathedra().getName()}"></td>
+        <td th:text="${teacher.getCathedraName()}"></td>
         <td>
             <a class="btn btn-outline-primary"
                th:href="@{/teachers/{id}(id = ${teacher.getId()})}"

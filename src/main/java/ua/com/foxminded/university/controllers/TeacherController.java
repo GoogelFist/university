@@ -1,14 +1,14 @@
 package ua.com.foxminded.university.controllers;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-import ua.com.foxminded.university.entities.Cathedra;
-import ua.com.foxminded.university.entities.Teacher;
+import org.springframework.web.servlet.ModelAndView;
+import ua.com.foxminded.university.entities.dto.TeacherDto;
 import ua.com.foxminded.university.service.CathedraService;
 import ua.com.foxminded.university.service.TeacherService;
 
@@ -19,111 +19,136 @@ import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 
+@Slf4j
+@RequiredArgsConstructor
 @Controller
 @RequestMapping("/teachers")
 public class TeacherController {
     private static final String TEACHERS = "teachers";
     private static final String TEACHER = "teacher";
+    private static final String TEACHER_DTO = "teacherDto";
     private static final String ID = "id";
     private static final String TEACHERS_BY_CATHEDRA_ID = "teachersByCathedraId";
     private static final String PAGE_NUMBERS = "pageNumbers";
-    private static final String CATHEDRA_ID = "cathedraId";
     private static final String CATHEDRAS = "cathedras";
 
     private static final String GET_BY_CATHEDRA_ID_VIEW_NAME = "/teachers/teachers-by-cathedra-id";
     private static final String GET_BY_ID_VIEW_NAME = "/teachers/teacher-info";
     private static final String GET_ALL_VIEW_NAME = "/teachers/teachers";
-    private static final String GET_NEW_TEACHER_VIEW_NAME = "/teachers/new-teacher";
+    private static final String GET_NEW_TEACHER_VIEW_NAME = "/teachers/teacher-new";
+    private static final String GET_EDIT_TEACHER_VIEW_NAME = "/teachers/teacher-update";
+
+    private static final String SHOW_LOG_MESSAGE = "showing all %s";
+    private static final String SHOW_BY_ID_LOG_MESSAGE = "showing %s with id {}";
+    private static final String GET_SAVE_LOG_MESSAGE = "getting save new %s";
+    private static final String SAVE_LOG_MESSAGE = "saving new %s: {}";
+    private static final String GET_UPDATE_LOG_MESSAGE = "getting update %s with id {}";
+    private static final String UPDATE_LOG_MESSAGE = "updating %s {}";
+    private static final String DELETE_LOG_MESSAGE = "deleting %s with id {}";
 
     private static final String REDIRECT = "redirect:/%s";
-    private static final String GET_EDIT_TEACHER_VIEW_NAME = "/teachers/teacher-update";
 
 
     private final TeacherService teacherService;
     private final CathedraService cathedraService;
 
-    @Autowired
-    public TeacherController(TeacherService teacherService, CathedraService cathedraService) {
-        this.teacherService = teacherService;
-        this.cathedraService = cathedraService;
-    }
-
     @GetMapping()
-    public String showAllTeachers(Model model, Pageable pageable) {
-        Page<Teacher> teacherPage = teacherService.getAll(pageable);
-        model.addAttribute(TEACHERS, teacherPage);
-
+    public ModelAndView showAllTeachers(Pageable pageable) {
+        log.debug(format(SHOW_LOG_MESSAGE, TEACHERS));
+        Page<TeacherDto> teacherPage = teacherService.getAllDto(pageable);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName(GET_ALL_VIEW_NAME);
+        modelAndView.addObject(TEACHERS, teacherPage);
         int totalPages = teacherPage.getTotalPages();
         if (totalPages > 0) {
             List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
-            model.addAttribute(PAGE_NUMBERS, pageNumbers);
+            modelAndView.addObject(PAGE_NUMBERS, pageNumbers);
         }
-        return GET_ALL_VIEW_NAME;
+        return modelAndView;
     }
 
-    @GetMapping("/by-cathedra/{cathedraId}")
-    public String showTeachersByCathedraId(@PathVariable(CATHEDRA_ID) int cathedraId, Model model, Pageable pageable) {
-        Page<Teacher> teacherPage = teacherService.getByCathedraId(cathedraId, pageable);
-        model.addAttribute(TEACHERS_BY_CATHEDRA_ID, teacherPage);
-
+    @GetMapping("/by-cathedra/{id}")
+    public ModelAndView showTeachersByCathedraId(@PathVariable(ID) int id, Pageable pageable) {
+        log.debug(format(SHOW_LOG_MESSAGE, TEACHERS_BY_CATHEDRA_ID));
+        Page<TeacherDto> teacherPage = teacherService.getDtoByCathedraId(id, pageable);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName(GET_BY_CATHEDRA_ID_VIEW_NAME);
+        modelAndView.addObject(TEACHERS, teacherPage);
         int totalPages = teacherPage.getTotalPages();
         if (totalPages > 0) {
             List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
-            model.addAttribute(PAGE_NUMBERS, pageNumbers);
+            modelAndView.addObject(PAGE_NUMBERS, pageNumbers);
         }
-        return GET_BY_CATHEDRA_ID_VIEW_NAME;
+        return modelAndView;
     }
 
     @GetMapping("/{id}")
-    public String showTeacherById(@PathVariable(ID) int id, Model model) {
-        Teacher teacherById = teacherService.getById(id);
-
-        model.addAttribute(TEACHER, teacherById);
-        return GET_BY_ID_VIEW_NAME;
+    public ModelAndView showTeacherById(@PathVariable(ID) int id) {
+        log.debug(format(SHOW_BY_ID_LOG_MESSAGE, TEACHER), id);
+        TeacherDto teacherDto = teacherService.getDtoById(id);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName(GET_BY_ID_VIEW_NAME);
+        modelAndView.addObject(TEACHER_DTO, teacherDto);
+        return modelAndView;
     }
 
     @GetMapping("/new")
-    public String newTeacher(@ModelAttribute(TEACHER) Teacher teacher, Model model) {
-        List<Cathedra> cathedras = cathedraService.getAll();
-        model.addAttribute(CATHEDRAS, cathedras);
-        return GET_NEW_TEACHER_VIEW_NAME;
+    public ModelAndView newTeacher() {
+        log.debug(format(GET_SAVE_LOG_MESSAGE, TEACHER));
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName(GET_NEW_TEACHER_VIEW_NAME);
+        modelAndView.addObject(TEACHER_DTO, new TeacherDto());
+        modelAndView.addObject(CATHEDRAS, cathedraService.getAll());
+        return modelAndView;
     }
 
     @PostMapping()
-    public String createTeacher(@ModelAttribute(TEACHER) @Valid Teacher teacher, BindingResult bindingResult, Model model) {
-        if (teacher.getCathedra() == null || teacher.getCathedra().getId() < 1) {
-            bindingResult.rejectValue("cathedra.id", "error.teacher", "Choose a cathedra");
-        }
+    public ModelAndView newTeacher(@Valid TeacherDto teacherDto, BindingResult bindingResult) {
+        log.debug(format(SAVE_LOG_MESSAGE, TEACHER), teacherDto);
+        ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
-            List<Cathedra> cathedras = cathedraService.getAll();
-            model.addAttribute(CATHEDRAS, cathedras);
-            return GET_NEW_TEACHER_VIEW_NAME;
+            modelAndView.setViewName(GET_NEW_TEACHER_VIEW_NAME);
+            modelAndView.addObject(TEACHER_DTO, teacherDto);
+            modelAndView.addObject(CATHEDRAS, cathedraService.getAll());
+        } else {
+            teacherService.createDto(teacherDto);
+            modelAndView.setViewName(format(REDIRECT, TEACHERS));
         }
-        teacherService.create(teacher);
-        return format(REDIRECT, TEACHERS);
+        return modelAndView;
     }
 
     @GetMapping("/{id}/edit")
-    public String edit(@PathVariable(ID) int id, Model model) {
-        List<Cathedra> cathedras = cathedraService.getAll();
-        model.addAttribute(CATHEDRAS, cathedras);
-        Teacher teacherById = teacherService.getById(id);
-        model.addAttribute(TEACHER, teacherById);
-        return GET_EDIT_TEACHER_VIEW_NAME;
+    public ModelAndView editTeacher(@PathVariable(ID) int id) {
+        log.debug(format(GET_UPDATE_LOG_MESSAGE, TEACHER), id);
+        TeacherDto teacherDto = teacherService.getDtoById(id);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName(GET_EDIT_TEACHER_VIEW_NAME);
+        modelAndView.addObject(TEACHER_DTO, teacherDto);
+        modelAndView.addObject(CATHEDRAS, cathedraService.getAll());
+        return modelAndView;
     }
 
     @PatchMapping("/{id}")
-    public String update(@ModelAttribute(TEACHER) @Valid Teacher teacher, BindingResult bindingResult) {
+    public ModelAndView editTeacher(@Valid TeacherDto teacherDto, BindingResult bindingResult) {
+        log.debug(format(UPDATE_LOG_MESSAGE, TEACHER), teacherDto);
+        ModelAndView modelAndView = new ModelAndView();
         if (bindingResult.hasErrors()) {
-            return GET_EDIT_TEACHER_VIEW_NAME;
+            modelAndView.setViewName(GET_EDIT_TEACHER_VIEW_NAME);
+            modelAndView.addObject(TEACHER_DTO, teacherDto);
+            modelAndView.addObject(CATHEDRAS, cathedraService.getAll());
+        } else {
+            teacherService.updateDto(teacherDto);
+            modelAndView.setViewName(format(REDIRECT, TEACHERS));
         }
-        teacherService.update(teacher);
-        return format(REDIRECT, TEACHERS);
+        return modelAndView;
     }
 
     @DeleteMapping("/{id}")
-    public String delete(@PathVariable(ID) int id) {
+    public ModelAndView delete(@PathVariable(ID) int id) {
+        log.debug(format(DELETE_LOG_MESSAGE, TEACHER), id);
         teacherService.delete(id);
-        return format(REDIRECT, TEACHERS);
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName(format(REDIRECT, TEACHERS));
+        return modelAndView;
     }
 }

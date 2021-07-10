@@ -9,9 +9,9 @@
     <img src="" class="card-img-top" alt="...">
     <div class="card-body">
         <h5 class="card-title">Group</h5>
-        <p th:text="| ID: ${group.getId()} |" class="card-text">VALUE</p>
-        <p th:text="| Name: ${group.getName()} |" class="card-text">VALUE</p>
-        <p th:text="| Cathedra: ${group.getCathedra().getName()} |" class="card-text">VALUE</p>
+        <p th:text="| ID: ${groupDto.getId()} |" class="card-text">VALUE</p>
+        <p th:text="| Name: ${groupDto.getName()} |" class="card-text">VALUE</p>
+        <p th:text="| Cathedra: ${groupDto.getCathedraName()} |" class="card-text">VALUE</p>
         <a onclick="history.back()" class="btn btn-primary">Go back</a>
     </div>
 </div>

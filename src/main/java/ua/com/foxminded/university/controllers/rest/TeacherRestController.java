@@ -6,8 +6,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Teacher;
-import ua.com.foxminded.university.entities.dto.TeacherDtoRequest;
-import ua.com.foxminded.university.entities.dto.TeacherDtoResponse;
+import ua.com.foxminded.university.entities.dto.rest.TeacherDtoRequest;
+import ua.com.foxminded.university.entities.dto.rest.TeacherDtoResponse;
 import ua.com.foxminded.university.entities.mapper.TeacherMapper;
 import ua.com.foxminded.university.service.TeacherService;
 

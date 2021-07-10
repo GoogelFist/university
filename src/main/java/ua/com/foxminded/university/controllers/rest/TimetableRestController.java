@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ua.com.foxminded.university.entities.Timetable;
-import ua.com.foxminded.university.entities.dto.TimetableDtoRequest;
-import ua.com.foxminded.university.entities.dto.TimetableDtoResponse;
+import ua.com.foxminded.university.entities.dto.rest.TimetableDtoRequest;
+import ua.com.foxminded.university.entities.dto.rest.TimetableDtoResponse;
 import ua.com.foxminded.university.entities.mapper.TimetableMapper;
 import ua.com.foxminded.university.service.TimetableService;
 

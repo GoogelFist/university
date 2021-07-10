@@ -2,6 +2,8 @@ package ua.com.foxminded.university.controllers;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -12,7 +14,10 @@ import ua.com.foxminded.university.service.TeacherService;
 import ua.com.foxminded.university.service.TimetableService;
 
 import javax.validation.Valid;
+
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static java.lang.String.format;
 
@@ -27,8 +32,7 @@ public class TimetableController {
     private static final String TIMETABLE_DTO = "timetableDto";
     private static final String TIMETABLES = "timetables";
     private static final String TIMETABLE = "timetable";
-    private static final String REDIRECT = "redirect:/%s";
-    private static final String TIMETABLES_DTO_LIST = "timetablesDtoList";
+    private static final String PAGE_NUMBERS = "pageNumbers";
 
     private static final String GET_ALL_VIEW_NAME = "/timetables/timetables";
     private static final String GET_BY_ID_VIEW_NAME = "/timetables/timetable-info";
@@ -43,18 +47,24 @@ public class TimetableController {
     private static final String UPDATE_LOG_MESSAGE = "updating %s {}";
     private static final String DELETE_LOG_MESSAGE = "deleting %s with id {}";
 
+    private static final String REDIRECT = "redirect:/%s";
 
     private final TimetableService timetableService;
     private final GroupService groupService;
     private final TeacherService teacherService;
 
     @GetMapping()
-    public ModelAndView showAllTimetables() {
+    public ModelAndView showAllTimetables(Pageable pageable) {
         log.debug(format(SHOW_LOG_MESSAGE, TIMETABLES));
-        List<TimetableDto> timetablesDtoList = timetableService.getAllDto();
+        Page<TimetableDto> timetablesPage = timetableService.getAllDto(pageable);
         ModelAndView modelAndView = new ModelAndView();
         modelAndView.setViewName(GET_ALL_VIEW_NAME);
-        modelAndView.addObject(TIMETABLES_DTO_LIST, timetablesDtoList);
+        modelAndView.addObject(TIMETABLES, timetablesPage);
+        int totalPages = timetablesPage.getTotalPages();
+        if (totalPages > 0) {
+            List<Integer> pageNumbers = IntStream.rangeClosed(1, totalPages).boxed().collect(Collectors.toList());
+            modelAndView.addObject(PAGE_NUMBERS, pageNumbers);
+        }
         return modelAndView;
     }
 
@@ -127,6 +137,8 @@ public class TimetableController {
     public ModelAndView delete(@PathVariable(ID) int id) {
         log.debug(format(DELETE_LOG_MESSAGE, TIMETABLE), id);
         timetableService.delete(id);
-        return showAllTimetables();
+        ModelAndView modelAndView = new ModelAndView();
+        modelAndView.setViewName(format(REDIRECT, TIMETABLES));
+        return modelAndView;
     }
 }

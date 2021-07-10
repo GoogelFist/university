@@ -12,9 +12,15 @@ public class Constants {
     public static final String SUBJECT = "subject";
     public static final String GROUP = "group";
     public static final String GROUPS = "groups";
-    public static final String GROUP_ID = "group.id";
+    public static final String GROUP_NAME = "groupName";
+    public static final String GROUP_ID = "groupId";
     public static final String TEACHER = "teacher";
     public static final String TEACHERS = "teachers";
+    public static final String TEACHER_ID = "teacherId";
+    public static final String TEACHER_FIRST_NAME = "teacherFirstName";
+    public static final String TEACHER_LAST_NAME = "teacherLastName";
+    public static final String TIMETABLE = "timetable";
+    public static final String TIME = "startTime";
     public static final String STUDENTS = "students";
     public static final String STUDENT = "student";
     public static final String FIRST_NAME = "firstName";
@@ -23,8 +29,7 @@ public class Constants {
     public static final String QUALIFICATION = "qualification";
     public static final String CATHEDRA = "cathedra";
     public static final String CATHEDRAS = "cathedras";
-    public static final String CATHEDRA_ID = "cathedra.id";
-    public static final String TIMETABLE = "timetable";
+    public static final String CATHEDRA_ID = "cathedraId";
     public static final String NAME = "name";
     public static final String PHYSICS = "physics";
     public static final String MEDICALS = "medicals";
@@ -35,7 +40,6 @@ public class Constants {
     public static final int ID_1_VALUE = 1;
     public static final int ID_2_VALUE = 2;
     public static final int ID_5_VALUE = 5;
-    public static final int INT_VALUE_2 = 2;
 
     public static final int JSON_SIZE_VALUE_2 = 2;
 
@@ -67,10 +71,12 @@ public class Constants {
     public static final String GROUP_3_NAME_VALUE = "CC-30";
 
     public static final LocalDate DATE_1_VALUE = LocalDate.of(2021, 4, 23);
+    public static final LocalDate DATE_2_VALUE = LocalDate.of(2021, 4, 24);
     public static final String DATE_1_VALUE_STRING = "2021-04-23";
     public static final String DATE_2_VALUE_STRING = "2021-04-24";
 
     public static final LocalTime TIME_1_VALUE = LocalTime.of(8, 0);
+    public static final LocalTime TIME_2_VALUE = LocalTime.of(10, 0);
     public static final String TIME_1_STRING_VALUE = "08:00:00";
     public static final String TIME_2_STRING_VALUE = "10:00:00";
     public static final String LECTURE_HALL_1_VALUE = "112";

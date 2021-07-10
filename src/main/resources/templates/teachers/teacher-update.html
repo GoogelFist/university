@@ -6,7 +6,7 @@
 <head th:replace="fragments/teachers-fragments :: menu-site-for-teachers"></head>
 
 <div th:fragment="update-teacher">
-    <form th:method="PATCH" th:action="@{/teachers/{id}(id=${teacher.getId()})}" th:object="${teacher}"
+    <form th:method="PATCH" th:action="@{/teachers/{id}(id=${teacherDto.getId()})}" th:object="${teacherDto}"
           class="row mb-1 m-lg-2">
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3 col-form-label">
@@ -46,12 +46,13 @@
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3">
                 <label for="inputState" class="form-label">Cathedra</label>
-                <select th:field="*{cathedra.id}" id="inputState" class="form-select">
+                <select th:field="*{cathedraId}" id="inputState" class="form-select">
                     <option th:each="cathedra : ${cathedras}"
                             th:value="${cathedra.id}"
                             th:text="${cathedra.getName()}">
                     </option>
                 </select>
+                <div style="color:red" th:if="${#fields.hasErrors('cathedraId')}" th:errors="*{cathedraId}"></div>
             </div>
         </div>
         <div class="row mb-1">

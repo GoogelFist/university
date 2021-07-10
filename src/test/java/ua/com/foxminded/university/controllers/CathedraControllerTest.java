@@ -8,7 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
-import ua.com.foxminded.university.entities.Cathedra;
+import ua.com.foxminded.university.entities.dto.CathedraDto;
 
 import static java.lang.String.format;
 import static org.hamcrest.Matchers.*;
@@ -28,15 +28,15 @@ class CathedraControllerTest {
 
     private static final String GET_BY_ID_URL_TEMPLATE = "/cathedras/1";
     private static final String GET_BY_ID_VIEW_NAME = "/cathedras/cathedra-info";
-    private static final String GET_BY_ID_PROPERTY_NAME = "cathedra";
+    private static final String GET_BY_ID_PROPERTY_NAME = "cathedraDto";
 
     private static final String GET_NEW_CATHEDRA_URL_TEMPLATE = "/cathedras/new";
-    private static final String GET_NEW_CATHEDRA_PROPERTY_NAME = "cathedra";
-    private static final String GET_NEW_CATHEDRA_VIEW_NAME = "/cathedras/new-cathedra";
+    private static final String GET_NEW_CATHEDRA_PROPERTY_NAME = "cathedraDto";
+    private static final String GET_NEW_CATHEDRA_VIEW_NAME = "/cathedras/cathedra-new";
     private static final String POST_NEW_CATHEDRA_URL_TEMPLATE = "/cathedras/";
 
     private static final String GET_EDIT_CATHEDRA_URL_TEMPLATE = "/cathedras/1/edit";
-    private static final String GET_EDIT_CATHEDRA_PROPERTY_NAME = "cathedra";
+    private static final String GET_EDIT_CATHEDRA_PROPERTY_NAME = "cathedraDto";
     private static final String GET_EDIT_CATHEDRA_VIEW_NAME = "/cathedras/cathedra-update";
     private static final String POST_EDIT_CATHEDRA_URL_TEMPLATE = "/cathedras/1";
 
@@ -179,10 +179,12 @@ class CathedraControllerTest {
 
     @Test
     void shouldReturnCorrectedStudentAttributesWhenGetCathedraById() throws Exception {
-        Cathedra cathedra = new Cathedra(ID_1_VALUE, PHYSICS);
+        CathedraDto cathedraDto = new CathedraDto();
+        cathedraDto.setId(ID_1_VALUE);
+        cathedraDto.setName(CATHEDRA_1_NAME_VALUE);
 
         mockMvc.perform(get(GET_BY_ID_URL_TEMPLATE))
             .andExpect(status().isOk())
-            .andExpect(model().attribute(GET_BY_ID_PROPERTY_NAME, equalTo(cathedra)));
+            .andExpect(model().attribute(GET_BY_ID_PROPERTY_NAME, equalTo(cathedraDto)));
     }
 }

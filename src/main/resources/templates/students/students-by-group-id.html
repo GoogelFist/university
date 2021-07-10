@@ -15,10 +15,10 @@
     </tr>
     </thead>
     <tbody>
-    <tr th:each="student: ${studentsByGroupId}">
+    <tr th:each="student: ${students}">
         <td th:text="${student.getFirstName()}"></td>
         <td th:text="${student.getLastName()}"></td>
-        <td th:text="${student.getGroup().getName()}"></td>
+        <td th:text="${student.getGroupName()}"></td>
         <td>
             <a class="btn btn-outline-primary"
                th:href="@{/students/{id}(id = ${student.getId()})}"

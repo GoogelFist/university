@@ -5,7 +5,31 @@
 
 <div th:replace="fragments/groups-fragments :: menu-site-for-groups"></div>
 
-<div th:replace="fragments/groups-fragments :: groups-by-cathedra"></div>
+<div th:fragment="groups-by-cathedra">
+    <table aria-label="Groups table" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Cathedra</th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="group: ${groups}">
+            <td th:text="${group.getName()}"></td>
+            <td th:text="${group.getCathedraName()}"></td>
+            <td>
+                <a th:href="@{/students/by-group/{groupId}(groupId = ${group.getId()})}"
+                   class="btn btn-outline-primary"
+                   role="button">Show students</a>
+                <a th:href="@{/groups/{id}(id = ${group.getId()})}"
+                   class="btn btn-outline-primary"
+                   role="button">Info</a>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
 <div th:replace="fragments/groups-fragments :: groups-by-cathedra-pagination"></div>
 

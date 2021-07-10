@@ -5,7 +5,44 @@
 
 <div th:replace="fragments/groups-fragments :: menu-site-for-groups"></div>
 
-<div th:replace="fragments/groups-fragments :: all-groups"></div>
+<div th:fragment="all-groups">
+    <table aria-label="Groups table" class="table table-striped">
+        <thead>
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Cathedra</th>
+            <th scope="col">
+                <a th:href="@{/groups/new}"
+                   type="button"
+                   class="btn btn-outline-primary">New group
+                </a>
+            </th>
+            <th scope="col"></th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="group: ${groups}">
+            <td th:text="${group.getName()}"></td>
+            <td th:text="${group.getCathedraName()}"></td>
+            <td></td>
+            <td class="d-flex flex-row text-nowrap bd-highlight">
+                <a th:href="@{/students/by-group/{groupId}(groupId = ${group.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Students</a>
+                <a th:href="@{/groups/{id}(id = ${group.getId()})}"
+                   class="btn btn-outline-primary ms-3"
+                   role="button">Info</a>
+                <a th:href="@{/groups/{id}/edit(id = ${group.getId()})}"
+                   class="btn btn-outline-primary ms-1"
+                   role="button">Edit</a>
+                <form th:method="DELETE" th:action="@{/groups/{id}(id=${group.getId()})}" class="input-group ms-1">
+                    <input type="submit" class="btn btn-outline-primary" value="Delete"/>
+                </form>
+            </td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 
 <div th:replace="fragments/groups-fragments :: groups-pagination"></div>
 

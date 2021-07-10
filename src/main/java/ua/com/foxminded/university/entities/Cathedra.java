@@ -37,9 +37,4 @@ public class Cathedra {
     @OneToMany(mappedBy = "cathedra")
     @JsonIgnore
     private List<Teacher> teachers;
-
-    public Cathedra(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
 }

@@ -3,13 +3,16 @@ package ua.com.foxminded.university.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ua.com.foxminded.university.entities.Teacher;
-
-import java.util.List;
+import ua.com.foxminded.university.entities.dto.TeacherDto;
 
 public interface TeacherService extends GenericServiceJpa<Teacher> {
-    Page<Teacher> getAll(Pageable pageable);
+    Page<TeacherDto> getAllDto(Pageable pageable);
 
-    List<Teacher> getByCathedraId(int cathedraId);
+    Page<TeacherDto> getDtoByCathedraId(int id, Pageable pageable);
 
-    Page<Teacher> getByCathedraId(int cathedraId, Pageable pageable);
+    TeacherDto getDtoById(int id);
+
+    void createDto(TeacherDto teacherDto);
+
+    void updateDto(TeacherDto teacherDto);
 }

@@ -9,12 +9,15 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
+import ua.com.foxminded.university.entities.Cathedra;
 import ua.com.foxminded.university.entities.Group;
+import ua.com.foxminded.university.entities.dto.GroupDto;
 import ua.com.foxminded.university.repository.GroupRepository;
 
 import javax.persistence.EntityNotFoundException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static java.lang.String.format;
 import static java.util.Collections.singletonList;
@@ -31,12 +34,26 @@ class GroupServiceImplTest {
 
     private GroupService groupService;
     private Group group;
+    private GroupDto groupDto;
     private List<Group> groups;
 
     @BeforeEach
     void setUp() {
+        Cathedra cathedra = new Cathedra();
+        cathedra.setId(ID_1_VALUE);
+        cathedra.setName(CATHEDRA_1_NAME_VALUE);
+
         groupService = new GroupServiceImpl(mockGroupRepository);
-        group = new Group(ID_1_VALUE, GROUP_1_NAME_VALUE);
+
+        group = new Group();
+        group.setName(GROUP_1_NAME_VALUE);
+        group.setCathedra(cathedra);
+
+        groupDto = new GroupDto();
+        groupDto.setName(GROUP_1_NAME_VALUE);
+        groupDto.setCathedraId(ID_1_VALUE);
+        groupDto.setCathedraName(CATHEDRA_1_NAME_VALUE);
+
         groups = singletonList(group);
     }
 
@@ -67,21 +84,6 @@ class GroupServiceImplTest {
     }
 
     @Test
-    void shouldCallGetAllGroupsPageable() {
-        Pageable pageable = PageRequest.of(PAGE, SIZE);
-        groups = new ArrayList<>();
-        groups.add(new Group(ID_1_VALUE, GROUP_1_NAME_VALUE));
-        Page<Group> expectedPageGroups = new PageImpl<>(groups, pageable, groups.size());
-
-        when(mockGroupRepository.findAll(pageable)).thenReturn(expectedPageGroups);
-
-        Page<Group> actualPageGroups = groupService.getAll(pageable);
-
-        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll(pageable);
-        assertEquals(expectedPageGroups, actualPageGroups);
-    }
-
-    @Test
     void shouldCallUpdateGroup() {
         groupService.update(group);
 
@@ -96,31 +98,62 @@ class GroupServiceImplTest {
     }
 
     @Test
-    void shouldCallGetGroupsByCathedraId() {
-        when(mockGroupRepository.findByCathedraId(ID_1_VALUE)).thenReturn(groups);
-        List<Group> actualGroups = groupService.getByCathedraId(ID_1_VALUE);
+    void shouldCallGetAllDtoGroupsPageable() {
+        Pageable pageable = PageRequest.of(PAGE, SIZE);
 
-        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findByCathedraId(ID_1_VALUE);
-        assertEquals(groups, actualGroups);
+        Page<Group> groupPage = new PageImpl<>(groups, pageable, groups.size());
+        when(mockGroupRepository.findAll(pageable)).thenReturn(groupPage);
+
+        List<GroupDto> groupsDto = new ArrayList<>();
+        groupsDto.add(groupDto);
+        Page<GroupDto> expectedGroupsDtoPage = new PageImpl<>(groupsDto, pageable, groupsDto.size());
+
+        Page<GroupDto> actualGroupsDtoPage = groupService.getAllDto(pageable);
+
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll(pageable);
+        assertEquals(expectedGroupsDtoPage, actualGroupsDtoPage);
     }
 
     @Test
-    void shouldCallGetGroupsByCathedraIdPageable() {
+    void shouldCallGetAllDtoGroupsByCathedraIdPageable() {
         Pageable pageable = PageRequest.of(PAGE, SIZE);
-        groups = new ArrayList<>();
-        groups.add(new Group(ID_1_VALUE, GROUP_1_NAME_VALUE));
-        Page<Group> expectedPageGroups = new PageImpl<>(groups, pageable, groups.size());
 
-        when(mockGroupRepository.findByCathedraId(ID_1_VALUE, pageable)).thenReturn(expectedPageGroups);
+        Page<Group> groupPage = new PageImpl<>(groups, pageable, groups.size());
+        when(mockGroupRepository.findByCathedraId(ID_1_VALUE, pageable)).thenReturn(groupPage);
 
-        Page<Group> actualPageStudents = groupService.getByCathedraId(ID_1_VALUE, pageable);
+        List<GroupDto> groupsDto = new ArrayList<>();
+        groupsDto.add(groupDto);
+        Page<GroupDto> expectedGroupsDtoPage = new PageImpl<>(groupsDto, pageable, groupsDto.size());
+
+        Page<GroupDto> actualGroupsDtoPage = groupService.getDtoByCathedraId(ID_1_VALUE, pageable);
 
         verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findByCathedraId(ID_1_VALUE, pageable);
-        assertEquals(expectedPageGroups, actualPageStudents);
+        assertEquals(expectedGroupsDtoPage, actualGroupsDtoPage);
     }
 
     @Test
-    void shouldThrowServiceExceptionWhenCantGetByGroupId() {
+    void shouldCallGetDtoGroupById() {
+        when(mockGroupRepository.findById(ID_1_VALUE)).thenReturn(Optional.ofNullable(group));
+        GroupDto actualGroupDto = groupService.getDtoById(ID_1_VALUE);
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findById(ID_1_VALUE);
+
+        assertEquals(groupDto, actualGroupDto);
+    }
+
+    @Test
+    void shouldCallCreateDtoGroup() {
+        groupService.createDto(groupDto);
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).save(group);
+    }
+
+    @Test
+    void shouldCallUpdateDtoGroup() {
+        groupService.updateDto(groupDto);
+        verify(mockGroupRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).save(group);
+    }
+
+    @Test
+    void shouldThrowEntityNotFoundExceptionWhenCantGetByGroupId() {
         String message = format(ENTITY_NOT_FOUND, GROUP);
         doThrow(new EntityNotFoundException(message)).when(mockGroupRepository).findById(ID_5_VALUE);
 

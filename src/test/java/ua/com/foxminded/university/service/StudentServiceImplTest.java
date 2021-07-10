@@ -9,7 +9,9 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.TestPropertySource;
+import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.Student;
+import ua.com.foxminded.university.entities.dto.StudentDto;
 import ua.com.foxminded.university.repository.StudentRepository;
 
 import javax.persistence.EntityNotFoundException;
@@ -32,12 +34,30 @@ class StudentServiceImplTest {
 
     private StudentService studentService;
     private Student student;
+    private StudentDto studentDto;
     private List<Student> students;
 
     @BeforeEach
     void setUp() {
+        Group group = new Group();
+        group.setId(ID_1_VALUE);
+        group.setName(GROUP_1_NAME_VALUE);
+
         studentService = new StudentServiceImpl(mockStudentRepository);
-        student = new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE);
+
+        student = new Student();
+        student.setFirstName(STUDENT_1_FIRST_NAME_VALUE);
+        student.setLastName(STUDENT_1_LAST_NAME_VALUE);
+        student.setPhone(STUDENT_1_PHONE_VALUE);
+        student.setGroup(group);
+
+        studentDto = new StudentDto();
+        studentDto.setFirstName(STUDENT_1_FIRST_NAME_VALUE);
+        studentDto.setLastName(STUDENT_1_LAST_NAME_VALUE);
+        studentDto.setPhone(STUDENT_1_PHONE_VALUE);
+        studentDto.setGroupId(ID_1_VALUE);
+        studentDto.setGroupName(GROUP_1_NAME_VALUE);
+
         students = singletonList(student);
     }
 
@@ -68,21 +88,6 @@ class StudentServiceImplTest {
     }
 
     @Test
-    void shouldCallGetAllStudentsPageable() {
-        Pageable pageable = PageRequest.of(PAGE, SIZE);
-        students = new ArrayList<>();
-        students.add(new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE));
-        Page<Student> expectedPageStudents = new PageImpl<>(students, pageable, students.size());
-
-        when(mockStudentRepository.findAll(pageable)).thenReturn(expectedPageStudents);
-
-        Page<Student> actualPageStudents = studentService.getAll(pageable);
-
-        verify(mockStudentRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll(pageable);
-        assertEquals(expectedPageStudents, actualPageStudents);
-    }
-
-    @Test
     void shouldCallUpdateStudent() {
         studentService.update(student);
 
@@ -97,27 +102,58 @@ class StudentServiceImplTest {
     }
 
     @Test
-    void shouldCallGetStudentsByGroupId() {
-        when(mockStudentRepository.findByGroupId(ID_1_VALUE)).thenReturn(students);
-        List<Student> actualStudents = studentService.getByGroupId(ID_1_VALUE);
+    void shouldCallGetAllDtoStudentsPageable() {
+        Pageable pageable = PageRequest.of(PAGE, SIZE);
 
-        verify(mockStudentRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findByGroupId(ID_1_VALUE);
-        assertEquals(students, actualStudents);
+        Page<Student> studentPage = new PageImpl<>(students, pageable, students.size());
+        when(mockStudentRepository.findAll(pageable)).thenReturn(studentPage);
+
+        List<StudentDto> studentsDto = new ArrayList<>();
+        studentsDto.add(studentDto);
+        Page<StudentDto> expectedStudentsDtoPage = new PageImpl<>(studentsDto, pageable, studentsDto.size());
+
+        Page<StudentDto> actualStudentsDtoPage = studentService.getAllDto(pageable);
+
+        verify(mockStudentRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findAll(pageable);
+        assertEquals(expectedStudentsDtoPage, actualStudentsDtoPage);
     }
 
     @Test
-    void shouldCallGetStudentsByGroupIdPageable() {
+    void shouldCallGetAllDtoStudentsByCathedraIdPageable() {
         Pageable pageable = PageRequest.of(PAGE, SIZE);
-        students = new ArrayList<>();
-        students.add(new Student(ID_1_VALUE, STUDENT_1_FIRST_NAME_VALUE, STUDENT_1_LAST_NAME_VALUE, STUDENT_1_PHONE_VALUE));
-        Page<Student> expectedPageStudents = new PageImpl<>(students, pageable, students.size());
 
-        when(mockStudentRepository.findByGroupId(ID_1_VALUE, pageable)).thenReturn(expectedPageStudents);
+        Page<Student> studentPage = new PageImpl<>(students, pageable, students.size());
+        when(mockStudentRepository.findByGroupId(ID_1_VALUE, pageable)).thenReturn(studentPage);
 
-        Page<Student> actualPageStudents = studentService.getByGroupId(ID_1_VALUE, pageable);
+        List<StudentDto> studentsDto = new ArrayList<>();
+        studentsDto.add(studentDto);
+        Page<StudentDto> expectedStudentsDtoPage = new PageImpl<>(studentsDto, pageable, studentsDto.size());
+
+        Page<StudentDto> actualStudentsDtoPage = studentService.getDtoByGroupId(ID_1_VALUE, pageable);
 
         verify(mockStudentRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findByGroupId(ID_1_VALUE, pageable);
-        assertEquals(expectedPageStudents, actualPageStudents);
+        assertEquals(expectedStudentsDtoPage, actualStudentsDtoPage);
+    }
+
+    @Test
+    void shouldCallGetDtoStudentById() {
+        when(mockStudentRepository.findById(ID_1_VALUE)).thenReturn(Optional.ofNullable(student));
+        StudentDto actualStudentDto = studentService.getDtoById(ID_1_VALUE);
+        verify(mockStudentRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).findById(ID_1_VALUE);
+
+        assertEquals(studentDto, actualStudentDto);
+    }
+
+    @Test
+    void shouldCallCreateDtoStudent() {
+        studentService.createDto(studentDto);
+        verify(mockStudentRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).save(student);
+    }
+
+    @Test
+    void shouldCallUpdateDtoStudent() {
+        studentService.updateDto(studentDto);
+        verify(mockStudentRepository, times(NUMBER_OF_INVOCATIONS_VALUE)).save(student);
     }
 
     @Test

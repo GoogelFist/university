@@ -3,13 +3,16 @@ package ua.com.foxminded.university.service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import ua.com.foxminded.university.entities.Student;
-
-import java.util.List;
+import ua.com.foxminded.university.entities.dto.StudentDto;
 
 public interface StudentService extends GenericServiceJpa<Student> {
-    Page<Student> getAll(Pageable pageable);
+    Page<StudentDto> getAllDto(Pageable pageable);
 
-    List<Student> getByGroupId(int groupId);
+    Page<StudentDto> getDtoByGroupId(int id, Pageable pageable);
 
-    Page<Student> getByGroupId(int groupId, Pageable pageable);
+    StudentDto getDtoById(int id);
+
+    void createDto(StudentDto studentDto);
+
+    void updateDto(StudentDto studentDto);
 }

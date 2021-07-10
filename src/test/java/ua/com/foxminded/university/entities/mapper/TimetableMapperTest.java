@@ -6,8 +6,8 @@ import ua.com.foxminded.university.entities.Group;
 import ua.com.foxminded.university.entities.Teacher;
 import ua.com.foxminded.university.entities.Timetable;
 import ua.com.foxminded.university.entities.dto.TimetableDto;
-import ua.com.foxminded.university.entities.dto.TimetableDtoRequest;
-import ua.com.foxminded.university.entities.dto.TimetableDtoResponse;
+import ua.com.foxminded.university.entities.dto.rest.TimetableDtoRequest;
+import ua.com.foxminded.university.entities.dto.rest.TimetableDtoResponse;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static ua.com.foxminded.university.utils.Constants.*;
@@ -29,7 +29,6 @@ class TimetableMapperTest {
         group.setId(ID_1_VALUE);
         group.setName(GROUP_1_NAME_VALUE);
 
-        timetable.setId(ID_0_VALUE);
         timetable.setDate(DATE_1_VALUE);
         timetable.setStartTime(TIME_1_VALUE);
         timetable.setLectureHall(LECTURE_HALL_1_VALUE);

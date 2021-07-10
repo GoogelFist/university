@@ -63,28 +63,28 @@
 
 <div th:fragment="teacher-by-cathedra-pagination">
     <nav aria-label="Page navigation example">
-        <ul th:if="${teachersByCathedraId.totalPages > 1}" class="pagination">
-            <li th:if="${teachersByCathedraId.isFirst()}" class="page-item disabled"><a class="page-link" href="">Previous</a>
+        <ul th:if="${teachers.totalPages > 1}" class="pagination">
+            <li th:if="${teachers.isFirst()}" class="page-item disabled"><a class="page-link" href="">Previous</a>
             </li>
-            <li th:unless="${teachersByCathedraId.isFirst()}" class="page-item">
-                <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachersByCathedraId.size}, page=${teachersByCathedraId.previousPageable().getPageNumber()})}"
+            <li th:unless="${teachers.isFirst()}" class="page-item">
+                <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachers.size}, page=${teachers.previousPageable().getPageNumber()})}"
                    class="page-link">Previous</a>
             </li>
             <div th:each="pageNumber : ${pageNumbers}" class="page-item">
-                <li th:if="${pageNumber - 1 == teachersByCathedraId.number}" class="page-item active"
+                <li th:if="${pageNumber - 1 == teachers.number}" class="page-item active"
                     aria-current="page">
-                    <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachersByCathedraId.size}, page=${pageNumber - 1})}"
+                    <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachers.size}, page=${pageNumber - 1})}"
                        th:text="${pageNumber}" class="page-link">1</a>
                 </li>
-                <li th:unless="${pageNumber - 1 == teachersByCathedraId.number}" class="page-item">
-                    <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachersByCathedraId.size}, page=${pageNumber - 1})}"
+                <li th:unless="${pageNumber - 1 == teachers.number}" class="page-item">
+                    <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachers.size}, page=${pageNumber - 1})}"
                        th:text="${pageNumber}" class="page-link">1</a>
                 </li>
             </div>
-            <li th:if="${teachersByCathedraId.isLast()}" class="page-item disabled"><a class="page-link"
+            <li th:if="${teachers.isLast()}" class="page-item disabled"><a class="page-link"
                                                                                        href="#">Next</a></li>
-            <li th:unless="${teachersByCathedraId.isLast()}" class="page-item">
-                <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachersByCathedraId.size}, page=${teachersByCathedraId.nextPageable().getPageNumber()})}"
+            <li th:unless="${teachers.isLast()}" class="page-item">
+                <a th:href="@{/teachers/by_cathedra/{cathedraId}(cathedraId=${cathedraId}, size=${teachers.size}, page=${teachers.nextPageable().getPageNumber()})}"
                    class="page-link">Next</a>
             </li>
         </ul>

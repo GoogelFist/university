@@ -6,7 +6,7 @@
 <div th:replace="fragments/students-fragments :: menu-site-for-students"></div>
 
 <div th:fragment="update-student">
-    <form th:method="PATCH" th:action="@{/students/{id}(id=${student.getId()})}" th:object="${student}"
+    <form th:method="PATCH" th:action="@{/students/{id}(id=${studentDto.getId()})}" th:object="${studentDto}"
           class="row mb-1 m-lg-2">
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3 col-form-label">
@@ -36,12 +36,13 @@
         <div class="row mb-1 col-form-label">
             <div class="col-sm-3">
                 <label for="inputState" class="form-label">Group</label>
-                <select th:field="*{group.id}" id="inputState" class="form-select">
+                <select th:field="*{groupId}" id="inputState" class="form-select">
                     <option th:each="group : ${groups}"
                             th:value="${group.id}"
                             th:text="${group.getName()}">
                     </option>
                 </select>
+                <div style="color:red" th:if="${#fields.hasErrors('groupId')}" th:errors="*{groupId}"></div>
             </div>
         </div>
         <div class="row mb-1">
