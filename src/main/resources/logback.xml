@@ -43,7 +43,7 @@
         </rollingPolicy>
     </appender>
 
-    <logger name="ua.com.foxminded.university.service" level="DEBUG">
+    <logger name="com.github.googelfist.university.service" level="DEBUG">
         <appender-ref ref="Service-File"/>
     </logger>
 
